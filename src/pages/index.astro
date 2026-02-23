@@ -27,7 +27,7 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
   <body>
     <header>
       <div class="container">
-        <h1>LUFS Audio Catalog</h1>
+        <a href="/" class="site-title">LUFS Catalog</a>
         <nav class="legend">
           <button class="legend-item active" data-filter="all">All</button>
           {allProjects.map(project => (
@@ -166,6 +166,17 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
         border-bottom: 1px solid var(--color-border);
         padding: 1rem 0;
         z-index: 900;
+      }
+      
+      .site-title {
+        font-size: 1.5rem;
+        color: var(--color-teal);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      
+      .site-title:hover {
+        color: var(--color-text);
       }
       
       h1 {

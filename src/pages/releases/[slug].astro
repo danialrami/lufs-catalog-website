@@ -1,6 +1,8 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import PlayerBar from '../../components/player/PlayerBar.svelte';
+import '../../styles/tokens.css';
+import '../../styles/global.css';
 
 export async function getStaticPaths() {
   const releases = await getCollection('releases');
@@ -21,10 +23,139 @@ const { release } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <title>{release.data.title} — LUFS Audio Catalog</title>
-    
-    <link rel="stylesheet" href="/styles/tokens.css" />
-    <link rel="stylesheet" href="/styles/global.css" />
-    
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <a href="/" class="back-link">← Back to Catalog</a>
+        
+        <h1>{release.data.title}</h1>
+        
+        <div class="release-meta">
+          <span class="badge-project">{release.data.project}</span>
+          
+          {release.data.artist && (
+            <span class="artist">{release.data.artist}</span>
+          )}
+          
+          {release.data.isrc && (
+            <span class="badge-catalog">ISRC: {release.data.isrc}</span>
+          )}
+          
+          <span class="release-date">
+            Released: {new Date(release.data.releaseDate).toLocaleDateString()}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      {release.data.coverArt && (
+        <img 
+          src={release.data.coverArt} 
+          alt={`${release.data.title} cover art`}
+          class="cover-art"
+        />
+      )}
+
+      <section class="track-list">
+        <h2>Tracks</h2>
+        
+        {release.data.tracks.length > 0 ? (
+          <div class="tracks">
+            {release.data.tracks.map((track) => (
+              <div class="track-row">
+                <div class="track-info">
+                  <span class="track-number">{track.trackNumber}</span>
+                  <button 
+                    class="track-play-btn play-button"
+                    data-audio-path={track.audioPath}
+                    data-track-title={track.displayTitle}
+                    aria-label={`Play ${track.displayTitle}`}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" fill="#78BEBA"/>
+                    </svg>
+                  </button>
+                  <div class="track-details">
+                    <span class="track-title">{track.displayTitle}</span>
+                    <span class="track-meta">
+                      {track.catalogNumber && <span class="catalog-number">{track.catalogNumber}</span>}
+                      {track.saturation && <span class="saturation">Sat: {track.saturation}</span>}
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="track-actions">
+                  {track.finalReport && (
+                    <a href={track.finalReport} target="_blank" class="report-link">
+                      View Report
+                    </a>
+                  )}
+                  {track.renderStatsPath && (
+                    <a href={track.renderStatsPath} target="_blank" class="report-link">
+                      Render Stats
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No tracks available yet.</p>
+        )}
+      </section>
+
+      {release.data.streamingLinks && (
+        <section class="streaming-links">
+          <h2>Stream On</h2>
+          <div class="links">
+            {release.data.streamingLinks.spotify && (
+              <a href={release.data.streamingLinks.spotify} target="_blank" class="stream-link spotify">
+                Spotify
+              </a>
+            )}
+            {release.data.streamingLinks.appleMusic && (
+              <a href={release.data.streamingLinks.appleMusic} target="_blank" class="stream-link apple">
+                Apple Music
+              </a>
+            )}
+            {release.data.streamingLinks.bandcamp && (
+              <a href={release.data.streamingLinks.bandcamp} target="_blank" class="stream-link bandcamp">
+                Bandcamp
+              </a>
+            )}
+            {release.data.streamingLinks.soundcloud && (
+              <a href={release.data.streamingLinks.soundcloud} target="_blank" class="stream-link soundcloud">
+                SoundCloud
+              </a>
+            )}
+          </div>
+        </section>
+      )}
+    </main>
+
+    <footer>
+      <PlayerBar client:only="svelte" />
+    </footer>
+
+    <script>
+      // Track play buttons - dispatch to player store
+      document.querySelectorAll('.track-play-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const audioPath = (btn as HTMLElement).dataset.audioPath;
+          const trackTitle = (btn as HTMLElement).dataset.trackTitle;
+          
+          console.log('Play clicked:', audioPath, trackTitle);
+          
+          // Dispatch custom event for player
+          window.dispatchEvent(new CustomEvent('play-track', {
+            detail: { audioPath, trackTitle }
+          }));
+        });
+      });
+    </script>
+
     <style>
       :root {
         --color-bg: #111111;
@@ -38,6 +169,7 @@ const { release } = Astro.props;
         --color-blue: #2069AF;
         --color-border: rgba(251, 249, 226, 0.08);
         --player-height: 72px;
+        --font-mono: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
       }
       
       * { box-sizing: border-box; }
@@ -51,33 +183,46 @@ const { release } = Astro.props;
       }
       
       .container {
-        max-width: 1000px;
+        max-width: 900px;
         margin: 0 auto;
         padding: 0 1.5rem;
+        padding-bottom: calc(var(--player-height) + 2rem);
       }
       
       header {
-        border-bottom: 1px solid var(--color-border);
         padding: 2rem 0 1rem;
       }
       
+      .back-link {
+        color: var(--color-teal);
+        text-decoration: none;
+        font-size: 0.875rem;
+      }
+      
+      .back-link:hover {
+        text-decoration: underline;
+      }
+      
       h1 {
-        margin: 0 0 0.5rem 0;
+        margin: 1rem 0 0.5rem 0;
         font-size: 2.5rem;
+        color: var(--color-text);
+      }
+      
+      h2 {
+        margin: 2rem 0 1rem 0;
+        font-size: 1.25rem;
+        color: var(--color-text);
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 0.5rem;
       }
       
       .release-meta {
         display: flex;
-        gap: 1.5rem;
-        margin-top: 1rem;
+        gap: 1rem;
         flex-wrap: wrap;
-      }
-      
-      .badge-catalog {
-        background-color: var(--color-yellow);
-        color: #111;
-        padding: 0.25rem 0.75rem;
-        border-radius: 2px;
+        align-items: center;
+        margin-top: 1rem;
       }
       
       .badge-project {
@@ -85,18 +230,30 @@ const { release } = Astro.props;
         color: #fff;
         padding: 0.25rem 0.75rem;
         border-radius: 2px;
+        font-size: 0.75rem;
       }
       
-      .badge-status {
-        background-color: var(--color-red);
-        color: #fff;
+      .badge-catalog {
+        background-color: var(--color-yellow);
+        color: #111;
         padding: 0.25rem 0.75rem;
         border-radius: 2px;
+        font-size: 0.75rem;
+        font-family: var(--font-mono);
+      }
+      
+      .artist {
+        color: var(--color-text-muted);
+      }
+      
+      .release-date {
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
       }
       
       .cover-art {
         width: 100%;
-        max-width: 500px;
+        max-width: 400px;
         height: auto;
         border-radius: 4px;
         margin-top: 1.5rem;
@@ -106,17 +263,128 @@ const { release } = Astro.props;
         margin-top: 2rem;
       }
       
-      .nav-links {
+      .tracks {
         display: flex;
-        justify-content: space-between;
-        margin-top: 2rem;
-        padding-top: 1rem;
-        border-top: 1px solid var(--color-border);
+        flex-direction: column;
+        gap: 0.5rem;
       }
       
-      .nav-link {
+      .track-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: var(--color-surface);
+        border-radius: 4px;
+        gap: 1rem;
+      }
+      
+      .track-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+      }
+      
+      .track-number {
+        color: var(--color-text-muted);
+        font-family: var(--font-mono);
+        width: 1.5rem;
+      }
+      
+      .track-play-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: var(--color-surface-2);
+        transition: background-color 0.2s;
+      }
+      
+      .track-play-btn:hover {
+        background-color: var(--color-teal);
+      }
+      
+      .track-play-btn:hover svg path {
+        fill: #111;
+      }
+      
+      .track-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      
+      .track-title {
+        font-weight: 600;
+      }
+      
+      .track-meta {
+        display: flex;
+        gap: 0.75rem;
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+        font-family: var(--font-mono);
+      }
+      
+      .track-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+      
+      .report-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        background-color: var(--color-surface-2);
         color: var(--color-teal);
+        border-radius: 2px;
         text-decoration: none;
+      }
+      
+      .report-link:hover {
+        background-color: var(--color-teal);
+        color: #111;
+      }
+      
+      .streaming-links {
+        margin-top: 2rem;
+      }
+      
+      .links {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      
+      .stream-link {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      
+      .stream-link.spotify {
+        background-color: #1DB954;
+        color: #000;
+      }
+      
+      .stream-link.apple {
+        background-color: #FA243C;
+        color: #fff;
+      }
+      
+      .stream-link.bandcamp {
+        background-color: #629AA9;
+        color: #fff;
+      }
+      
+      .stream-link.soundcloud {
+        background-color: #FF5500;
+        color: #fff;
       }
       
       footer {
@@ -126,63 +394,5 @@ const { release } = Astro.props;
         right: 0;
       }
     </style>
-  </head>
-  <body>
-    <header class="container">
-      <h1>{release.data.title}</h1>
-      
-      <div class="release-meta">
-        {release.data.status !== 'released' && (
-          <span class="badge-status">{release.data.status}</span>
-        )}
-        
-        {release.data.project && (
-          <span class="badge-project">{release.data.project}</span>
-        )}
-        
-        {release.data.isrc && (
-          <span class="badge-catalog" style="margin-left: 0.5rem;">{release.data.isrc}</span>
-        )}
-        
-        <span style="color: var(--color-text-muted); margin-left: 0.5rem;">
-          Release Date: {new Date(release.data.releaseDate).toLocaleDateString()}
-        </span>
-        
-        {release.data.catalogNumber && (
-          <span class="badge-catalog">{release.data.catalogNumber}</span>
-        )}
-      </div>
-      
-      {release.data.coverArt && (
-        <img 
-          src={release.data.coverArt} 
-          alt="{release.data.title} cover art"
-          class="cover-art"
-        />
-      )}
-    </header>
-
-    <main class="container">
-      <section class="track-list">
-        {release.data.tracks.length > 0 ? (
-          <div>
-            <h3>Tracks</h3>
-            <p>{release.data.tracks.length} track{release.data.tracks.length !== 1 ? 's' : ''}</p>
-          </div>
-        ) : (
-          <p>No tracks available yet.</p>
-        )}
-      </section>
-
-      <div class="nav-links">
-        {release.data.tracks.length > 0 && (
-          <a href="/" class="nav-link">Back to Catalog</a>
-        )}
-      </div>
-    </main>
-
-    <footer>
-      <PlayerBar client:only="svelte" />
-    </footer>
   </body>
 </html>
