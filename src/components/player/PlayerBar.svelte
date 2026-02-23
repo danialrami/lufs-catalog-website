@@ -1,17 +1,15 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { Howl } from 'howler';
   import type { Track } from './playerStore';
   import { persistedTrack, persistedVolume } from './playerStore';
+  import * as audioManager from './audioManager';
 
-  // Player state
   let currentTrack: Track | null = null;
   let isPlaying = false;
   let duration = 0;
   let position = 0;
   let volume = 0.8;
   
-  let howl: Howl | null = null;
   let progressFill: HTMLElement;
   let timeCurrent: HTMLElement;
   let timeTotal: HTMLElement;
@@ -21,135 +19,46 @@
   let isDraggingVolume = false;
   let isRestoring = false;
 
-  // Restore playback after page navigation
-  function restorePlayback() {
-    const saved = persistedTrack.get();
-    const savedVolume = persistedVolume.get();
-    
-    if (saved && saved.audioPath && !isRestoring) {
-      isRestoring = true;
-      
-      // Restore volume
-      volume = savedVolume;
-      if (howl) {
-        howl.volume(volume);
-      }
-      if (volumeFill) {
-        volumeFill.style.width = (volume * 100) + '%';
-      }
-      
-      // Restore track and position
-      const track: Track = {
-        trackNumber: 0,
-        displayTitle: saved.audioPath.split('/').pop() || 'Restored Track',
-        filename: '',
-        catalogNumber: '',
-        sha256: '',
-        processedDate: new Date().toISOString(),
-        audioPath: saved.audioPath,
-        finalReport: '',
-        duration: 0,
-        artwork: {}
-      };
-      
-      loadAndPlay(track, saved.position);
-      isRestoring = false;
+  function updateTimeDisplay() {
+    if (timeCurrent) {
+      timeCurrent.textContent = formatTime(position);
+    }
+    if (timeTotal) {
+      timeTotal.textContent = '/' + formatTime(duration);
     }
   }
 
-  // Listen for astro:page-load to restore after navigation
-  onMount(() => {
-    if (typeof window !== 'undefined') {
-      // Restore volume from persistent store
-      volume = persistedVolume.get();
-      if (volumeFill) {
-        volumeFill.style.width = (volume * 100) + '%';
-      }
-      
-      // Try to restore playback from previous session
-      restorePlayback();
-      
-      // Listen for page loads (including initial and after navigation)
-      document.addEventListener('astro:page-load', restorePlayback);
-      
-      window.addEventListener('play-track', handlePlayTrack as EventListener);
-    }
-    
-    // Update volume display on mount
-    if (volumeFill) {
-      volumeFill.style.width = (volume * 100) + '%';
-    }
-  });
+  function formatTime(seconds: number): string {
+    if (!seconds || !isFinite(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
 
-  onDestroy(() => {
-    if (typeof window !== 'undefined') {
-      document.removeEventListener('astro:page-load', restorePlayback);
-      window.removeEventListener('play-track', handlePlayTrack as EventListener);
-    }
-    if (howl) {
-      howl.stop();
-      howl.unload();
-    }
+  function startProgressLoop() {
+    const tick = () => {
+      if (audioManager.isPlaying()) {
+        position = audioManager.getPosition();
+        
+        if (currentTrack) {
+          persistedTrack.set({ audioPath: currentTrack.audioPath, position });
+        }
+        
+        if (progressFill && duration > 0) {
+          progressFill.style.width = (position / duration * 100) + '%';
+        }
+        
+        updateTimeDisplay();
+        animationId = requestAnimationFrame(tick);
+      }
+    };
+    
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
-  });
-
-  // Modified loadAndPlay to accept optional start position
-  function loadAndPlay(track: Track, startPosition: number = 0) {
-    // Stop current playback
-    if (howl) {
-      howl.stop();
-      howl.unload();
-    }
-    
-    currentTrack = track;
-    isPlaying = true;
-    position = startPosition;
-    duration = 0;
-    
-    // Save to persistent store
-    persistedTrack.set({ audioPath: track.audioPath, position: startPosition });
-    
-    // Create new Howl
-    howl = new Howl({
-      src: [track.audioPath],
-      html5: true,
-      format: ['mp3'],
-      volume: volume,
-      onload: () => {
-        duration = howl!.duration();
-        updateTimeDisplay();
-      },
-      onplay: () => {
-        isPlaying = true;
-        startProgressLoop();
-      },
-      onpause: () => {
-        isPlaying = false;
-      },
-      onstop: () => {
-        isPlaying = false;
-      },
-      onend: () => {
-        isPlaying = false;
-        position = 0;
-        persistedTrack.set(null);
-      },
-      onseek: () => {
-        position = howl!.seek() as number;
-      }
-    });
-    
-    // Seek to start position if specified
-    if (startPosition > 0) {
-      howl.seek(startPosition);
-    }
-    
-    howl.play();
+    tick();
   }
 
-  // Subscribe to events from the page
   function handlePlayTrack(e: Event) {
     const customEvent = e as CustomEvent;
     const { audioPath, trackTitle } = customEvent.detail;
@@ -170,69 +79,136 @@
     loadAndPlay(track);
   }
 
-  function startProgressLoop() {
-    const tick = () => {
-      if (howl && howl.playing()) {
-        position = howl.seek() as number;
-        
-        // Persist position periodically
-        if (currentTrack) {
-          persistedTrack.set({ audioPath: currentTrack.audioPath, position });
-        }
-        
-        if (progressFill && duration > 0) {
-          progressFill.style.width = (position / duration * 100) + '%';
-        }
-        
-        updateTimeDisplay();
-        animationId = requestAnimationFrame(tick);
-      }
-    };
+  function loadAndPlay(track: Track) {
+    currentTrack = track;
+    isPlaying = true;
+    position = 0;
+    duration = 0;
     
+    persistedTrack.set({ audioPath: track.audioPath, position: 0 });
+    
+    const loaded = audioManager.loadAudio(track.audioPath);
+    if (loaded) {
+      audioManager.setVolume(volume);
+      audioManager.play();
+    }
+  }
+
+  function restorePlayback() {
+    const saved = persistedTrack.get();
+    const savedVolume = persistedVolume.get();
+    
+    if (saved && saved.audioPath) {
+      isRestoring = true;
+      
+      volume = savedVolume;
+      if (volumeFill) {
+        volumeFill.style.width = (volume * 100) + '%';
+      }
+      
+      audioManager.setVolume(volume);
+      
+      const track: Track = {
+        trackNumber: 0,
+        displayTitle: saved.audioPath.split('/').pop() || 'Restored Track',
+        filename: '',
+        catalogNumber: '',
+        sha256: '',
+        processedDate: new Date().toISOString(),
+        audioPath: saved.audioPath,
+        finalReport: '',
+        duration: 0,
+        artwork: {}
+      };
+      
+      currentTrack = track;
+      audioManager.loadAudio(saved.audioPath);
+      audioManager.setVolume(volume);
+      audioManager.seek(saved.position);
+      audioManager.play();
+      
+      isRestoring = false;
+    }
+  }
+
+  onMount(() => {
+    if (typeof window !== 'undefined') {
+      volume = persistedVolume.get();
+      if (volumeFill) {
+        volumeFill.style.width = (volume * 100) + '%';
+      }
+      
+      audioManager.setOnLoad((dur) => {
+        duration = dur;
+        updateTimeDisplay();
+      });
+      
+      audioManager.setOnPlay(() => {
+        isPlaying = true;
+        startProgressLoop();
+      });
+      
+      audioManager.setOnPause(() => {
+        isPlaying = false;
+      });
+      
+      audioManager.setOnEnd(() => {
+        isPlaying = false;
+        position = 0;
+        persistedTrack.set(null);
+        if (progressFill) progressFill.style.width = '0%';
+        updateTimeDisplay();
+      });
+      
+      audioManager.setOnSeek((pos) => {
+        position = pos;
+        if (currentTrack) {
+          persistedTrack.set({ audioPath: currentTrack.audioPath, position: pos });
+        }
+      });
+      
+      restorePlayback();
+      
+      document.addEventListener('astro:page-load', restorePlayback);
+      window.addEventListener('play-track', handlePlayTrack as EventListener);
+    }
+    
+    if (volumeFill) {
+      volumeFill.style.width = (volume * 100) + '%';
+    }
+  });
+
+  onDestroy(() => {
+    if (typeof window !== 'undefined') {
+      document.removeEventListener('astro:page-load', restorePlayback);
+      window.removeEventListener('play-track', handlePlayTrack as EventListener);
+    }
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
-    tick();
-  }
-
-  function updateTimeDisplay() {
-    if (timeCurrent) {
-      timeCurrent.textContent = formatTime(position);
-    }
-    if (timeTotal) {
-      timeTotal.textContent = '/' + formatTime(duration);
-    }
-  }
-
-  function formatTime(seconds: number): string {
-    if (!seconds || !isFinite(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  }
+  });
 
   function togglePlayPause() {
-    if (!howl) return;
-    
-    if (isPlaying) {
-      howl.pause();
-    } else {
-      howl.play();
+    if (audioManager.isLoaded()) {
+      if (isPlaying) {
+        audioManager.pause();
+      } else {
+        audioManager.play();
+      }
     }
   }
 
   function handleSeek(e: MouseEvent) {
-    if (!howl || !duration) return;
+    if (!duration) return;
     
     const bar = e.currentTarget as HTMLElement;
     const rect = bar.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const newPos = x * duration;
     
-    howl.seek(newPos);
+    audioManager.seek(newPos);
     position = newPos;
     
-    // Update persisted position
     if (currentTrack) {
       persistedTrack.set({ audioPath: currentTrack.audioPath, position: newPos });
     }
@@ -274,13 +250,8 @@
 
   function setVolumeLevel(x: number) {
     volume = Math.max(0, Math.min(1, x));
-    
-    // Persist volume
     persistedVolume.set(volume);
-    
-    if (howl) {
-      howl.volume(volume);
-    }
+    audioManager.setVolume(volume);
     
     if (volumeFill) {
       volumeFill.style.width = (volume * 100) + '%';
@@ -294,12 +265,8 @@
       volume = 0.8;
     }
     
-    // Persist volume
     persistedVolume.set(volume);
-    
-    if (howl) {
-      howl.volume(volume);
-    }
+    audioManager.setVolume(volume);
     
     if (volumeFill) {
       volumeFill.style.width = (volume * 100) + '%';
@@ -307,10 +274,9 @@
   }
 
   function playNext() {
-    // For now, just restart current track
-    if (howl) {
-      howl.seek(0);
-      howl.play();
+    if (audioManager.isLoaded()) {
+      audioManager.seek(0);
+      audioManager.play();
     }
   }
 </script>
