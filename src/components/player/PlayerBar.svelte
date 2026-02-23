@@ -14,8 +14,10 @@
   let progressFill: HTMLElement;
   let timeCurrent: HTMLElement;
   let timeTotal: HTMLElement;
+  let volumeBar: HTMLElement;
   let volumeFill: HTMLElement;
   let animationId: number;
+  let isDraggingVolume = false;
 
   // Subscribe to events from the page
   function handlePlayTrack(e: Event) {
@@ -107,7 +109,7 @@
       timeCurrent.textContent = formatTime(position);
     }
     if (timeTotal) {
-      timeTotal.textContent = '/ ' + formatTime(duration);
+      timeTotal.textContent = '/' + formatTime(duration);
     }
   }
 
@@ -144,12 +146,31 @@
     }
   }
 
-  function handleVolume(e: MouseEvent) {
-    updateVolumeFromEvent(e);
+  function handleVolumeMouseDown(e: MouseEvent) {
+    isDraggingVolume = true;
+    updateVolumeFromEvent(e, volumeBar);
+    
+    window.addEventListener('mousemove', handleVolumeMouseMove);
+    window.addEventListener('mouseup', handleVolumeMouseUp);
   }
 
-  function updateVolumeFromEvent(e: MouseEvent | MouseEvent) {
-    const bar = e.currentTarget as HTMLElement;
+  function handleVolumeMouseMove(e: MouseEvent) {
+    if (!isDraggingVolume) return;
+    updateVolumeFromEvent(e, volumeBar);
+  }
+
+  function handleVolumeMouseUp() {
+    isDraggingVolume = false;
+    window.removeEventListener('mousemove', handleVolumeMouseMove);
+    window.removeEventListener('mouseup', handleVolumeMouseUp);
+  }
+
+  function handleVolumeClick(e: MouseEvent) {
+    updateVolumeFromEvent(e, volumeBar);
+  }
+
+  function updateVolumeFromEvent(e: MouseEvent, bar: HTMLElement | undefined) {
+    if (!bar) return;
     const rect = bar.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     setVolumeLevel(x);
@@ -165,12 +186,6 @@
     if (volumeFill) {
       volumeFill.style.width = (volume * 100) + '%';
     }
-  }
-
-  function handleVolumeDrag(e: MouseEvent) {
-    // Only handle if left mouse button
-    if (e.buttons !== 1) return;
-    updateVolumeFromEvent(e);
   }
 
   function toggleMute() {
@@ -313,8 +328,8 @@
 
       <div 
         class="volume-bar"
-        onmousedown={(e) => { handleVolume(e); }}
-        onmousemove={(e) => { handleVolumeDrag(e); }}
+        bind:this={volumeBar}
+        onmousedown={handleVolumeMouseDown}
         role="slider"
         aria-label="Volume"
         aria-valuemin="0"

@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 import PlayerBar from '../../components/player/PlayerBar.svelte';
 import '../../styles/tokens.css';
 import '../../styles/global.css';
@@ -24,7 +24,7 @@ const { release } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <title>{release.data.title} — LUFS Catalog</title>
-    <ViewTransitions />
+    <ClientRouter />
   </head>
   <body>
     <header>

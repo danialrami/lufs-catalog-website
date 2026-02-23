@@ -1,4 +1,4 @@
-import { Howl, type HowlOptions } from 'howler';
+import { Howl, type HowlOptions, type Howl as HowlType } from 'howler';
 
 /**
  * Create a Howl instance from an absolute audio path.
@@ -8,7 +8,7 @@ import { Howl, type HowlOptions } from 'howler';
  * 
  * This is the key abstraction that lets us swap between local and remote storage.
  */
-export function createHowlFromUrl(audioPath: string, onEnd?: () => void): Howl {
+export function createHowlFromUrl(audioPath: string, onEnd?: () => void): HowlType {
   const options: HowlOptions = {
     src: [audioPath],
     html5: true,
