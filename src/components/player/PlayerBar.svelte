@@ -186,6 +186,7 @@
       
       document.addEventListener('astro:page-load', restorePlayback);
       window.addEventListener('play-track', handlePlayTrack as EventListener);
+      window.addEventListener('keydown', handleKeydown);
     }
     
     if (volumeFill) {
@@ -197,11 +198,35 @@
     if (typeof window !== 'undefined') {
       document.removeEventListener('astro:page-load', restorePlayback);
       window.removeEventListener('play-track', handlePlayTrack as EventListener);
+      window.removeEventListener('keydown', handleKeydown);
     }
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
   });
+
+  function handleKeydown(e: KeyboardEvent) {
+    // Only handle if focus is not in an input/textarea
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return;
+    }
+
+    switch (e.code) {
+      case 'Space':
+        e.preventDefault();
+        togglePlayPause();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        setVolumeLevel(Math.max(0, volume - 0.1));
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        setVolumeLevel(Math.min(1, volume + 0.1));
+        break;
+    }
+  }
 
   function togglePlayPause() {
     if (audioManager.isLoaded()) {

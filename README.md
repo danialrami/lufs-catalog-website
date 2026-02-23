@@ -40,7 +40,7 @@ npm run dev
 
 ## Features
 
-- **Persistent Audio Player** — Playback continues seamlessly as users navigate between pages using Astro ViewTransitions
+- **Persistent Audio Player** — Playback continues seamlessly as users navigate between pages. Uses Astro ViewTransitions with `transition:persist` + localStorage state synchronization to survive page reloads
 - **Click & Drag Volume Control** — Click or drag the volume slider to adjust volume
 - **Mute Toggle** — Click the speaker icon to mute/unmute
 - **Workchain Reports** — View final report and render stats HTML for each track
@@ -190,7 +190,7 @@ See `docs/PRD.md` and `docs/TDD.md` for full production architecture.
 - **Svelte 5** — Reactive UI components
 - **ViewTransitions** — Persistent player across navigation
 - **nanostores** — Cross-component state management
-- **Howler.js** — Audio playback
+- **Howler.js** — Audio playback with localStorage state sync for persistence
 - **Playwright** — E2E testing
 - **Vitest** — Unit testing
 - **node-html-parser** — Parse workchain HTML reports

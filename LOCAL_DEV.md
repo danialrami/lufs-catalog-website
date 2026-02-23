@@ -65,12 +65,13 @@ These are **local paths** that work with Astro's static server.
 
 ## Using the Player
 
-The persistent bottom player uses Howler.js in HTML5 mode:
+The persistent bottom player uses Howler.js in HTML5 mode with localStorage state synchronization:
 
 1. Click any play button to start playback
-2. Player persists across page navigation (via Astro View Transitions)
+2. Player persists across page navigation (via Astro View Transitions + localStorage)
 3. Use the progress bar to seek
 4. Volume controls adjust playback
+5. Position, volume, and play state are saved to localStorage every 500ms, allowing seamless resume even after full page reloads
 
 ## Development Commands
 
