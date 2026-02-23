@@ -3,12 +3,30 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "catalog:ingest:local": "node ./src/scripts/ingest/catalog-ingest-local.mjs",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.17.1"
+    "astro": "^5.17.3",
+    "svelte": "^5.53.2"
+  },
+  "description": "```sh npm create astro@latest -- --template minimal ```",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@astrojs/svelte": "^7.2.5",
+    "@types/node": "^25.3.0",
+    "howler": "^2.2.4",
+    "nanostores": "^1.1.0",
+    "node-html-parser": "^7.0.2",
+    "typescript": "^5.9.3"
   }
 }

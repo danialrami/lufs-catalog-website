@@ -1,0 +1,188 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import PlayerBar from '../../components/player/PlayerBar.svelte';
+
+export async function getStaticPaths() {
+  const releases = await getCollection('releases');
+  
+  return releases.map((release) => ({
+    params: { slug: release.slug },
+    props: { release },
+  }));
+}
+
+const { release } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{release.data.title} — LUFS Audio Catalog</title>
+    
+    <link rel="stylesheet" href="/styles/tokens.css" />
+    <link rel="stylesheet" href="/styles/global.css" />
+    
+    <style>
+      :root {
+        --color-bg: #111111;
+        --color-surface: #1a1a1a;
+        --color-surface-2: #242424;
+        --color-text: #fbf9e2;
+        --color-text-muted: #E2E3D8;
+        --color-teal: #78BEBA;
+        --color-red: #D35233;
+        --color-yellow: #E7B225;
+        --color-blue: #2069AF;
+        --color-border: rgba(251, 249, 226, 0.08);
+        --player-height: 72px;
+      }
+      
+      * { box-sizing: border-box; }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+      
+      header {
+        border-bottom: 1px solid var(--color-border);
+        padding: 2rem 0 1rem;
+      }
+      
+      h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+      }
+      
+      .release-meta {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+      }
+      
+      .badge-catalog {
+        background-color: var(--color-yellow);
+        color: #111;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2px;
+      }
+      
+      .badge-project {
+        background-color: var(--color-blue);
+        color: #fff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2px;
+      }
+      
+      .badge-status {
+        background-color: var(--color-red);
+        color: #fff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2px;
+      }
+      
+      .cover-art {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+        border-radius: 4px;
+        margin-top: 1.5rem;
+      }
+      
+      .track-list {
+        margin-top: 2rem;
+      }
+      
+      .nav-links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-border);
+      }
+      
+      .nav-link {
+        color: var(--color-teal);
+        text-decoration: none;
+      }
+      
+      footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="container">
+      <h1>{release.data.title}</h1>
+      
+      <div class="release-meta">
+        {release.data.status !== 'released' && (
+          <span class="badge-status">{release.data.status}</span>
+        )}
+        
+        {release.data.project && (
+          <span class="badge-project">{release.data.project}</span>
+        )}
+        
+        {release.data.isrc && (
+          <span class="badge-catalog" style="margin-left: 0.5rem;">{release.data.isrc}</span>
+        )}
+        
+        <span style="color: var(--color-text-muted); margin-left: 0.5rem;">
+          Release Date: {new Date(release.data.releaseDate).toLocaleDateString()}
+        </span>
+        
+        {release.data.catalogNumber && (
+          <span class="badge-catalog">{release.data.catalogNumber}</span>
+        )}
+      </div>
+      
+      {release.data.coverArt && (
+        <img 
+          src={release.data.coverArt} 
+          alt="{release.data.title} cover art"
+          class="cover-art"
+        />
+      )}
+    </header>
+
+    <main class="container">
+      <section class="track-list">
+        {release.data.tracks.length > 0 ? (
+          <div>
+            <h3>Tracks</h3>
+            <p>{release.data.tracks.length} track{release.data.tracks.length !== 1 ? 's' : ''}</p>
+          </div>
+        ) : (
+          <p>No tracks available yet.</p>
+        )}
+      </section>
+
+      <div class="nav-links">
+        {release.data.tracks.length > 0 && (
+          <a href="/" class="nav-link">Back to Catalog</a>
+        )}
+      </div>
+    </main>
+
+    <footer>
+      <PlayerBar client:only="svelte" />
+    </footer>
+  </body>
+</html>

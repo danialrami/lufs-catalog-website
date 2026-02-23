@@ -1,17 +1,215 @@
 ---
+import { getCollection } from 'astro:content';
+import PlayerBar from '../components/player/PlayerBar.svelte';
 
+const releases = await getCollection('releases');
+
+// Filter for released releases
+const envShowDrafts = import.meta.env.PUBLIC_SHOW_DRAFTS === 'true';
+const filteredReleases = envShowDrafts 
+  ? releases 
+  : releases.filter(r => r.data.status === 'released');
+
+// Get unique tags for legend
+const allTags = [...new Set(releases.flatMap(r => r.data.tags || []))];
 ---
 
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <title>LUFS Audio Catalog</title>
+    
+    <link rel="stylesheet" href="/styles/tokens.css" />
+    <link rel="stylesheet" href="/styles/global.css" />
+    
+    <style>
+      :root {
+        --color-bg: #111111;
+        --color-surface: #1a1a1a;
+        --color-surface-2: #242424;
+        --color-text: #fbf9e2;
+        --color-text-muted: #E2E3D8;
+        --color-teal: #78BEBA;
+        --color-red: #D35233;
+        --color-yellow: #E7B225;
+        --color-blue: #2069AF;
+        --color-border: rgba(251, 249, 226, 0.08);
+        --player-height: 72px;
+      }
+      
+      * { box-sizing: border-box; }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+      
+      header {
+        position: sticky;
+        top: 0;
+        background-color: var(--color-bg);
+        border-bottom: 1px solid var(--color-border);
+        padding: 1rem 0;
+        z-index: 900;
+      }
+      
+      h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--color-teal);
+      }
+      
+      .legend {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      
+      .legend-item {
+        padding: 0.25rem 0.75rem;
+        background-color: var(--color-surface-2);
+        border-radius: 4px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        border: 1px solid var(--color-border);
+        transition: background-color 0.2s;
+      }
+      
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        padding-bottom: calc(var(--player-height) + 2rem);
+      }
+      
+      .card {
+        background-color: var(--color-surface);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      
+      .card-cover {
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+      }
+      
+      .card-content {
+        padding: 1rem;
+      }
+      
+      .card-title {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.125rem;
+      }
+      
+      .card-meta {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 2px;
+        font-size: 0.75rem;
+      }
+      
+      .badge-catalog {
+        background-color: var(--color-yellow);
+        color: #111;
+      }
+      
+      .badge-project {
+        background-color: var(--color-blue);
+        color: #fff;
+      }
+      
+      footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>LUFS Audio Catalog</h1>
+        <nav class="legend">
+          {allTags.map(tag => (
+            <button 
+              className="legend-item"
+              data-filter={tag}
+            >
+              {tag}
+            </button>
+          ))}
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="grid">
+        {filteredReleases.map((release) => (
+          <article class="card">
+            {release.data.coverArt && (
+              <img 
+                src={release.data.coverArt} 
+                alt="{release.data.title} cover art"
+                class="card-cover"
+              />
+            )}
+            
+            <div class="card-content">
+              <h2 class="card-title">{release.data.title}</h2>
+              
+              <div class="card-meta">
+                {release.data.catalogNumber && (
+                  <span class="badge badge-catalog">{release.data.catalogNumber}</span>
+                )}
+                <span class="badge badge-project">{release.data.project}</span>
+              </div>
+              
+              {release.data.tracks.length > 0 && (
+                <div class="card-tracks">
+                  {release.data.tracks.slice(0, 3).map((track) => (
+                    <div class="track-row">
+                      <span class="track-number">{track.trackNumber}</span>
+                      <button 
+                        class="track-play-btn"
+                        onclick={() => console.log('Play track:', track.displayTitle)}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" fill="#78BEBA"/>
+                        </svg>
+                      </button>
+                      <span class="track-title">{track.displayTitle}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </main>
+
+    <footer>
+      <PlayerBar client:only="svelte" />
+    </footer>
+  </body>
 </html>

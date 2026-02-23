@@ -1,9 +1,122 @@
 # TDD — LUFS Audio Catalog Website
-**Document version:** 0.2 — 2026-02-22
+**Document version:** 0.3 — 2026-02-22
 
 ***
 
-## 1. Architecture Overview
+## 1. Architecture Overview (Remote Production)
+
+```
+┌──────────────────────────────────────────────────────┐
+│  Developer Machine                                   │
+│  $CATALOG_SOURCE_PATH = /Volumes/project/continuo/   │
+│                                                      │
+│  catalog-ingest.mjs  ──reads──►  workchain output   │
+│       │                                              │
+│       ├── writes ──► src/content/releases/*.md       │
+│       ├── copies ──► public/covers/, public/reports/ │
+│       └── uploads ─► Cloudflare R2 (audio + reports)│
+│                                                      │
+│  catalog-deploy.sh                                   │
+│       ├── pnpm build  ──► dist/                      │
+│       ├── git push origin main                       │
+│       └── git subtree split dist → hostinger branch  │
+└───────────────────────────┬──────────────────────────┘
+                            │ git push (hostinger branch)
+             ┌──────────────▼──────────────┐
+             │  GitHub Repository           │
+             │  branch: hostinger           │
+             └──────────────┬──────────────┘
+                            │ webhook
+             ┌──────────────▼──────────────┐
+             │  Hostinger (static hosting)  │
+             │  public_html/ ← dist/        │
+             │  catalog.lufs.audio          │
+             └─────────────────────────────┘
+
+  Browser ──fetch /stream?key=───► Cloudflare Worker
+                                   (standalone deployment)
+                                       │ getSignedUrl
+                                   Cloudflare R2
+                                   lufs-audio bucket
+                                   releases/  (private)
+                                   reports/   (public)
+                                   artwork/   (public)
+```
+
+**Architecture rationale:** The Astro site is fully `output: 'static'` — no SSR needed on Hostinger. Audio protection comes from a **standalone Cloudflare Worker** (free tier, deployed independently via `wrangler deploy`) that signs R2 URLs on demand. The site calls this Worker from the client side. `dist/` is split from the main repo and pushed to a separate `hostinger` branch, which Hostinger's Git auto-deploy webhook watches — the same pattern as the existing Hugo blog. [dev](https://dev.to/bkanhu/auto-deployment-of-website-with-github-and-hostinger-563p)
+
+***
+
+## 1b. Local-Only Development Architecture
+
+```
+┌──────────────────────────────────────────────────────┐
+│  Developer Machine (MacBook Pro)                     │
+│  $CATALOG_SOURCE_PATH = /Volumes/project/continuo/   │
+│                                                      │
+│  catalog-ingest-local.mjs ──reads──► workchain      │
+│       │                                              │
+│       ├── writes ──► src/content/releases/*.md       │
+│       ├── copies ──► public/audio/                   │
+│       ├── copies ──► public/reports/                 │
+│       └── copies ──► public/covers/                  │
+│                                                      │
+│  catalog-dev.sh                                      │
+│       ├── pnpm catalog:ingest:local                  │
+│       └── pnpm dev                                   │
+│           └─► http://localhost:4321                  │
+└───────────────────────────┬──────────────────────────┘
+                            │ (serves from)           │
+             ┌──────────────▼──────────────┐
+             │  Browser                   │
+             │  http://localhost:4321     │
+             │  (serves dist/ statically) │
+             └─────────────────────────────┘
+
+  Browser ──fetch local path──► Astro dev/build
+                                   public/audio/*.mp3
+                                   public/reports/*.html
+                                   (no external services)
+```
+
+**Local Architecture Rationale:**
+- Astro runs in default SSG mode (`output: 'static'`) with no SSR needed
+- Audio is served directly from `public/` without Cloudflare Worker or R2
+- The ingest script reads from local workchain output at `/Volumes/project/continuo/catalogs`
+- All assets (MP3, reports, covers) are copied into `public/` on ingest
+- Player uses Howler.js in HTML5 mode with direct local URLs
+- Code is structured to allow swapping `audioPath`/`renderStatsPath` for R2 URLs later
+- Same source directory structure - no schema migration needed
+
+### Local Development Flow:
+
+1. **Ingest**: `pnpm catalog:ingest:local` walks `$CATALOG_SOURCE_PATH`, copies assets to `public/`
+2. **Dev**: `pnpm dev` serves from memory at http://localhost:4321
+3. **Build**: `pnpm build` creates static site in `dist/`
+4. **Preview**: `pnpm preview` serves static build locally for testing
+
+### Local URL Structure:
+
+- Audio: `/audio/[collectionId]/[trackNumber]/[filename].mp3`
+  - Example: `/audio/a98ff_praise-legend-road/1/11-01-22.2181-03-42.773.mp3`
+- Final Report: `/reports/[collectionId]/[trackNumber]/final_report.html`
+  - Example: `/reports/a98ff_praise-legend-road/1/final_report.html`
+- Render Stats: `/reports/[collectionId]/[trackNumber]/render_stats.html`
+  - Example: `/reports/a98ff_praise-legend-road/1/render_stats.html`
+- Covers: `/covers/[collectionId]/[trackNumber]/artwork.png`
+
+### Migration-Friendly Design:
+
+All track objects expose URL fields that are already fully-qualified public paths:
+- `audioPath: string` — can be `/audio/...` (local) or `https://pub-xxxx.r2.dev/...` (R2)
+- `renderStatsPath?: string` — can be `/reports/...` or R2 public URL
+- `finalReport: string` — can be `/reports/...` or R2 public URL
+
+To migrate to remote storage, swap these string values before storing in content; no component code changes needed.
+
+***
+
+## 2. Tech Stack
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -579,14 +692,53 @@ CORS policy (applied via R2 dashboard or `wrangler r2 bucket cors put`):
 
 ***
 
-## 12. Key Decisions Log
+***
 
-| Decision | Rationale |
-|---|---|
-| Astro `output: 'static'` (no SSR adapter) | Hostinger is static file hosting; no server runtime available  [reddit](https://www.reddit.com/r/astrojs/comments/1n208m5/has_anyone_deployed_a_static_website_on_hostinger/) |
-| Standalone Cloudflare Worker for stream signing | SSR Worker cannot co-deploy with Hostinger; standalone Worker (free tier) gives server-side signing without changing the host  [developers.cloudflare](https://developers.cloudflare.com/r2/api/s3/presigned-urls/) |
-| `dist/` subtree split → Hostinger branch | Exact same pattern as existing Hugo blog (`sync_obsidian-to-hugo.sh`); consistent toolchain  [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/31731122/8736632a-ddcd-4197-a104-4e72e26df8b2/sync_obsidian-to-hugo.sh) |
-| `_final_report.html` committed to repo; `render_stats.html` in R2 | Final report is ≈13KB — fine for git. Render stats is 109KB+ (likely with embedded binary/base64) — better in R2 as a public object  [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/31731122/e57459da-8192-4a3f-b8e1-611365802eff/11-01-22.2181-03-42.773.render_stats.html) |
-| One `.md` per collection, tracks as array | Matches the workchain schema (collection dir → numbered track dirs); a "release" is a collection |
-| `ffprobe` fallback for duration | `render_stats.html` structure unknown; `ffprobe` on the local MP3 is reliable and already available in most audio production environments |
-| `PUBLIC_` prefix on all browser-safe env vars | Astro's convention; prevents accidental credential leakage into the client bundle  [docs.astro](https://docs.astro.build/en/guides/content-collections/) |
+## 12. Local-Only Development
+
+For local development on MacBook Pro without Cloudflare R2, Workers, or Hostinger:
+
+### Local Tech Stack (in addition to remote stack above)
+
+| Layer | Choice | Rationale |
+|---|---|---|
+| Audio storage | Local filesystem (`public/`) | No R2 needed for local dev; assets copied to `public/audio/`, `public/reports/`, `public/covers/` |
+| Audio streaming | Howler.js HTML5 mode | Direct local URLs via `audioPath`, no presigned URL worker required |
+| Site serving | Astro dev/preview | HTTP server on localhost:4321; serve static from `dist/` |
+| Deploy scripting | Bash (`catalog-dev.sh`) | Simpler workflow: ingest → dev; no git push to remote needed |
+
+### Local Ingest Script Behavior
+
+Run `pnpm catalog:ingest:local` (wrapped in `catalog-dev.sh`):
+
+```
+CATALOG_SOURCE_PATH/                    # Config: CATALOG_SOURCE_PATH env var (default: /Volumes/project/continuo/catalogs)
+  [collectionId]/                       # e.g. a98ff_praise-legend-road
+    artwork/YYYY-MM-DD_artwork.png      # → copied to public/covers/[collectionId]/artwork.png
+    [trackNumber]/                      # e.g. "1", "2"
+      [filename]_final/
+        [filename]_final_report.html    # → copied to public/reports/[collectionId]/[trackNumber]/final_report.html (sanitized)
+        artwork/...                     # → copied to public/covers/[collectionId]/[trackNumber]/
+        audio/original/[filename].wav
+        canvas/...
+      [filename].render_stats.html      # → optional copy to public/reports/[collectionId]/[trackNumber]/
+      [filename].wav
+      [filename].mp3                    # → copied to public/audio/[collectionId]/[trackNumber]/[filename].mp3
+```
+
+For each track, the ingest script writes/updates `src/content/releases/[slug].md` with:
+- `audioPath: "/audio/[collectionId]/[trackNumber]/[filename].mp3"` (local URL)
+- `renderStatsPath: "/reports/[collectionId]/[trackNumber]/render_stats.html"` (local URL)
+- `finalReport: "/reports/[collectionId]/[trackNumber]/final_report.html"` (local URL)
+
+### Migration Path: Local → Cloud
+
+All URL fields (`audioPath`, `renderStatsPath`, `finalReport`) are already abstracted as public URLs:
+1. **Local dev**: Set to `/audio/...`, `/reports/...`
+2. **R2 production**: Set to `https://pub-xxxx.r2.dev/releases/...`, `https://pub-xxxx.r2.dev/reports/...`
+
+No component code needs to change—just the values stored in content files.
+
+***
+
+## 13. Key Decisions Log
