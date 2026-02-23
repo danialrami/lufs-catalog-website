@@ -1,4 +1,5 @@
 import { atom, computed } from 'nanostores';
+import { persistentAtom } from '@nanostores/persistent';
 
 /**
  * Track interface - matches the content schema
@@ -22,6 +23,28 @@ export interface Track {
     canvasStatic?: string;
   };
 }
+
+/**
+ * Persisted player state - stored in localStorage
+ * This survives page navigations via ViewTransitions
+ */
+export const persistedTrack = persistentAtom<{ audioPath: string; position: number } | null>(
+  'lufs-player-track',
+  null,
+  {
+    encode: JSON.stringify,
+    decode: JSON.parse,
+  }
+);
+
+export const persistedVolume = persistentAtom<number>(
+  'lufs-player-volume',
+  0.8,
+  {
+    encode: String,
+    decode: Number,
+  }
+);
 
 /**
  * Player state

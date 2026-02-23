@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { Howl } from 'howler';
   import type { Track } from './playerStore';
+  import { persistedTrack, persistedVolume } from './playerStore';
 
   // Player state
   let currentTrack: Track | null = null;
@@ -18,29 +19,84 @@
   let volumeFill: HTMLElement;
   let animationId: number;
   let isDraggingVolume = false;
+  let isRestoring = false;
 
-  // Subscribe to events from the page
-  function handlePlayTrack(e: Event) {
-    const customEvent = e as CustomEvent;
-    const { audioPath, trackTitle } = customEvent.detail;
+  // Restore playback after page navigation
+  function restorePlayback() {
+    const saved = persistedTrack.get();
+    const savedVolume = persistedVolume.get();
     
-    const track: Track = {
-      trackNumber: 0,
-      displayTitle: trackTitle || 'Unknown',
-      filename: '',
-      catalogNumber: '',
-      sha256: '',
-      processedDate: new Date().toISOString(),
-      audioPath: audioPath,
-      finalReport: '',
-      duration: 0,
-      artwork: {}
-    };
-    
-    loadAndPlay(track);
+    if (saved && saved.audioPath && !isRestoring) {
+      isRestoring = true;
+      
+      // Restore volume
+      volume = savedVolume;
+      if (howl) {
+        howl.volume(volume);
+      }
+      if (volumeFill) {
+        volumeFill.style.width = (volume * 100) + '%';
+      }
+      
+      // Restore track and position
+      const track: Track = {
+        trackNumber: 0,
+        displayTitle: saved.audioPath.split('/').pop() || 'Restored Track',
+        filename: '',
+        catalogNumber: '',
+        sha256: '',
+        processedDate: new Date().toISOString(),
+        audioPath: saved.audioPath,
+        finalReport: '',
+        duration: 0,
+        artwork: {}
+      };
+      
+      loadAndPlay(track, saved.position);
+      isRestoring = false;
+    }
   }
 
-  function loadAndPlay(track: Track) {
+  // Listen for astro:page-load to restore after navigation
+  onMount(() => {
+    if (typeof window !== 'undefined') {
+      // Restore volume from persistent store
+      volume = persistedVolume.get();
+      if (volumeFill) {
+        volumeFill.style.width = (volume * 100) + '%';
+      }
+      
+      // Try to restore playback from previous session
+      restorePlayback();
+      
+      // Listen for page loads (including initial and after navigation)
+      document.addEventListener('astro:page-load', restorePlayback);
+      
+      window.addEventListener('play-track', handlePlayTrack as EventListener);
+    }
+    
+    // Update volume display on mount
+    if (volumeFill) {
+      volumeFill.style.width = (volume * 100) + '%';
+    }
+  });
+
+  onDestroy(() => {
+    if (typeof window !== 'undefined') {
+      document.removeEventListener('astro:page-load', restorePlayback);
+      window.removeEventListener('play-track', handlePlayTrack as EventListener);
+    }
+    if (howl) {
+      howl.stop();
+      howl.unload();
+    }
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+    }
+  });
+
+  // Modified loadAndPlay to accept optional start position
+  function loadAndPlay(track: Track, startPosition: number = 0) {
     // Stop current playback
     if (howl) {
       howl.stop();
@@ -49,8 +105,11 @@
     
     currentTrack = track;
     isPlaying = true;
-    position = 0;
+    position = startPosition;
     duration = 0;
+    
+    // Save to persistent store
+    persistedTrack.set({ audioPath: track.audioPath, position: startPosition });
     
     // Create new Howl
     howl = new Howl({
@@ -75,19 +134,51 @@
       onend: () => {
         isPlaying = false;
         position = 0;
+        persistedTrack.set(null);
       },
       onseek: () => {
         position = howl!.seek() as number;
       }
     });
     
+    // Seek to start position if specified
+    if (startPosition > 0) {
+      howl.seek(startPosition);
+    }
+    
     howl.play();
+  }
+
+  // Subscribe to events from the page
+  function handlePlayTrack(e: Event) {
+    const customEvent = e as CustomEvent;
+    const { audioPath, trackTitle } = customEvent.detail;
+    
+    const track: Track = {
+      trackNumber: 0,
+      displayTitle: trackTitle || 'Unknown',
+      filename: '',
+      catalogNumber: '',
+      sha256: '',
+      processedDate: new Date().toISOString(),
+      audioPath: audioPath,
+      finalReport: '',
+      duration: 0,
+      artwork: {}
+    };
+    
+    loadAndPlay(track);
   }
 
   function startProgressLoop() {
     const tick = () => {
       if (howl && howl.playing()) {
         position = howl.seek() as number;
+        
+        // Persist position periodically
+        if (currentTrack) {
+          persistedTrack.set({ audioPath: currentTrack.audioPath, position });
+        }
         
         if (progressFill && duration > 0) {
           progressFill.style.width = (position / duration * 100) + '%';
@@ -141,6 +232,11 @@
     howl.seek(newPos);
     position = newPos;
     
+    // Update persisted position
+    if (currentTrack) {
+      persistedTrack.set({ audioPath: currentTrack.audioPath, position: newPos });
+    }
+    
     if (progressFill && duration > 0) {
       progressFill.style.width = (position / duration * 100) + '%';
     }
@@ -179,6 +275,9 @@
   function setVolumeLevel(x: number) {
     volume = Math.max(0, Math.min(1, x));
     
+    // Persist volume
+    persistedVolume.set(volume);
+    
     if (howl) {
       howl.volume(volume);
     }
@@ -194,6 +293,9 @@
     } else {
       volume = 0.8;
     }
+    
+    // Persist volume
+    persistedVolume.set(volume);
     
     if (howl) {
       howl.volume(volume);
@@ -211,30 +313,6 @@
       howl.play();
     }
   }
-
-  onMount(() => {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('play-track', handlePlayTrack as EventListener);
-    }
-    
-    // Update volume display on mount
-    if (volumeFill) {
-      volumeFill.style.width = (volume * 100) + '%';
-    }
-  });
-
-  onDestroy(() => {
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('play-track', handlePlayTrack as EventListener);
-    }
-    if (howl) {
-      howl.stop();
-      howl.unload();
-    }
-    if (animationId) {
-      cancelAnimationFrame(animationId);
-    }
-  });
 </script>
 
 <div class="player-bar">
