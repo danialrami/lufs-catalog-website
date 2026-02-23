@@ -145,9 +145,17 @@
   }
 
   function handleVolume(e: MouseEvent) {
+    updateVolumeFromEvent(e);
+  }
+
+  function updateVolumeFromEvent(e: MouseEvent | MouseEvent) {
     const bar = e.currentTarget as HTMLElement;
     const rect = bar.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
+    setVolumeLevel(x);
+  }
+
+  function setVolumeLevel(x: number) {
     volume = Math.max(0, Math.min(1, x));
     
     if (howl) {
@@ -157,6 +165,12 @@
     if (volumeFill) {
       volumeFill.style.width = (volume * 100) + '%';
     }
+  }
+
+  function handleVolumeDrag(e: MouseEvent) {
+    // Only handle if left mouse button
+    if (e.buttons !== 1) return;
+    updateVolumeFromEvent(e);
   }
 
   function toggleMute() {
@@ -299,7 +313,8 @@
 
       <div 
         class="volume-bar"
-        onclick={handleVolume}
+        onmousedown={(e) => { handleVolume(e); }}
+        onmousemove={(e) => { handleVolumeDrag(e); }}
         role="slider"
         aria-label="Volume"
         aria-valuemin="0"
