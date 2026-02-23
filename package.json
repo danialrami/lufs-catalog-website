@@ -7,7 +7,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "astro": "^5.17.3",
@@ -23,11 +27,16 @@
   "license": "ISC",
   "devDependencies": {
     "@astrojs/svelte": "^7.2.5",
+    "@playwright/test": "^1.58.2",
+    "@testing-library/svelte": "^5.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/howler": "^2.2.12",
     "@types/node": "^25.3.0",
     "howler": "^2.2.4",
+    "jsdom": "^28.1.0",
     "nanostores": "^1.1.0",
     "node-html-parser": "^7.0.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   }
 }
