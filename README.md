@@ -40,9 +40,9 @@ npm run dev
 
 ## Features
 
-- **Persistent Audio Player** — Playback continues seamlessly as users navigate between pages. Uses Astro ViewTransitions with `transition:persist` + localStorage state synchronization to survive page reloads
-- **Keyboard Shortcuts** — Space to play/pause, Left/Right arrows to adjust volume
-- **Click & Drag Volume Control** — Click or drag the volume slider to adjust volume
+- **Persistent Audio Player** — Playback continues seamlessly as users navigate between pages. Uses Astro ViewTransitions with `transition:persist` + localStorage state synchronization to survive page reloads and maintain playback position/volume
+- **Keyboard Shortcuts** — Space to play/pause, Left/Right arrows to adjust volume in 10% increments
+- **Click & Drag Volume Control** — Click or drag the volume slider to adjust volume (supports 0-100% range)
 - **Mute Toggle** — Click the speaker icon to mute/unmute
 - **Workchain Reports** — View final report and render stats HTML for each track
 - **Project Filtering** — Filter releases by project/series on the home page
@@ -188,13 +188,13 @@ See `docs/PRD.md` and `docs/TDD.md` for full production architecture.
 ## Tech Stack
 
 - **Astro v5** — Static site generation with islands architecture
-- **Svelte 5** — Reactive UI components
-- **ViewTransitions** — Persistent player across navigation
-- **nanostores** — Cross-component state management
-- **Howler.js** — Audio playback with localStorage state sync for persistence
-- **Playwright** — E2E testing
+- **Svelte 5** — Reactive UI components (PlayerBar, playerStore)
+- **ViewTransitions** — Persistent player across navigation via `transition:persist`
+- **nanostores + @nanostores/persistent** — Cross-component state management with localStorage for cross-page persistence
+- **Howler.js v2** — Audio playback with HTML5 streaming mode and localStorage state sync
+- **Playwright** — E2E testing (playback, navigation, keyboard shortcuts, volume controls)
 - **Vitest** — Unit testing
-- **node-html-parser** — Parse workchain HTML reports
+- **node-html-parser** — Parse workchain HTML reports (catalog number, SHA256, saturation)
 
 ---
 
