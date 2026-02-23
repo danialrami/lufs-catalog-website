@@ -173,6 +173,34 @@ function processTrack(collection, trackDir) {
   const destFinalReport = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'final_report.html');
   writeFileSync(destFinalReport, sanitizedHtml);
 
+  // Copy artwork/components to reports directory for HTML report
+  const artworkComponentsSrc = join(trackDir.path, finalDir.name, 'artwork', 'components');
+  const destArtworkComponents = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'artwork', 'components');
+  if (existsSync(artworkComponentsSrc)) {
+    ensureDir(destArtworkComponents);
+    const componentFiles = readdirSync(artworkComponentsSrc);
+    for (const file of componentFiles) {
+      copyAsset(join(artworkComponentsSrc, file), join(destArtworkComponents, file));
+    }
+  }
+
+  // Also copy entire artwork folder to reports
+  const artworkAllSrc = join(trackDir.path, finalDir.name, 'artwork');
+  const destArtworkAll = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'artwork');
+  if (existsSync(artworkAllSrc)) {
+    ensureDir(destArtworkAll);
+    const artworkAllFiles = readdirSync(artworkAllSrc);
+    for (const file of artworkAllFiles) {
+      const srcPath = join(artworkAllSrc, file);
+      if (statSync(srcPath).isDirectory() && file !== 'components') {
+        // Handle other subdirectories if any
+        ensureDir(join(destArtworkAll, file));
+      } else if (statSync(srcPath).isFile()) {
+        copyAsset(srcPath, join(destArtworkAll, file));
+      }
+    }
+  }
+
   // Use finalDir.name for artwork path
   const artworkSrc = join(trackDir.path, finalDir.name, 'artwork');
   if (existsSync(artworkSrc)) {
