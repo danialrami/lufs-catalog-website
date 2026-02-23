@@ -1,5 +1,27 @@
 import { atom, computed } from 'nanostores';
-import type { Track } from '../../content/collections';
+
+/**
+ * Track interface - matches the content schema
+ */
+export interface Track {
+  trackNumber: number;
+  displayTitle: string;
+  filename: string;
+  catalogNumber: string;
+  sha256: string;
+  processedDate: string;
+  saturation?: number;
+  audioPath: string;
+  renderStatsPath?: string;
+  finalReport: string;
+  duration: number;
+  artwork?: {
+    main?: string;
+    identicon?: string;
+    spectrogram?: string;
+    canvasStatic?: string;
+  };
+}
 
 /**
  * Player state

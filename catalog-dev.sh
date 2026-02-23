@@ -22,6 +22,12 @@ if [ -f .env.local ]; then
   set -a; source .env.local; set +a
 fi
 
+# Default CATALOG_SOURCE_PATH if not set
+CATALOG_SOURCE_PATH="${CATALOG_SOURCE_PATH:-/Volumes/project/continuo/catalogs}"
+
+# Add npm global bin to PATH
+export PATH="$(npm root -g)/bin:$PATH"
+
 # Check for required commands
 for cmd in pnpm node; do
   if ! command -v $cmd &> /dev/null; then
@@ -48,5 +54,5 @@ fi
 
 # Step 2: Start dev server
 echo ""
-echo "Starting Astro dev server..."
-exec pnpm dev
+echo "Starting Astro dev server on http://0.0.0.0:4321..."
+exec pnpm dev --host 0.0.0.0

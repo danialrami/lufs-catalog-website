@@ -1,15 +1,41 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { playerState, isPlaying, currentTrack, playNext } from './playerStore';
-  import { createHowlFromUrl, bindProgressLoop } from './useHowler';
+  import { playerState, isPlaying, currentTrack, playNext, playTrack, togglePlay } from './playerStore';
+  import type { Track } from './playerStore';
+  import { createHowlFromUrl } from './useHowler';
+  import type { Howl } from 'howler';
 
-  let howl: import('howler').Howl | null = null;
+  let howl: Howl | null = null;
 
   // Subscribe to store
   let unsubPlayerState: (() => void) | undefined;
   let unsubIsPlaying: (() => void) | undefined;
 
   onMount(() => {
+    // Listen for play-track events from the page
+    const handlePlayTrack = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { audioPath, trackTitle } = customEvent.detail;
+      
+      const track: Track = {
+        trackNumber: 0,
+        displayTitle: trackTitle || 'Unknown',
+        filename: '',
+        catalogNumber: '',
+        sha256: '',
+        processedDate: new Date().toISOString(),
+        audioPath: audioPath,
+        finalReport: '',
+        duration: 0,
+      };
+      
+      playTrack(track);
+    };
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener('play-track', handlePlayTrack as EventListener);
+    }
+
     // Subscribe to player state
     unsubPlayerState = playerState.subscribe((state) => {
       if (!state.currentTrack || !state.currentTrack.audioPath) return;
@@ -27,7 +53,7 @@
         });
         
         howl.on('load', () => {
-          const dur = howl.duration();
+          const dur = howl!.duration();
           if (dur) {
             playerState.set({
               ...playerState.get(),
@@ -66,12 +92,14 @@
           const progressFill = document.querySelector('.progress-fill');
           if (progressFill) {
             const duration = playerState.get().duration || 0;
-            progressFill.style.width = duration > 0 ? (pos / duration) * 100 + '%' : '0%';
+            (progressFill as HTMLElement).style.width = duration > 0 ? (pos / duration) * 100 + '%' : '0%';
           }
           
-          const timeDisplay = document.querySelectorAll('.time-display');
-          if (timeDisplay.length >= 2) {
-            timeDisplay[0].textContent = formatTime(pos);
+          const timeDisplays = document.querySelectorAll('.time-display');
+          if (timeDisplays.length >= 2) {
+            const duration = playerState.get().duration || 0;
+            timeDisplays[0].textContent = formatTime(pos);
+            timeDisplays[1].textContent = '/ ' + formatTime(duration);
           }
         }
       }
@@ -85,6 +113,9 @@
     }
 
     return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('play-track', handlePlayTrack as EventListener);
+      }
       if (unsubPlayerState) unsubPlayerState();
       if (unsubIsPlaying) unsubIsPlaying();
       if (howl) {
@@ -101,13 +132,6 @@
     const secs = Math.floor(seconds % 60);
     
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  }
-
-  function togglePlay() {
-    playerState.set({
-      ...playerState.get(),
-      isPlaying: !playerState.get().isPlaying,
-    });
   }
 
   function handleSeek(e: MouseEvent) {
@@ -282,19 +306,19 @@
 
 <div class="player-bar">
   <div class="track-info">
-    {#if currentTrack}
-      {#if currentTrack.coverArt}
+    {#if $currentTrack}
+      {#if $currentTrack.artwork?.main}
         <img 
           class="cover-art" 
-          src={currentTrack.coverArt} 
+          src={$currentTrack.artwork.main} 
           alt="Cover Art"
         />
       {/if}
       
       <div class="track-meta">
-        <span class="track-title">{currentTrack.title}</span>
-        {#if currentTrack.catalogNumber}
-          <span class="track-artist">{currentTrack.catalogNumber}</span>
+        <span class="track-title">{$currentTrack.displayTitle}</span>
+        {#if $currentTrack.catalogNumber}
+          <span class="track-artist">{$currentTrack.catalogNumber}</span>
         {/if}
       </div>
     {:else}
@@ -308,9 +332,9 @@
     <button 
       class="play-btn" 
       on:click={togglePlay}
-      aria-label={currentTrack?.audioPath && isPlaying ? 'Pause' : 'Play'}
+      aria-label={$currentTrack?.audioPath && $isPlaying ? 'Pause' : 'Play'}
     >
-      {#if currentTrack?.audioPath}
+      {#if $currentTrack?.audioPath}
         <svg class="pause-icon" viewBox="0 0 24 24">
           <rect x="6" y="4" width="4" height="16" />
           <rect x="14" y="4" width="4" height="16" />

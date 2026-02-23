@@ -1,6 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import PlayerBar from '../components/player/PlayerBar.svelte';
+import '../styles/tokens.css';
+import '../styles/global.css';
 
 const releases = await getCollection('releases');
 
@@ -10,8 +12,8 @@ const filteredReleases = envShowDrafts
   ? releases 
   : releases.filter(r => r.data.status === 'released');
 
-// Get unique tags for legend
-const allTags = [...new Set(releases.flatMap(r => r.data.tags || []))];
+// Get unique projects for legend
+const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
 ---
 
 <!DOCTYPE html>
@@ -21,10 +23,111 @@ const allTags = [...new Set(releases.flatMap(r => r.data.tags || []))];
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <title>LUFS Audio Catalog</title>
-    
-    <link rel="stylesheet" href="/styles/tokens.css" />
-    <link rel="stylesheet" href="/styles/global.css" />
-    
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>LUFS Audio Catalog</h1>
+        <nav class="legend">
+          <button class="legend-item active" data-filter="all">All</button>
+          {allProjects.map(project => (
+            <button 
+              class="legend-item"
+              data-filter={project}
+            >
+              {project}
+            </button>
+          ))}
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="grid" id="releases-grid">
+        {filteredReleases.map((release) => (
+          <a href={`/releases/${release.slug}`} class="card">
+            {release.data.coverArt && (
+              <img 
+                src={release.data.coverArt} 
+                alt={`${release.data.title} cover art`}
+                class="card-cover"
+              />
+            )}
+            
+            <div class="card-content">
+              <h2 class="card-title">{release.data.title}</h2>
+              
+              <div class="card-meta">
+                {release.data.tracks[0]?.catalogNumber && (
+                  <span class="badge badge-catalog">{release.data.tracks[0].catalogNumber}</span>
+                )}
+                <span class="badge badge-project">{release.data.project}</span>
+              </div>
+              
+              {release.data.tracks.length > 0 && (
+                <div class="card-tracks">
+                  {release.data.tracks.slice(0, 3).map((track) => (
+                    <div class="track-row">
+                      <span class="track-number">{track.trackNumber}</span>
+                      <button 
+                        class="track-play-btn"
+                        data-audio-path={track.audioPath}
+                        data-track-title={track.displayTitle}
+                        onclick="event.preventDefault(); event.stopPropagation();"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" fill="#78BEBA"/>
+                        </svg>
+                      </button>
+                      <span class="track-title">{track.displayTitle}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </a>
+        ))}
+      </div>
+    </main>
+
+    <footer>
+      <PlayerBar client:only="svelte" />
+    </footer>
+
+    <script>
+      // Simple client-side filtering
+      const buttons = document.querySelectorAll('.legend-item');
+      const cards = document.querySelectorAll('.card');
+      
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filter = (btn as HTMLElement).dataset.filter;
+          
+          // Update active state
+          buttons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          
+          // Filter cards (would need project data on cards for real filtering)
+          cards.forEach(card => {
+            (card as HTMLElement).style.display = 'block';
+          });
+        });
+      });
+
+      // Track play buttons - dispatch to player store
+      document.querySelectorAll('.track-play-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const audioPath = (btn as HTMLElement).dataset.audioPath;
+          const trackTitle = (btn as HTMLElement).dataset.trackTitle;
+          
+          // Dispatch custom event for player
+          window.dispatchEvent(new CustomEvent('play-track', {
+            detail: { audioPath, trackTitle }
+          }));
+        });
+      });
+    </script>
+
     <style>
       :root {
         --color-bg: #111111;
@@ -75,6 +178,7 @@ const allTags = [...new Set(releases.flatMap(r => r.data.tags || []))];
         display: flex;
         gap: 0.75rem;
         margin-top: 1rem;
+        flex-wrap: wrap;
       }
       
       .legend-item {
@@ -85,12 +189,23 @@ const allTags = [...new Set(releases.flatMap(r => r.data.tags || []))];
         cursor: pointer;
         border: 1px solid var(--color-border);
         transition: background-color 0.2s;
+        color: var(--color-text);
+      }
+      
+      .legend-item:hover {
+        background-color: var(--color-surface);
+      }
+      
+      .legend-item.active {
+        background-color: var(--color-teal);
+        color: #111;
       }
       
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
+        padding: 2rem 0;
         padding-bottom: calc(var(--player-height) + 2rem);
       }
       
@@ -98,6 +213,15 @@ const allTags = [...new Set(releases.flatMap(r => r.data.tags || []))];
         background-color: var(--color-surface);
         border-radius: 4px;
         overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
       
       .card-cover {
@@ -113,18 +237,21 @@ const allTags = [...new Set(releases.flatMap(r => r.data.tags || []))];
       .card-title {
         margin: 0 0 0.5rem 0;
         font-size: 1.125rem;
+        font-weight: 600;
       }
       
       .card-meta {
         display: flex;
         gap: 0.5rem;
         margin-bottom: 1rem;
+        flex-wrap: wrap;
       }
       
       .badge {
         padding: 0.25rem 0.5rem;
         border-radius: 2px;
         font-size: 0.75rem;
+        font-family: var(--font-mono, monospace);
       }
       
       .badge-catalog {
@@ -137,6 +264,46 @@ const allTags = [...new Set(releases.flatMap(r => r.data.tags || []))];
         color: #fff;
       }
       
+      .card-tracks {
+        border-top: 1px solid var(--color-border);
+        padding-top: 0.75rem;
+      }
+      
+      .track-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0;
+        font-size: 0.875rem;
+      }
+      
+      .track-number {
+        color: var(--color-text-muted);
+        font-family: var(--font-mono, monospace);
+        width: 1.5rem;
+      }
+      
+      .track-play-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .track-play-btn:hover svg {
+        transform: scale(1.1);
+      }
+      
+      .track-title {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
       footer {
         position: fixed;
         bottom: 0;
@@ -144,72 +311,5 @@ const allTags = [...new Set(releases.flatMap(r => r.data.tags || []))];
         right: 0;
       }
     </style>
-  </head>
-  <body>
-    <header>
-      <div class="container">
-        <h1>LUFS Audio Catalog</h1>
-        <nav class="legend">
-          {allTags.map(tag => (
-            <button 
-              className="legend-item"
-              data-filter={tag}
-            >
-              {tag}
-            </button>
-          ))}
-        </nav>
-      </div>
-    </header>
-
-    <main class="container">
-      <div class="grid">
-        {filteredReleases.map((release) => (
-          <article class="card">
-            {release.data.coverArt && (
-              <img 
-                src={release.data.coverArt} 
-                alt="{release.data.title} cover art"
-                class="card-cover"
-              />
-            )}
-            
-            <div class="card-content">
-              <h2 class="card-title">{release.data.title}</h2>
-              
-              <div class="card-meta">
-                {release.data.catalogNumber && (
-                  <span class="badge badge-catalog">{release.data.catalogNumber}</span>
-                )}
-                <span class="badge badge-project">{release.data.project}</span>
-              </div>
-              
-              {release.data.tracks.length > 0 && (
-                <div class="card-tracks">
-                  {release.data.tracks.slice(0, 3).map((track) => (
-                    <div class="track-row">
-                      <span class="track-number">{track.trackNumber}</span>
-                      <button 
-                        class="track-play-btn"
-                        onclick={() => console.log('Play track:', track.displayTitle)}
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" fill="#78BEBA"/>
-                        </svg>
-                      </button>
-                      <span class="track-title">{track.displayTitle}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
-    </main>
-
-    <footer>
-      <PlayerBar client:only="svelte" />
-    </footer>
   </body>
 </html>

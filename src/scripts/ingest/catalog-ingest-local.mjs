@@ -7,14 +7,19 @@
  * Updates/creates src/content/releases/*.md files with local paths
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'fs';
 import { parse } from 'node-html-parser';
 import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+// --- ESM compatibility ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // --- Configuration ---
 
 const CATALOG_SOURCE_PATH = process.env.CATALOG_SOURCE_PATH || '/Volumes/project/continuo/catalogs';
-const REPO_ROOT = join(__dirname, '..', '..');
+const REPO_ROOT = join(__dirname, '..', '..', '..');
 const PUBLIC_DIR = join(REPO_ROOT, 'public');
 const CONTENT_DIR = join(REPO_ROOT, 'src', 'content', 'releases');
 
@@ -27,6 +32,14 @@ function ensureDir(dirPath) {
 }
 
 function copyAsset(src, dest) {
+  if (!existsSync(src)) {
+    console.warn(`    Source not found: ${src}`);
+    return;
+  }
+  if (statSync(src).isDirectory()) {
+    console.warn(`    Skipping directory: ${src}`);
+    return;
+  }
   ensureDir(dirname(dest));
   const content = readFileSync(src);
   writeFileSync(dest, content);
@@ -115,18 +128,31 @@ function walkCollections() {
 }
 
 function processTrack(collection, trackDir) {
-  const finalReportPath = join(trackDir.path, `${trackDir.number}_final`, `${trackDir.number}_final_report.html`);
+  // Find the _final directory within the track directory (pattern: *_final)
+  const trackContents = readdirSync(trackDir.path, { withFileTypes: true });
+  const finalDir = trackContents.find(d => d.isDirectory() && d.name.endsWith('_final'));
   
-  if (!existsSync(finalReportPath)) {
-    console.warn(`  Track ${trackDir.number}: _final_report.html not found`);
+  if (!finalDir) {
+    console.warn(`  Track ${trackDir.number}: _final directory not found`);
     return null;
   }
 
-  const mp3Path = join(trackDir.path, `${trackDir.number}.mp3`);
-  if (!existsSync(mp3Path)) {
-    console.warn(`  Track ${trackDir.number}: .mp3 not found at ${mp3Path}`);
+  const finalDirPath = join(trackDir.path, finalDir.name);
+  const finalReportPath = join(finalDirPath, `${finalDir.name}_report.html`);
+  
+  if (!existsSync(finalReportPath)) {
+    console.warn(`  Track ${trackDir.number}: _final_report.html not found at ${finalReportPath}`);
     return null;
   }
+
+  // Find any .mp3 file in the track directory
+  const mp3File = trackContents.find(f => f.isFile() && f.name.endsWith('.mp3'));
+  if (!mp3File) {
+    console.warn(`  Track ${trackDir.number}: .mp3 not found`);
+    return null;
+  }
+
+  const mp3Path = join(trackDir.path, mp3File.name);
 
   const html = readFileSync(finalReportPath, 'utf-8');
   const parsedData = parseFinalReport(html);
@@ -138,14 +164,17 @@ function processTrack(collection, trackDir) {
   ensureDir(join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`));
   ensureDir(join(PUBLIC_DIR, 'covers', collectionId, `${trackNum}`));
 
-  const destAudio = join(PUBLIC_DIR, 'audio', collectionId, `${trackNum}`, `${parsedData.filename}.mp3`);
+  // Use actual mp3 filename from source
+  const mp3Filename = mp3File.name.replace('.mp3', '');
+  const destAudio = join(PUBLIC_DIR, 'audio', collectionId, `${trackNum}`, `${mp3Filename}.mp3`);
   copyAsset(mp3Path, destAudio);
 
   const sanitizedHtml = sanitizeFinalReport(html);
   const destFinalReport = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'final_report.html');
   writeFileSync(destFinalReport, sanitizedHtml);
 
-  const artworkSrc = join(trackDir.path, `${trackDir.number}_final`, 'artwork');
+  // Use finalDir.name for artwork path
+  const artworkSrc = join(trackDir.path, finalDir.name, 'artwork');
   if (existsSync(artworkSrc)) {
     const artworkFiles = readdirSync(artworkSrc);
     for (const file of artworkFiles) {
@@ -153,9 +182,11 @@ function processTrack(collection, trackDir) {
     }
   }
 
-  const renderStatsPath = join(trackDir.path, `${trackDir.number}.render_stats.html`);
+  // Find render_stats.html in track directory
+  const renderStatsFile = trackContents.find(f => f.isFile() && f.name.endsWith('.render_stats.html'));
   let renderStatsPathLocal = undefined;
-  if (existsSync(renderStatsPath)) {
+  if (renderStatsFile) {
+    const renderStatsPath = join(trackDir.path, renderStatsFile.name);
     const destRenderStats = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'render_stats.html');
     copyAsset(renderStatsPath, destRenderStats);
     renderStatsPathLocal = `/reports/${collectionId}/${trackNum}/render_stats.html`;
@@ -176,12 +207,12 @@ function processTrack(collection, trackDir) {
   return {
     trackNumber: trackNum,
     displayTitle: parsedData.filename || `Track ${trackNum}`,
-    filename: parsedData.filename,
+    filename: mp3Filename,
     catalogNumber: parsedData.catalogNumber,
     sha256: parsedData.sha256,
     processedDate: parsedData.processedDate.toISOString(),
     saturation: parsedData.saturation || 0,
-    audioPath: `/audio/${collectionId}/${trackNum}/${parsedData.filename}.mp3`,
+    audioPath: `/audio/${collectionId}/${trackNum}/${mp3Filename}.mp3`,
     renderStatsPath: renderStatsPathLocal,
     finalReport: `/reports/${collectionId}/${trackNum}/final_report.html`,
     duration: 0,

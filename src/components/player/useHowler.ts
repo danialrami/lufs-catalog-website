@@ -1,4 +1,4 @@
-import { Howl, HowlOptions } from 'howler';
+import { Howl, type HowlOptions } from 'howler';
 
 /**
  * Create a Howl instance from an absolute audio path.
