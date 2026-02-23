@@ -34,16 +34,54 @@ function ensureDir(dirPath) {
 function copyAsset(src, dest) {
   if (!existsSync(src)) {
     console.warn(`    Source not found: ${src}`);
-    return;
+    return false;
   }
   if (statSync(src).isDirectory()) {
     console.warn(`    Skipping directory: ${src}`);
-    return;
+    return false;
   }
   ensureDir(dirname(dest));
   const content = readFileSync(src);
   writeFileSync(dest, content);
   console.log(`    Copied: ${dest}`);
+  return true;
+}
+
+function verifyReportAssets(collectionId, trackNum) {
+  const reportPath = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'final_report.html');
+  if (!existsSync(reportPath)) {
+    console.warn(`  Warning: final_report.html not found for verification`);
+    return;
+  }
+
+  const html = readFileSync(reportPath, 'utf-8');
+  const root = parse(html);
+
+  const expectedAssets = [
+    { type: 'artwork', path: 'artwork' },
+    { type: 'artwork/components', path: 'artwork/components' },
+    { type: 'canvas', path: 'canvas' },
+    { type: 'logs', path: 'logs' },
+    { type: 'audio/original', path: 'audio/original' },
+    { type: 'catalog', path: 'catalog' },
+  ];
+
+  const baseReportDir = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`);
+  let allPresent = true;
+
+  for (const asset of expectedAssets) {
+    const assetDir = join(baseReportDir, asset.path);
+    if (!existsSync(assetDir)) {
+      console.warn(`  Warning: Missing ${asset.type} directory: ${asset.path}`);
+      allPresent = false;
+    }
+  }
+
+  if (allPresent) {
+    console.log(`  ✓ All expected assets verified for track ${trackNum}`);
+  } else {
+    console.warn(`  ⚠ Some assets missing for track ${trackNum} - report may have broken links`);
+  }
 }
 
 export function parseFinalReport(html) {
@@ -220,6 +258,50 @@ function processTrack(collection, trackDir) {
     renderStatsPathLocal = `/reports/${collectionId}/${trackNum}/render_stats.html`;
   }
 
+  // Copy canvas/ folder (static png, gif, mp4)
+  const canvasSrc = join(trackDir.path, finalDir.name, 'canvas');
+  const destCanvas = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'canvas');
+  if (existsSync(canvasSrc)) {
+    ensureDir(destCanvas);
+    const canvasFiles = readdirSync(canvasSrc);
+    for (const file of canvasFiles) {
+      copyAsset(join(canvasSrc, file), join(destCanvas, file));
+    }
+  }
+
+  // Copy logs/ folder
+  const logsSrc = join(trackDir.path, finalDir.name, 'logs');
+  const destLogs = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'logs');
+  if (existsSync(logsSrc)) {
+    ensureDir(destLogs);
+    const logFiles = readdirSync(logsSrc);
+    for (const file of logFiles) {
+      copyAsset(join(logsSrc, file), join(destLogs, file));
+    }
+  }
+
+  // Copy audio/original/ folder (original wav)
+  const audioOriginalSrc = join(trackDir.path, finalDir.name, 'audio', 'original');
+  const destAudioOriginal = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'audio', 'original');
+  if (existsSync(audioOriginalSrc)) {
+    ensureDir(destAudioOriginal);
+    const audioFiles = readdirSync(audioOriginalSrc);
+    for (const file of audioFiles) {
+      copyAsset(join(audioOriginalSrc, file), join(destAudioOriginal, file));
+    }
+  }
+
+  // Copy catalog/ folder
+  const catalogSrc = join(trackDir.path, finalDir.name, 'catalog');
+  const destCatalog = join(PUBLIC_DIR, 'reports', collectionId, `${trackNum}`, 'catalog');
+  if (existsSync(catalogSrc)) {
+    ensureDir(destCatalog);
+    const catalogFiles = readdirSync(catalogSrc);
+    for (const file of catalogFiles) {
+      copyAsset(join(catalogSrc, file), join(destCatalog, file));
+    }
+  }
+
   const collectionArtworkSrc = join(collection.basePath, 'artwork');
   let coverArtPath = '';
   if (existsSync(collectionArtworkSrc)) {
@@ -231,6 +313,9 @@ function processTrack(collection, trackDir) {
       coverArtPath = `/covers/${collectionId}/${mainArtwork}`;
     }
   }
+
+  // Verify all expected assets were copied
+  verifyReportAssets(collectionId, trackNum);
 
   return {
     trackNumber: trackNum,
