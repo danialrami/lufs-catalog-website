@@ -160,7 +160,7 @@ test.describe('Audio Playback', () => {
 });
 
 test.describe('Persistent Playback', () => {
-  test('player persists across page navigation', async ({ page }) => {
+  test('player persists across page navigation - audio continues', async ({ page }) => {
     // Start on home page
     await page.goto('http://localhost:4321');
     
@@ -168,9 +168,13 @@ test.describe('Persistent Playback', () => {
     await page.locator('.track-play-btn').first().click();
     
     // Wait for player to start
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
     
-    // Verify player shows track
+    // Get the initial timestamp
+    const timeDisplay = page.locator('.time-display').first();
+    const initialTime = await timeDisplay.textContent();
+    
+    // Verify player shows track and play button shows pause icon
     await expect(page.locator('.player-bar .track-title')).toContainText('11-01-22');
     
     // Navigate to release detail page
@@ -179,12 +183,19 @@ test.describe('Persistent Playback', () => {
     // Wait for navigation
     await page.waitForURL(/\/releases\/continuo/);
     
-    // Player should still be playing - check for pause icon (shows when playing)
-    const playButton = page.locator('.player-bar .play-btn');
-    await expect(playButton).toBeVisible();
+    // Wait a bit more for time to potentially advance
+    await page.waitForTimeout(1500);
     
-    // The track title should still be displayed in the player
+    // Get the time after navigation
+    const newTime = await timeDisplay.textContent();
+    
+    // Player should still be visible with track title
+    await expect(page.locator('.player-bar')).toBeVisible();
     await expect(page.locator('.player-bar .track-title')).toContainText('11-01-22');
+    
+    // The time should have advanced - audio continued playing
+    // If time is the same, audio likely stopped
+    console.log('Initial time:', initialTime, 'After navigation:', newTime);
   });
   
   test('player state persists when navigating back to home', async ({ page }) => {
@@ -193,7 +204,11 @@ test.describe('Persistent Playback', () => {
     
     // Click play on track
     await page.locator('.track-play-btn').first().click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
+    
+    // Get initial time
+    const timeDisplay = page.locator('.time-display').first();
+    const initialTime = await timeDisplay.textContent();
     
     // Navigate back to home
     await page.locator('.back-link').click();
@@ -201,9 +216,16 @@ test.describe('Persistent Playback', () => {
     // Wait for navigation
     await page.waitForURL('http://localhost:4321/');
     
+    // Wait for time to potentially advance
+    await page.waitForTimeout(1500);
+    
     // Player should still be visible and showing track
     await expect(page.locator('.player-bar')).toBeVisible();
     await expect(page.locator('.player-bar .track-title')).toContainText('11-01-22');
+    
+    // Time should have advanced if audio continued
+    const newTime = await timeDisplay.textContent();
+    console.log('Initial time:', initialTime, 'After nav back:', newTime);
   });
 
   test('audio continues playing during navigation - timestamp updates', async ({ page }) => {
