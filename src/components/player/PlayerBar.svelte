@@ -95,6 +95,11 @@
   }
 
   function restorePlayback() {
+    // Only restore if audio is not already playing and we have saved state
+    if (audioManager.isPlaying()) {
+      return;
+    }
+    
     const saved = persistedTrack.get();
     const savedVolume = persistedVolume.get();
     
@@ -133,6 +138,11 @@
 
   onMount(() => {
     if (typeof window !== 'undefined') {
+      // Clean up any existing listeners first (important for persisted components)
+      document.removeEventListener('astro:page-load', restorePlayback);
+      window.removeEventListener('play-track', handlePlayTrack as EventListener);
+      
+      // Restore volume from persistent store
       volume = persistedVolume.get();
       if (volumeFill) {
         volumeFill.style.width = (volume * 100) + '%';

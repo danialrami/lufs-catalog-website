@@ -1,9 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { ClientRouter } from 'astro:transitions';
-import PlayerBar from '../components/player/PlayerBar.svelte';
-import '../styles/tokens.css';
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
 const releases = await getCollection('releases');
 
@@ -17,17 +14,8 @@ const filteredReleases = envShowDrafts
 const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <title>LUFS Catalog</title>
-    <ClientRouter />
-  </head>
-  <body>
-    <header>
+<BaseLayout title="LUFS Catalog">
+  <header>
       <div class="container">
         <a href="/" class="site-title">LUFS Catalog</a>
         <nav class="legend">
@@ -91,10 +79,6 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
         ))}
       </div>
     </main>
-
-    <footer>
-      <PlayerBar client:load transition:persist="player-bar" />
-    </footer>
 
     <script>
       // Simple client-side filtering
@@ -324,5 +308,4 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
         right: 0;
       }
     </style>
-  </body>
-</html>
+  </BaseLayout>

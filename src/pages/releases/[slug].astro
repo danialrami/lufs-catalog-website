@@ -1,9 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { ClientRouter } from 'astro:transitions';
-import PlayerBar from '../../components/player/PlayerBar.svelte';
-import '../../styles/tokens.css';
-import '../../styles/global.css';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
   const releases = await getCollection('releases');
@@ -16,18 +13,9 @@ export async function getStaticPaths() {
 
 const { release } = Astro.props;
 ---
- 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{release.data.title} — LUFS Catalog</title>
-    <ClientRouter />
-  </head>
-  <body>
-    <header>
+
+<BaseLayout title="{release.data.title} — LUFS Catalog">
+  <header>
       <div class="container">
         <a href="/" class="back-link">← Back to Catalog</a>
         
@@ -136,10 +124,6 @@ const { release } = Astro.props;
         </section>
       )}
     </main>
-
-    <footer>
-      <PlayerBar client:load transition:persist="player-bar" />
-    </footer>
 
     <script>
       // Track play buttons - dispatch to player store
@@ -396,5 +380,4 @@ const { release } = Astro.props;
         right: 0;
       }
     </style>
-  </body>
-</html>
+  </BaseLayout>
