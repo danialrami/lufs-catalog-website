@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { ViewTransitions } from 'astro:transitions';
 import PlayerBar from '../../components/player/PlayerBar.svelte';
 import '../../styles/tokens.css';
 import '../../styles/global.css';
@@ -15,7 +16,7 @@ export async function getStaticPaths() {
 
 const { release } = Astro.props;
 ---
-
+ 
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -23,6 +24,7 @@ const { release } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <title>{release.data.title} — LUFS Catalog</title>
+    <ViewTransitions />
   </head>
   <body>
     <header>
@@ -136,7 +138,7 @@ const { release } = Astro.props;
     </main>
 
     <footer>
-      <PlayerBar client:only="svelte" />
+      <PlayerBar client:only="svelte" transition:persist />
     </footer>
 
     <script>

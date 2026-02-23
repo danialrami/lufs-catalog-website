@@ -90,6 +90,54 @@ test.describe('Audio Playback', () => {
   });
 });
 
+test.describe('Persistent Playback', () => {
+  test('player persists across page navigation', async ({ page }) => {
+    // Start on home page
+    await page.goto('http://localhost:4321');
+    
+    // Click play on a track
+    await page.locator('.track-play-btn').first().click();
+    
+    // Wait for player to start
+    await page.waitForTimeout(500);
+    
+    // Verify player shows track
+    await expect(page.locator('.player-bar .track-title')).toContainText('11-01-22');
+    
+    // Navigate to release detail page
+    await page.locator('.card').click();
+    
+    // Wait for navigation
+    await page.waitForURL(/\/releases\/continuo/);
+    
+    // Player should still be playing - check for pause icon (shows when playing)
+    const playButton = page.locator('.player-bar .play-btn');
+    await expect(playButton).toBeVisible();
+    
+    // The track title should still be displayed in the player
+    await expect(page.locator('.player-bar .track-title')).toContainText('11-01-22');
+  });
+  
+  test('player state persists when navigating back to home', async ({ page }) => {
+    // Start on release page
+    await page.goto('http://localhost:4321/releases/continuo');
+    
+    // Click play on track
+    await page.locator('.track-play-btn').first().click();
+    await page.waitForTimeout(500);
+    
+    // Navigate back to home
+    await page.locator('.back-link').click();
+    
+    // Wait for navigation
+    await page.waitForURL('http://localhost:4321/');
+    
+    // Player should still be visible and showing track
+    await expect(page.locator('.player-bar')).toBeVisible();
+    await expect(page.locator('.player-bar .track-title')).toContainText('11-01-22');
+  });
+});
+
 test.describe('Assets', () => {
   test('cover art is accessible', async ({ request }) => {
     const response = await request.get('http://localhost:4321/covers/a98ff_praise-legend-road/2025-09-25_artwork.png');

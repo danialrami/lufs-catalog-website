@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { ViewTransitions } from 'astro:transitions';
 import PlayerBar from '../components/player/PlayerBar.svelte';
 import '../styles/tokens.css';
 import '../styles/global.css';
@@ -23,6 +24,7 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <title>LUFS Catalog</title>
+    <ViewTransitions />
   </head>
   <body>
     <header>
@@ -91,7 +93,7 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
     </main>
 
     <footer>
-      <PlayerBar client:only="svelte" />
+      <PlayerBar client:only="svelte" transition:persist />
     </footer>
 
     <script>
