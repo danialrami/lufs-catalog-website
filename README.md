@@ -41,6 +41,7 @@ npm run dev
 ## Features
 
 - **Persistent Audio Player** — Playback continues seamlessly as users navigate between pages. Uses Astro ViewTransitions with `transition:persist` + localStorage state synchronization to survive page reloads
+- **Keyboard Shortcuts** — Space to play/pause, Left/Right arrows to adjust volume
 - **Click & Drag Volume Control** — Click or drag the volume slider to adjust volume
 - **Mute Toggle** — Click the speaker icon to mute/unmute
 - **Workchain Reports** — View final report and render stats HTML for each track

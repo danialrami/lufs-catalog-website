@@ -72,6 +72,7 @@ The persistent bottom player uses Howler.js in HTML5 mode with localStorage stat
 3. Use the progress bar to seek
 4. Volume controls adjust playback
 5. Position, volume, and play state are saved to localStorage every 500ms, allowing seamless resume even after full page reloads
+6. **Keyboard shortcuts**: Space = play/pause, Left/Right arrows = volume
 
 ## Development Commands
 
