@@ -138,7 +138,7 @@ const { release } = Astro.props;
     </main>
 
     <footer>
-      <PlayerBar client:only="svelte" transition:persist />
+      <PlayerBar client:load transition:persist="player-bar" />
     </footer>
 
     <script>
