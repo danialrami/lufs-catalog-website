@@ -1,14 +1,45 @@
 /**
  * Global audio manager - survives across page navigations
- * This module creates a singleton Howl instance that isn't tied to component lifecycle
+ * Uses localStorage for state persistence so audio can be restored after ViewTransition
  */
 
 import { Howl } from 'howler';
+
+const STORAGE_KEY = 'lufs-audio-state';
+
+interface AudioState {
+  audioPath: string | null;
+  position: number;
+  volume: number;
+  isPlaying: boolean;
+}
+
+function getStoredState(): AudioState | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveState(state: Partial<AudioState>) {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = getStoredState() || { audioPath: null, position: 0, volume: 0.8, isPlaying: false };
+    const updated = { ...current, ...state };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  } catch {
+    // Storage unavailable
+  }
+}
 
 let howlInstance: Howl | null = null;
 let currentAudioPath: string | null = null;
 let lastKnownPosition = 0;
 let positionInterval: ReturnType<typeof setInterval> | null = null;
+let shouldAutoPlay = false;
 
 // Callbacks for UI updates
 let onPlayCallback: (() => void) | null = null;
@@ -23,6 +54,7 @@ function startPositionTracking() {
   positionInterval = setInterval(() => {
     if (howlInstance && howlInstance.playing()) {
       lastKnownPosition = howlInstance.seek() as number;
+      saveState({ position: lastKnownPosition, isPlaying: true });
     }
   }, 500);
 }
@@ -44,24 +76,43 @@ export function getLastKnownPosition(): number {
   return lastKnownPosition;
 }
 
-export function loadAudio(audioPath: string): boolean {
-  // If same path and already loaded, just return true without reloading
+export function hasStoredState(): boolean {
+  const state = getStoredState();
+  return !!(state?.audioPath);
+}
+
+export function restoreFromStorage(): { audioPath: string; position: number; volume: number } | null {
+  const state = getStoredState();
+  if (!state?.audioPath) return null;
+  
+  currentAudioPath = state.audioPath;
+  lastKnownPosition = state.position;
+  shouldAutoPlay = state.isPlaying;
+  
+  return {
+    audioPath: state.audioPath,
+    position: state.position,
+    volume: state.volume,
+  };
+}
+
+export function loadAudio(audioPath: string, autoPlay = true): boolean {
   if (howlInstance && currentAudioPath === audioPath && howlInstance.state() === 'loaded') {
     return true;
   }
 
-  // Save current position before switching
   if (howlInstance && howlInstance.playing()) {
     lastKnownPosition = howlInstance.seek() as number;
+    saveState({ position: lastKnownPosition });
   }
 
-  // Unload existing but keep track of position
   if (howlInstance) {
     howlInstance.unload();
     howlInstance = null;
   }
 
   currentAudioPath = audioPath;
+  saveState({ audioPath, position: 0, isPlaying: false });
 
   try {
     howlInstance = new Howl({
@@ -76,25 +127,33 @@ export function loadAudio(audioPath: string): boolean {
       },
       onplay: () => {
         startPositionTracking();
+        saveState({ isPlaying: true });
         if (onPlayCallback) onPlayCallback();
       },
       onpause: () => {
         stopPositionTracking();
+        if (howlInstance) {
+          lastKnownPosition = howlInstance.seek() as number;
+          saveState({ position: lastKnownPosition, isPlaying: false });
+        }
         if (onPauseCallback) onPauseCallback();
       },
       onstop: () => {
         stopPositionTracking();
+        saveState({ isPlaying: false });
         if (onPauseCallback) onPauseCallback();
       },
       onend: () => {
         stopPositionTracking();
         lastKnownPosition = 0;
+        saveState({ position: 0, isPlaying: false });
         if (onEndCallback) onEndCallback();
       },
       onseek: () => {
-        if (onSeekCallback && howlInstance) {
+        if (howlInstance) {
           lastKnownPosition = howlInstance.seek() as number;
-          onSeekCallback(lastKnownPosition);
+          saveState({ position: lastKnownPosition });
+          if (onSeekCallback) onSeekCallback(lastKnownPosition);
         }
       },
     });
@@ -126,6 +185,8 @@ export function stop() {
 export function seek(position: number) {
   if (howlInstance) {
     howlInstance.seek(position);
+    lastKnownPosition = position;
+    saveState({ position });
   }
 }
 
@@ -133,6 +194,7 @@ export function setVolume(volume: number) {
   if (howlInstance) {
     howlInstance.volume(volume);
   }
+  saveState({ volume });
 }
 
 export function isPlaying(): boolean {
@@ -140,7 +202,7 @@ export function isPlaying(): boolean {
 }
 
 export function getPosition(): number {
-  return (howlInstance?.seek() as number) ?? 0;
+  return (howlInstance?.seek() as number) ?? lastKnownPosition;
 }
 
 export function getDuration(): number {
@@ -153,4 +215,8 @@ export function getCurrentPath(): string | null {
 
 export function isLoaded(): boolean {
   return howlInstance?.state() === 'loaded';
+}
+
+export function shouldAutoPlayOnRestore(): boolean {
+  return shouldAutoPlay;
 }

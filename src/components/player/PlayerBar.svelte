@@ -95,45 +95,50 @@
   }
 
   function restorePlayback() {
-    // Only restore if audio is not already playing and we have saved state
+    // Only restore if audio is not already playing
     if (audioManager.isPlaying()) {
       return;
     }
-    
-    const saved = persistedTrack.get();
-    const savedVolume = persistedVolume.get();
-    
-    if (saved && saved.audioPath) {
-      isRestoring = true;
-      
-      volume = savedVolume;
-      if (volumeFill) {
-        volumeFill.style.width = (volume * 100) + '%';
-      }
-      
-      audioManager.setVolume(volume);
-      
-      const track: Track = {
-        trackNumber: 0,
-        displayTitle: saved.audioPath.split('/').pop() || 'Restored Track',
-        filename: '',
-        catalogNumber: '',
-        sha256: '',
-        processedDate: new Date().toISOString(),
-        audioPath: saved.audioPath,
-        finalReport: '',
-        duration: 0,
-        artwork: {}
-      };
-      
-      currentTrack = track;
-      audioManager.loadAudio(saved.audioPath);
-      audioManager.setVolume(volume);
-      audioManager.seek(saved.position);
-      audioManager.play();
-      
-      isRestoring = false;
+
+    const restored = audioManager.restoreFromStorage();
+    if (!restored) return;
+
+    isRestoring = true;
+    volume = restored.volume;
+
+    if (volumeFill) {
+      volumeFill.style.width = (volume * 100) + '%';
     }
+
+    audioManager.setVolume(volume);
+
+    const track: Track = {
+      trackNumber: 0,
+      displayTitle: restored.audioPath.split('/').pop() || 'Restored Track',
+      filename: '',
+      catalogNumber: '',
+      sha256: '',
+      processedDate: new Date().toISOString(),
+      audioPath: restored.audioPath,
+      finalReport: '',
+      duration: 0,
+      artwork: {}
+    };
+
+    currentTrack = track;
+    audioManager.loadAudio(restored.audioPath, false);
+    audioManager.setVolume(volume);
+    audioManager.seek(restored.position);
+
+    // Restore playing state
+    setTimeout(() => {
+      if (audioManager.shouldAutoPlayOnRestore()) {
+        audioManager.play();
+        isPlaying = true;
+        startProgressLoop();
+      }
+      isRestoring = false;
+    }, 100);
   }
 
   onMount(() => {
