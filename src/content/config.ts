@@ -8,22 +8,31 @@ const trackSchema = z.object({
   sha256: z.string().length(64),
   processedDate: z.coerce.date(),
   saturation: z.number().optional(),
-  
-  // *** Local Paths (local-only dev) ***
-  // For production with Cloudflare R2, replace these with public URLs like:
-  // audioPath: 'https://pub-xxxx.r2.dev/releases/[collectionId]/[trackNumber]/[filename].mp3'
+
+  // Loudness metadata from the workchain (astro-catalog logs/normalization.json).
+  // Optional so legacy/album releases without it still validate.
+  loudness: z.object({
+    targetLufs: z.number().optional(),
+    finalLufs: z.number().optional(),
+    truePeak: z.number().optional(),
+    lra: z.number().optional(),
+    sampleRate: z.number().optional(),
+    channels: z.number().optional(),
+  }).optional(),
+
+  // *** Storage-agnostic URL/key fields ***
+  // Local dev: '/audio/[collectionId]/[trackNumber]/[filename].mp3'
+  // R2 (Phase 2): the player resolves the key via the signing Worker.
   audioPath: z.string(),
-  
-  // Optional render stats path (local path or R2 URL)
-  // For production: 'https://pub-xxxx.r2.dev/reports/[collectionId]/[trackNumber]/render_stats.html'
+
+  // Optional render stats (legacy REAPER export; astro-catalog has none)
   renderStatsPath: z.string().optional(),
-  
-  // Final report path (must be available for embedding)
-  // For production: 'https://pub-xxxx.r2.dev/reports/[collectionId]/[trackNumber]/final_report.html'
+
+  // Final report path (embedded, sanitized) — local path or public R2 URL
   finalReport: z.string(),
-  
+
   duration: z.number().default(0),
-  
+
   artwork: z.object({
     main: z.string().optional(),
     identicon: z.string().optional(),
@@ -44,10 +53,10 @@ const releases = defineCollection({
     coverArt: z.string(),
     isrc: z.string().optional(),
     streamingLinks: z.object({
-      spotify: z.string().url().optional(),
-      appleMusic: z.string().url().optional(),
-      bandcamp: z.string().url().optional(),
-      soundcloud: z.string().url().optional(),
+      spotify: z.string().url().optional().or(z.literal('')),
+      appleMusic: z.string().url().optional().or(z.literal('')),
+      bandcamp: z.string().url().optional().or(z.literal('')),
+      soundcloud: z.string().url().optional().or(z.literal('')),
     }).optional(),
     tags: z.array(z.string()).default([]),
     tracks: z.array(trackSchema).default([]),
