@@ -31,7 +31,12 @@ order). Track identity = the dir name minus `_astro-catalog`, reconciled with
 context.json `input_name`; **track names are slugified for filenames/R2 keys** while
 `displayTitle` keeps the real name (e.g. `Beta Two` → `beta-two.mp3`). Albums with no
 `*_astro-catalog/` dir are **skipped** (reported, never fatal) — they still need the
-workchain. `__MACOSX/` and `._*` are ignored.
+workchain. Any individual `*_astro-catalog/` whose `context.json` `status` isn't
+`completed` (or whose normalized WAV is missing) is **also skipped**, so a failed /
+half-written workchain run never becomes a broken entry. The **release identity is the
+folder name verbatim** — `a98ff_praise-legend-road` is the literal album name (hex
+prefix kept; slug `a98ff-praise-legend-road`, title defaults to the folder name for
+multi-track albums). `__MACOSX/` and `._*` are ignored.
 
 > The earlier `astro-catalog/` (single) and `<n>/astro-catalog/` (numbered) shapes and
 > the legacy `_final` handling are gone — everything is reprocessed into the

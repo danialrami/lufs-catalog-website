@@ -185,7 +185,7 @@ function parseAstroCatalog(acDir) {
 
   return {
     name, ext, acDir, normalizedWav, reportHtml, artworkMain,
-    catalogNumber, sha256,
+    catalogNumber, sha256, status: ctx.status,
     processedDate: ctx.end_time || ctx.start_time || new Date().toISOString(),
     saturation: ctx.globals?.saturation,
     loudness,
@@ -195,6 +195,15 @@ function parseAstroCatalog(acDir) {
 // ---------- per-track ----------
 async function processAstroTrack(collectionId, trackNumber, acDir) {
   const m = parseAstroCatalog(acDir);
+  // Skip incomplete/failed workchain runs so a half-written dir never becomes a broken entry.
+  if (m.status && m.status !== 'completed') {
+    warn(`skip "${m.name}" — workchain status="${m.status}" (incomplete/failed): ${acDir}`);
+    return null;
+  }
+  if (!existsSync(m.normalizedWav)) {
+    warn(`skip "${m.name}" — normalized WAV missing (failed run?): ${m.normalizedWav}`);
+    return null;
+  }
   const n = String(trackNumber);
   const base = slugify(m.name) || `track-${n}`; // path/URL-safe (track names may have spaces)
   log(`    track ${n}: "${m.name}"  ${m.catalogNumber || '(no catalog#)'}`);
@@ -334,8 +343,9 @@ function writeReleaseMarkdown(slug, data) {
 
 // ---------- orchestrator ----------
 function deriveIds(dirName) {
-  const m = dirName.match(/^([a-f0-9]{4,})_(.+)$/);
-  return { collectionId: dirName, slug: m ? slugify(m[2]) : slugify(dirName) };
+  // The folder name IS the album name verbatim (e.g. "a98ff_praise-legend-road" is the
+  // real album name, hex prefix included) — do not strip anything.
+  return { collectionId: dirName, slug: slugify(dirName) };
 }
 
 async function main() {
@@ -364,10 +374,14 @@ async function main() {
     }
 
     const tracks = [];
-    let i = 0;
     for (const t of found) {
-      i += 1;
-      tracks.push(await processAstroTrack(collectionId, i, t.acDir));
+      const track = await processAstroTrack(collectionId, tracks.length + 1, t.acDir);
+      if (track) tracks.push(track); // null = incomplete/failed run, skipped
+    }
+    if (!tracks.length) {
+      warn(`no completed astro-catalog tracks in ${dirName} — skipping.`);
+      skipped.push(`${dirName} (no completed tracks)`);
+      continue;
     }
 
     // collection cover = first track's artwork
@@ -377,9 +391,9 @@ async function main() {
     const human = readHumanFields(slug);
     const single = tracks.length === 1;
     writeReleaseMarkdown(slug, {
-      title: human.title || (single ? tracks[0].displayTitle : slug),
+      title: human.title || (single ? tracks[0].displayTitle : dirName),
       collectionId,
-      project: human.project || (single ? 'Singles' : (human.title || slug)),
+      project: human.project || (single ? 'Singles' : (human.title || dirName)),
       artist: 'Daniel Ramirez',
       releaseDate: human.releaseDate || (tracks[0].processedDate || '').slice(0, 10) || new Date().toISOString().slice(0, 10),
       status: human.status || 'draft',
