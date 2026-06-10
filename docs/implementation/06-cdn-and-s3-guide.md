@@ -87,6 +87,14 @@ For this project:
 | `reports/` | public | render-stats HTML embedded in an iframe |
 | `artwork/` | public | covers/spectrograms shown on the page |
 
+> **Implementation note (corrects this table):** R2 public access is **bucket-level**,
+> not per-prefix — a public bucket exposes *everything* in it. So as built (see
+> `09-ingest-and-deploy.md` §4.1) we keep **only audio in the private `lufs-catalog`
+> bucket** (signed by the Worker) and commit the small `reports/` + `artwork/` assets
+> into the repo's `public/` instead. To truly serve those from the CDN, use a second
+> *public* bucket. Mental model below is unchanged; just the public/private split is
+> "private bucket + committed assets," not "one bucket, mixed prefixes."
+
 ---
 
 ## 4. Presigned URLs (how we serve private audio)
