@@ -65,3 +65,10 @@ For single-component testing, open a browser tab with `npm run dev` and inspect 
 No specific rules files found. Follow Astro/Svelte conventions:
 - Prefer `@astrojs/svelte` for Svelte integration.
 - Use `svelte.config.js` if present for component configurations.
+
+## Related Documentation
+- **[emdash-research.md](./docs/emdash-research.md)** — Full EmDash research and analysis
+- **[emdash-future-plans.md](./docs/emdash-future-plans.md)** — Future EmDash integration plans
+- **[emdash-related-projects.md](./docs/emdash-related-projects.md)** — External projects and links
+
+> **Note on EmDash**: EmDash is a Cloudflare CMS built on Astro 6.0, explored as a potential future content management solution. For this static catalog site, the current approach is preferred. See docs for details.
