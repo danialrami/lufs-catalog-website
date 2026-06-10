@@ -1,14 +1,7 @@
-/* Reset + Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Reset + base */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-html {
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-}
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
 
 body {
   font-family: var(--font-body);
@@ -18,32 +11,45 @@ body {
 }
 
 h1, h2, h3 {
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   color: var(--color-text);
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
+a { color: var(--color-teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
-a {
-  color: var(--color-teal);
-  text-decoration: none;
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+img { max-width: 100%; height: auto; display: block; }
+
+/* Brand utilities */
+.eyebrow, .sec-label {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
 }
+.mono { font-family: var(--font-mono); }
 
-a:hover {
-  text-decoration: underline;
+/* Custom cursor — desktop only, JS-gated, blend-difference dot + lagging ring */
+.cur-dot, .cur-ring {
+  position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+  border-radius: 50%; mix-blend-mode: difference;
 }
+.cur-dot  { width: 6px;  height: 6px;  background: var(--color-teal); }
+.cur-ring { width: 30px; height: 30px; border: 1px solid var(--color-teal); transition: width .2s ease, height .2s ease; }
+.cur-ring.hot { width: 46px; height: 46px; }
+@media (hover: none) { .cur-dot, .cur-ring { display: none; } }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-}
+/* Scroll reveal — only hides once JS is active, so no-JS keeps content visible */
+.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+.js .reveal.in { opacity: 1; transform: none; }
 
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .cur-dot, .cur-ring { display: none !important; }
 }

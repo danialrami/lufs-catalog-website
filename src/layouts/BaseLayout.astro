@@ -18,14 +18,72 @@ const { title } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600;700;800&family=Public+Sans:wght@300;400;500;600&family=Space+Mono&display=swap"
+    />
     <ClientRouter />
   </head>
   <body>
+    <div class="cur-dot" aria-hidden="true"></div>
+    <div class="cur-ring" aria-hidden="true"></div>
+
     <slot />
-    
+
     <footer>
       <PlayerBar client:load transition:persist="player-bar" />
     </footer>
+
+    <script is:inline>
+      // Brand interactions: js-gate, custom cursor (once), scroll-reveal (force-show fallback).
+      (function () {
+        document.documentElement.classList.add('js');
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function initCursorOnce() {
+          if (window.__lufsCursor) return;
+          if (reduce || window.matchMedia('(hover: none)').matches) return;
+          var dot = document.querySelector('.cur-dot');
+          var ring = document.querySelector('.cur-ring');
+          if (!dot || !ring) return;
+          window.__lufsCursor = true;
+          var mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
+          addEventListener('mousemove', function (e) {
+            mx = e.clientX; my = e.clientY;
+            dot.style.transform = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
+          });
+          (function loop() {
+            rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+            ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
+            requestAnimationFrame(loop);
+          })();
+          addEventListener('mouseover', function (e) { if (e.target.closest('a,button,[data-hover]')) ring.classList.add('hot'); });
+          addEventListener('mouseout', function (e) { if (e.target.closest('a,button,[data-hover]')) ring.classList.remove('hot'); });
+        }
+
+        function initReveal() {
+          var els = document.querySelectorAll('.reveal:not(.in)');
+          if (!els.length) return;
+          if (reduce || !('IntersectionObserver' in window)) {
+            els.forEach(function (el) { el.classList.add('in'); });
+            return;
+          }
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } });
+          }, { threshold: 0.12 });
+          els.forEach(function (el) { io.observe(el); });
+          // Force-show fallback so nothing is ever stuck hidden.
+          setTimeout(function () { els.forEach(function (el) { el.classList.add('in'); }); }, 1200);
+        }
+
+        function init() { initCursorOnce(); initReveal(); }
+        document.addEventListener('astro:page-load', init);
+        if (document.readyState !== 'loading') init();
+        else document.addEventListener('DOMContentLoaded', init);
+      })();
+    </script>
   </body>
 </html>
 

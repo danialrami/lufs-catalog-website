@@ -42,6 +42,12 @@ come back.
 **Objective:** a real, browsable URL as fast as possible, using what already works
 (the *Continuo* album).
 
+> **Note:** `pnpm install` / `pnpm build` can't run in the agent sandbox (the npm
+> registry is blocked there), so the Astro build is verified on Daniel's Mac (or the
+> optional CI build-check). Logic that needs only Node + ffmpeg (the ingest) *is*
+> verified in-sandbox. Deploy = `catalog-deploy.sh` + Hostinger webhook (no CI) —
+> see [`09-ingest-and-deploy.md`](./09-ingest-and-deploy.md) §3.
+
 - [ ] Clone the repo into the sandbox, `npm install`, and run `npm run build`; capture any errors.
 - [ ] Fix build/schema issues; keep the existing `continuo.md` example rendering.
 - [ ] Choose an **interim asset strategy**:
@@ -82,6 +88,14 @@ and no download link; reports/artwork load from the public prefixes.
 **Objective:** one command turns a workchain astro-catalog export into a published
 catalog entry.
 
+> **Status (2026-06-10): the ingest is built + tested.** `catalog-ingest.mjs`
+> classifies shapes, parses `context.json` + `catalog_info.txt` + `normalization.json`,
+> transcodes WAV→MP3 @320k, computes duration via ffprobe, sanitizes the report, and
+> writes an edit-preserving release `.md` — validated end-to-end against the real
+> `3434` sample. `catalog-deploy.sh` is written. Remaining: R2/rustfs upload
+> (`STORAGE_MODE=remote`, Phase 2), organize-by-project/year, and legacy-shape
+> support. Full detail in [`09-ingest-and-deploy.md`](./09-ingest-and-deploy.md).
+
 - [ ] Get a real `context.json` (from the workchain repo's astro-catalog chain, or a sample export) to design against.
 - [ ] Rewrite the ingest to recognize **three source shapes** (see [`02-observed-state.md`](./02-observed-state.md)):
       single-track astro-catalog (e.g. `3434/astro-catalog/`), multi-track album
@@ -105,6 +119,12 @@ catalog entry.
 
 **Objective:** make it unmistakably LUFS and pleasant to use.
 
+> **Status (2026-06-10): done (build-sensitive — verify after `pnpm build`).** Brand
+> tokens + Host Grotesk/Public Sans/Space Mono, custom cursor + JS-gated scroll-reveal
+> (force-show fallback) + reduced-motion, the project legend filter now actually
+> filters, and an embedded sandboxed proof-of-work report with loudness. Detail in
+> [`10-brand-and-ux.md`](./10-brand-and-ux.md). Deferred: WebGL hero, chapter-marker timeline.
+
 - [ ] Apply the **LUFS Brand Design System**: tokens, Host Grotesk + Public Sans +
       Space Mono, dark-editorial components, single-accent (teal) discipline.
 - [ ] Custom cursor + scroll-reveal **with the force-show fallback** + `prefers-reduced-motion`.
@@ -120,6 +140,11 @@ no-JS; consistent with the rest of the LUFS web family.
 ## Phase 5 — Repeatable runbook and handoff
 
 **Objective:** Daniel can publish a new release in minutes, from memory or a one-pager.
+
+> **Status (2026-06-10): done.** Runbook at [`11-runbook.md`](./11-runbook.md); the
+> consolidated one-time + per-release human checklist is the root [`SETUP.md`](../../SETUP.md).
+> CI decision recorded in [`09`](./09-ingest-and-deploy.md) §3. Remaining: optionally
+> backfill PRD/TDD to match, and the future drafts/SoundCloud hooks.
 
 - [ ] `docs/implementation/08-runbook.md`: end-to-end steps (workchain → ingest → deploy), with troubleshooting.
 - [ ] Update README / PRD / TDD and fill the TDD "Key Decisions Log".

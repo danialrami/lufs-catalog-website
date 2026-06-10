@@ -54,40 +54,56 @@ const { release } = Astro.props;
         {release.data.tracks.length > 0 ? (
           <div class="tracks">
             {release.data.tracks.map((track) => (
-              <div class="track-row">
-                <div class="track-info">
-                  <span class="track-number">{track.trackNumber}</span>
-                  <button 
-                    class="track-play-btn play-button"
-                    data-audio-path={track.audioPath}
-                    data-track-title={track.displayTitle}
-                    aria-label={`Play ${track.displayTitle}`}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" fill="#78BEBA"/>
-                    </svg>
-                  </button>
-                  <div class="track-details">
-                    <span class="track-title">{track.displayTitle}</span>
-                    <span class="track-meta">
-                      {track.catalogNumber && <span class="catalog-number">{track.catalogNumber}</span>}
-                      {track.saturation && <span class="saturation">Sat: {track.saturation}</span>}
-                    </span>
+              <div class="track reveal">
+                <div class="track-row">
+                  <div class="track-info">
+                    <span class="track-number">{track.trackNumber}</span>
+                    <button
+                      class="track-play-btn play-button"
+                      data-audio-path={track.audioPath}
+                      data-track-title={track.displayTitle}
+                      aria-label={`Play ${track.displayTitle}`}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" fill="#78BEBA"/>
+                      </svg>
+                    </button>
+                    <div class="track-details">
+                      <span class="track-title">{track.displayTitle}</span>
+                      <span class="track-meta">
+                        {track.catalogNumber && <span class="catalog-number">{track.catalogNumber}</span>}
+                        {track.loudness?.finalLufs !== undefined && <span>{track.loudness.finalLufs} LUFS</span>}
+                        {track.loudness?.truePeak !== undefined && <span>{track.loudness.truePeak} dBTP</span>}
+                        {track.saturation && <span class="saturation">sat {track.saturation}</span>}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="track-actions">
+                    {track.finalReport && (
+                      <a href={track.finalReport} target="_blank" rel="noopener noreferrer" class="report-link">
+                        Open report ↗
+                      </a>
+                    )}
+                    {track.renderStatsPath && (
+                      <a href={track.renderStatsPath} target="_blank" rel="noopener noreferrer" class="report-link">
+                        Render stats ↗
+                      </a>
+                    )}
                   </div>
                 </div>
-                
-                <div class="track-actions">
-                  {track.finalReport && (
-                    <a href={track.finalReport} target="_blank" class="report-link">
-                      View Report
-                    </a>
-                  )}
-                  {track.renderStatsPath && (
-                    <a href={track.renderStatsPath} target="_blank" class="report-link">
-                      Render Stats
-                    </a>
-                  )}
-                </div>
+
+                {track.finalReport && (
+                  <details class="report">
+                    <summary>Proof of work{track.sha256 ? ` — ${track.sha256.slice(0, 12)}…` : ''}</summary>
+                    <iframe
+                      src={track.finalReport}
+                      title={`Workchain report for ${track.displayTitle}`}
+                      loading="lazy"
+                      sandbox="allow-same-origin"
+                    ></iframe>
+                  </details>
+                )}
               </div>
             ))}
           </div>
@@ -165,7 +181,7 @@ const { release } = Astro.props;
         padding: 0;
         background-color: var(--color-bg);
         color: var(--color-text);
-        font-family: system-ui, -apple-system, sans-serif;
+        font-family: var(--font-body);
       }
       
       .container {
@@ -334,6 +350,31 @@ const { release } = Astro.props;
       .report-link:hover {
         background-color: var(--color-teal);
         color: #111;
+      }
+
+      .track { display: flex; flex-direction: column; }
+
+      details.report { margin: 0.25rem 0; }
+      details.report > summary {
+        cursor: pointer;
+        list-style: none;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        padding: 0.5rem 0;
+      }
+      details.report > summary::-webkit-details-marker { display: none; }
+      details.report > summary:hover,
+      details.report[open] > summary { color: var(--color-teal); }
+      details.report iframe {
+        width: 100%;
+        height: 520px;
+        margin-top: 0.5rem;
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+        background: #0c0c0c;
       }
       
       .streaming-links {
