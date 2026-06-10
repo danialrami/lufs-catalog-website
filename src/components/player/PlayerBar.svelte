@@ -86,12 +86,11 @@
     duration = 0;
     
     persistedTrack.set({ audioPath: track.audioPath, position: 0 });
-    
-    const loaded = audioManager.loadAudio(track.audioPath);
-    if (loaded) {
-      audioManager.setVolume(volume);
-      audioManager.play();
-    }
+
+    // Persist volume first so the new Howl picks it up, then load with autoplay
+    // (loadAudio plays on load — works for both local URLs and async-signed R2 keys).
+    audioManager.setVolume(volume);
+    audioManager.loadAudio(track.audioPath, true);
   }
 
   function restorePlayback() {

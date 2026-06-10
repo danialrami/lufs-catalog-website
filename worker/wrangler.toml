@@ -1,0 +1,22 @@
+# Cloudflare Worker that signs private R2 audio URLs for catalog.lufs.audio.
+# Deploy:  cd worker && npm install && npx wrangler deploy
+# Map a route/custom domain to it (e.g. stream.lufs.audio) in the Cloudflare dashboard,
+# then set PUBLIC_R2_STREAM_URL to that URL in .env.production.
+
+name = "lufs-catalog-stream"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+# Non-secret vars (safe to commit).
+[vars]
+ALLOWED_ORIGIN = "https://catalog.lufs.audio"
+R2_BUCKET_NAME = "lufs-catalog"
+URL_TTL_SECONDS = "3600"
+
+# Secrets — DO NOT put here. Set them once with:
+#   npx wrangler secret put R2_ACCOUNT_ID
+#   npx wrangler secret put R2_ACCESS_KEY_ID
+#   npx wrangler secret put R2_SECRET_ACCESS_KEY
+#
+# To also allow local dev origin, set:
+#   ALLOWED_ORIGIN = "https://catalog.lufs.audio,http://localhost:4321"

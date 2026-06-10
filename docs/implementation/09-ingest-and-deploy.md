@@ -1,0 +1,177 @@
+# 09 — Ingest & Deploy (built in Phase 3)
+
+What `catalog-ingest.mjs` and `catalog-deploy.sh` do, and the decision on the
+GitHub Actions workflow. This reflects code that exists and was tested against the
+real `3434` astro-catalog sample.
+
+---
+
+## 1. The ingest: `src/scripts/ingest/catalog-ingest.mjs`
+
+A single, dependency-light Node script (Node stdlib + `ffmpeg`/`ffprobe` + the
+existing `node-html-parser` dep, with a regex fallback) that turns workchain output
+into catalog content.
+
+### Shapes it recognizes (`classify()`)
+| Shape | Detector | Handled |
+|---|---|---|
+| astro-catalog single-track | `<album>/astro-catalog/context.json` | ✅ full |
+| astro-catalog multi-track | `<album>/<n>/astro-catalog/context.json` | ✅ full |
+| legacy hex_slug album | `^[a-f0-9]+_…` + numbered `*_final/` | ⛔ skipped (use `catalog-ingest-local.mjs`, or re-run through the workchain) |
+| legacy single `*_final` | dir ends `_final` | ⛔ skipped |
+| raw / unprocessed | none of the above | ⛔ skipped (needs the workchain first) |
+
+Skipped albums are reported, never fatal. `__MACOSX/` and `._*` resource forks are
+ignored.
+
+### Metadata sources (structured, not scraped)
+Per the confirmed sample (see also `02-observed-state.md`):
+- **`context.json`** → resolves every output via its `path_template` (relative to the
+  `astro-catalog/` dir — we deliberately ignore the absolute paths baked in, which
+  point at Daniel's machine). Also gives `globals.saturation` and timestamps.
+- **`catalog/catalog_info.txt`** → `catalogNumber` (`lufs-XXXXXXXX`) + full `sha256`.
+- **`logs/normalization.json`** → `loudness` (target/final LUFS, true peak, LRA,
+  sample rate, channels) — surfaced as proof-of-work.
+
+### What it produces (local mode)
+- **Audio:** transcodes `<name>_normalized.wav` → **MP3 @ 320 kbps** (`-codec:a
+  libmp3lame -b:a 320k -joint_stereo 1 -map_metadata -1`) into
+  `public/audio/<collectionId>/<n>/<name>.mp3`; **duration via `ffprobe`**.
+- **Report:** sanitizes `<name>_report.html` (strips `<audio>`, `<source>`, and
+  `download`/`*.wav`/`*.mp3` anchors so there's no download affordance — text
+  mentions of filenames are harmless) → `public/reports/<collectionId>/<n>/final_report.html`,
+  copying its `artwork/`, `canvas/`, `logs/` alongside so the embedded relative links
+  resolve.
+- **Covers:** `artwork.png` + `identicon/spectrogram/rectangle_spectrogram.png` +
+  `canvas_static.png` → `public/covers/<collectionId>/<n>/`, plus a collection
+  `cover.png`.
+- **Content:** writes/merges `src/content/releases/<slug>.md` (schema in
+  `src/content/config.ts`, now incl. an optional `loudness` block).
+
+### Edit-preserving merge (idempotent)
+On re-ingest, machine fields (`catalogNumber`, `sha256`, `duration`, `loudness`,
+asset paths, `processedDate`, `saturation`) are refreshed, while **human-owned
+fields are preserved**: `title`, `project`, `releaseDate`, `status`, `isrc`,
+`streamingLinks.*`, `tags`. New releases default to **`status: draft`** (so nothing
+goes public until you flip it) and `project: "Singles"` for single tracks — edit and
+re-run safely.
+
+### Config (env)
+`CATALOG_SOURCE_PATH`, `MP3_BITRATE` (default `320k`), `STORAGE_MODE`
+(`local` now; `remote` = R2/rustfs upload is Phase 2), `CATALOG_OUTPUT_ROOT`
+(testing), `CATALOG_ONLY` (process one album, for testing).
+
+### System dependency
+**`ffmpeg` + `ffprobe` must be on PATH** (the workchain already uses ffmpeg, so
+Daniel's Mac has it). Documented here so it isn't a surprise on a fresh machine.
+
+### Validated (2026-06-10) against the real `3434` sample
+`42.9 MB normalized.wav → 8.9 MB MP3 @320k`, `ffprobe` duration **223 s**, catalog
+`lufs-424b1054`, loudness final −13.14 LUFS / TP −1.5 / LRA 7 / 48 kHz / 2ch. Report
+sanitized to **0** audio/source tags, **0** download links, **0** live `.wav`
+src/href (kept imgs + the canvas video). Re-ingest preserved simulated human edits.
+
+> **Not yet:** R2/rustfs upload (`STORAGE_MODE=remote`) lands in Phase 2 via
+> `uploadR2.mjs`; the script already branches on `STORAGE_MODE` and warns. Legacy
+> album/`_final` shapes are skipped for now (only the Continuo album used them; the
+> path forward is astro-catalog).
+
+---
+
+## 2. Deploy: `catalog-deploy.sh` + Hostinger webhook (no CI)
+
+```
+pnpm catalog:ingest         # (local) transcode + assets + content   [needs NAS + ffmpeg]
+./catalog-deploy.sh [--ingest]
+   ├── pnpm build            -> dist/
+   ├── git push origin main  (source)
+   └── publish dist/  ->  `hostinger` branch  (built output, via a throwaway repo)
+                              │
+                              └── Hostinger Git auto-deploy webhook -> public_html -> catalog.lufs.audio
+```
+
+Key point: **Hostinger static hosting doesn't build Astro**, so the branch it watches
+must contain *built* output. `catalog-deploy.sh` builds locally and publishes only
+`dist/` to the `hostinger` branch (using a temporary repo, so `dist/` never has to be
+committed to `main`). The Hostinger side is exactly the "GitHub → webhook →
+auto-deploy" flow Daniel already uses for the Hugo blog — just pointed at the
+`hostinger` branch.
+
+---
+
+## 3. Decision: the GitHub Actions workflow (`deploy.yml`) — **removed**
+
+The existing `.github/workflows/deploy.yml` was a **non-functional placeholder**:
+- every real deploy step was commented out (it only built + uploaded an artifact),
+- it had bugs (`cache: pnpm` ordered before pnpm setup; a bogus `pnpm build --out
+  dist` double-build; deprecated `setup-node@v3` / `upload-artifact@v3`), and
+- it duplicated/contradicted the local-build + webhook model.
+
+Since (a) deployment is handled by `catalog-deploy.sh` + the Hostinger webhook, and
+(b) the build already runs locally right before each deploy (so a CI build-check is
+redundant for a solo workflow), **we removed it** to keep one clear deploy path.
+
+**If we ever want CI back**, the one genuinely useful job would be a *build-health
+check* on PRs (no secrets, no deploy): `pnpm install --frozen-lockfile && pnpm build
+&& pnpm astro check`. That catches a broken content `.md` or dependency before it
+reaches the deploy script. It's easy to add later as `.github/workflows/ci.yml`; it's
+intentionally omitted now per the "keep it simple, deploy via webhook" preference.
+
+> Sandbox note: the build itself can't be verified in the agent sandbox (the npm
+> registry is blocked there), so `pnpm install && pnpm build` runs on Daniel's Mac
+> (or in the optional CI). The ingest logic above *was* verified in-sandbox because
+> it only needs Node + ffmpeg.
+
+---
+
+## 4. Phase 2: storage + protected streaming (built)
+
+### 4.1 Bucket model (a correction to the PRD/TDD)
+R2 public access is **bucket-level**, not per-prefix — attaching a public r2.dev URL
+or custom domain exposes the *whole* bucket. So the "`releases/` private, `reports/`
+public within one bucket" idea in the PRD/TDD isn't how R2 works. The implemented
+model is simpler and cheaper:
+
+- **Private R2 bucket `lufs-catalog`** holds only the **audio MP3s** (`releases/…`),
+  served via short-lived presigned URLs from the Worker. Nothing public points at it.
+- **Small assets** (the ~8 KB sanitized `final_report.html` + cover/identicon/
+  spectrogram/canvas-still PNGs) stay **committed in `public/`** and deploy with the
+  site — cacheable, zero-egress, no second bucket, no signing needed.
+- The **45 MB Spotify-canvas GIF is never shipped** (ingest excludes `*.gif` and the
+  sanitizer drops its `<img>`); the static PNG + the 3 MB MP4 cover the visual.
+
+If you ever want reports/artwork on the CDN too, add a *second, public* bucket
+(`lufs-catalog-public` + custom domain) — but at this scale committing them is fine.
+
+### 4.2 Pieces
+- **`worker/`** — `lufs-catalog-stream`, a tiny Cloudflare Worker that presigns GET
+  URLs for `releases/…` keys using `aws4fetch` (Workers-native; no AWS SDK / no
+  `nodejs_compat`). Origin-locked to `ALLOWED_ORIGIN`; only signs `releases/` keys;
+  TTL via `URL_TTL_SECONDS` (default 1h). Deploy: `npm run worker:deploy`. Setup in
+  `worker/README.md`.
+- **`src/scripts/ingest/uploadR2.mjs`** — `uploadObject(localPath, key, contentType)`
+  via `@aws-sdk/client-s3` `PutObject` (lazy-loaded; only needed in remote mode).
+  Includes a commented rustfs mirror (doc 07).
+- **ingest remote mode** — with `STORAGE_MODE=remote`, the MP3 is transcoded to a
+  temp file, uploaded to `releases/<collectionId>/<n>/<file>.mp3`, and the track's
+  `audioPath` is set to that **key** (not a `/audio/…` path). Reports + covers still
+  go to `public/`.
+- **player** — `src/components/player/resolveAudio.ts` turns a stored ref into a
+  playable URL: `/…` or `http(s)` → used as-is (local, unchanged); otherwise treated
+  as an R2 key and exchanged for a signed URL via `PUBLIC_R2_STREAM_URL`.
+  `audioManager.loadAudio()` builds the Howl synchronously for direct URLs (local
+  behavior preserved) and asynchronously after signing for keys. The NAS failover is
+  present but commented.
+
+### 4.3 The R2 ↔ rustfs switch
+`STORAGE_PRIMARY`, `STORAGE_MIRROR`, `STREAM_FALLBACK_ENABLED` live in
+`.env.production` and are flipped with `scripts/catalog-set-origin.sh`. The rustfs
+dual-write (`uploadR2.mjs`) and player failover (`resolveAudio.ts`) are written but
+commented until the NAS endpoint exists (doc 07 has the stand-up checklist).
+
+### 4.4 Build-sensitive — verify after `pnpm build`
+The Node/Worker pieces are correct-by-construction, but the **player edit**
+(`audioManager.ts` + `PlayerBar.svelte`) and the worker both need a real build/deploy
+to confirm. Local playback is preserved by the direct-URL short-circuit, so the risk
+is confined to the remote-streaming path (which only matters once R2 is set up).
+`@aws-sdk/client-s3` was added to root deps → run `pnpm install` after pulling.

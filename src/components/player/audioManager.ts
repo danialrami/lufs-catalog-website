@@ -4,6 +4,7 @@
  */
 
 import { Howl } from 'howler';
+import { resolveAudioUrl, isDirectUrl } from './resolveAudio';
 
 const STORAGE_KEY = 'lufs-audio-state';
 
@@ -96,34 +97,21 @@ export function restoreFromStorage(): { audioPath: string; position: number; vol
   };
 }
 
-export function loadAudio(audioPath: string, autoPlay = true): boolean {
-  if (howlInstance && currentAudioPath === audioPath && howlInstance.state() === 'loaded') {
-    return true;
-  }
-
-  if (howlInstance && howlInstance.playing()) {
-    lastKnownPosition = howlInstance.seek() as number;
-    saveState({ position: lastKnownPosition });
-  }
-
-  if (howlInstance) {
-    howlInstance.unload();
-    howlInstance = null;
-  }
-
-  currentAudioPath = audioPath;
-  saveState({ audioPath, position: 0, isPlaying: false });
-
+/**
+ * Build the Howl from an already-resolved playable URL. `autoPlay` starts playback
+ * on load so it works for both the synchronous (local) and async (R2) paths.
+ */
+function buildHowl(resolvedUrl: string, autoPlay: boolean) {
+  const volume = getStoredState()?.volume ?? 0.8;
   try {
     howlInstance = new Howl({
-      src: [audioPath],
+      src: [resolvedUrl],
       html5: true,
       format: ['mp3'],
-      volume: 0.8,
+      volume,
       onload: () => {
-        if (onLoadCallback && howlInstance) {
-          onLoadCallback(howlInstance.duration());
-        }
+        if (onLoadCallback && howlInstance) onLoadCallback(howlInstance.duration());
+        if (autoPlay && howlInstance) howlInstance.play();
       },
       onplay: () => {
         startPositionTracking();
@@ -157,11 +145,43 @@ export function loadAudio(audioPath: string, autoPlay = true): boolean {
         }
       },
     });
-    return true;
   } catch (e) {
-    console.error('Failed to load audio:', e);
-    return false;
+    console.error('Failed to build audio:', e);
   }
+}
+
+/**
+ * Load audio from a stored reference: a local "/audio/…" URL (or any http(s) URL),
+ * or a private R2 key like "releases/…". Direct URLs build synchronously (unchanged
+ * local behavior); R2 keys are first exchanged for a short-lived signed URL via the
+ * stream Worker (see resolveAudio.ts).
+ */
+export function loadAudio(ref: string, autoPlay = true): boolean {
+  if (howlInstance && currentAudioPath === ref && howlInstance.state() === 'loaded') {
+    if (autoPlay) howlInstance.play();
+    return true;
+  }
+
+  if (howlInstance && howlInstance.playing()) {
+    lastKnownPosition = howlInstance.seek() as number;
+    saveState({ position: lastKnownPosition });
+  }
+  if (howlInstance) {
+    howlInstance.unload();
+    howlInstance = null;
+  }
+
+  currentAudioPath = ref;
+  saveState({ audioPath: ref, position: 0, isPlaying: false });
+
+  if (isDirectUrl(ref)) {
+    buildHowl(ref, autoPlay); // local / already-public URL — synchronous, as before
+  } else {
+    resolveAudioUrl(ref) // private R2 key — sign via the stream Worker
+      .then((url) => buildHowl(url, autoPlay))
+      .catch((e) => console.error('Failed to resolve audio URL:', e));
+  }
+  return true;
 }
 
 export function play() {
