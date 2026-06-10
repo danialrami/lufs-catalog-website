@@ -5,9 +5,11 @@ All of this runs on Daniel's Mac (it needs the NAS + ffmpeg).
 
 ## Publish / update a release
 
-1. **Run the workchain** on the finished audio with the `astro-catalog` chain →
-   produces `…/catalogs/<album>/astro-catalog/` (with `context.json`, the normalized
-   WAV, report, artwork, canvas).
+1. **Process the audio.** Drop the finished track(s) into the album dir, then run
+   `./scripts/catalog-process.sh --album <album-dir>` (or pass files). It runs the
+   lufs-workchain `astro-catalog` chain per file and leaves a `{track-name}_astro-catalog/`
+   dir per track, ready to ingest. (Or run the workchain yourself and name each output
+   dir `{track-name}_astro-catalog`.)
 2. **Deploy:**
    ```bash
    ./catalog-deploy.sh --ingest

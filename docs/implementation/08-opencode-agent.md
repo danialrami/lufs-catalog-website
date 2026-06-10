@@ -31,7 +31,8 @@ switch). No extra config needed.
 |---|---|---|
 | "What's the current config / where are we serving from?" | `./scripts/catalog-config.sh` | Read-only, masks secrets |
 | "Switch production to rustfs" / "…back to R2" | `./scripts/catalog-set-origin.sh <origin>` | 🛑 confirms first; warns if rustfs isn't stood up |
-| "Update the site with the new audio I added" | `./catalog-sync.sh` (local) or `pnpm catalog:ingest` (R2) | 🛑 confirms before any bucket upload |
+| "Process the new audio I dropped in" | `./scripts/catalog-process.sh <file>… \| --album <dir>` | 🛑 runs the lufs-workchain `astro-catalog` chain; leaves `{track-name}_astro-catalog/` ready to ingest |
+| "Update the site with the new audio" | `catalog-process.sh` (if unprocessed) → `pnpm catalog:ingest` or `./catalog-deploy.sh --ingest` | 🛑 confirms before any upload/deploy |
 | "Run it locally / preview" | `./catalog-dev.sh --ingest` or `pnpm dev` | |
 | "Build" | `pnpm build` | |
 | "Deploy / publish" | `./catalog-deploy.sh` | 🛑 confirms before pushing to production |
@@ -59,7 +60,14 @@ changed**.
 
 ---
 
-## 4. The two helper scripts
+## 4. The helper scripts
+
+### `scripts/catalog-process.sh <file>… | --album <dir>`
+Runs the lufs-workchain `astro-catalog` chain on each audio file and normalizes the
+output to `{track-name}_astro-catalog/` in the album root (the shape the ingest
+expects). This is the "new audio → ready to ingest" step. Requires the
+`lufs-workchain` CLI on PATH + ffmpeg + the workchain's Python deps; override the
+command with `WORKCHAIN_CMD`. After it, run `pnpm catalog:ingest`.
 
 ### `scripts/catalog-config.sh`
 Read-only. Loads the first of `.env.production` / `.env.local` / `.env` (or `--env
@@ -85,17 +93,15 @@ Both are pure-local (no cloud calls), so they're safe and were tested before com
 
 ---
 
-## 6. Commands that don't exist yet
+## 6. External dependency
 
-The agent references a few commands that land in later build phases:
-- `pnpm catalog:ingest` with **R2 upload** (Phase 2/3) — today only the local
-  `catalog:ingest:local` exists.
-- `./catalog-deploy.sh` (Phase 3).
-- the signing Worker / `wrangler` deploy (Phase 2).
-
-The agent is instructed to **say so plainly** if a referenced script isn't present
-yet and point at `01-implementation-plan.md` for status — it won't improvise a
-substitute. As those scripts land, the agent "lights up" with no edits needed.
+Everything the agent references now exists in the repo (`catalog:ingest`,
+`catalog-deploy.sh`, the signing Worker, `catalog-config.sh`, `catalog-set-origin.sh`,
+`catalog-process.sh`). The one **external** dependency is the **`lufs-workchain` CLI**
+(used by `catalog-process.sh`): it must be installed on PATH from the workchain repo
+(`cd cli && npm install && npm link`, plus `uv sync` for the artwork/canvas Python
+deps). If it's missing, the agent is instructed to say so plainly and stop rather than
+improvise.
 
 ---
 
