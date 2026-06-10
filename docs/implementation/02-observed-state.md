@@ -63,9 +63,12 @@ collection `a98ff_praise-legend-road`.
 
 ## 4. Source-shape taxonomy (critical for Phase 3)
 
-The real catalog at `/Volumes/project/continuo/catalogs` contains **several distinct
-shapes**. The current ingest handles only one of them. The new pipeline must handle
-at least the first three:
+**Each top-level folder under `/Volumes/project/continuo/catalogs` is one album**
+(a collection / release) — `a98ff_praise-legend-road`, `footlights`, `3434`,
+`my-mind`, `hogtagon`, etc. are all albums. They differ along two axes: **how many
+tracks**, and **the processing state/shape of those tracks**. The current ingest
+recognizes only one of these shapes; the new pipeline must handle at least the first
+three below, and treat the rest as albums that simply aren't workchain-processed yet.
 
 ### A) NEW — astro-catalog single-track (the target format) ⛔ not handled
 Example: `3434/`
@@ -110,12 +113,19 @@ Examples: `10-00.0006-37.182_final/`, `my-mind/my-mind_final/`, `my-mind/if-you-
 Note: these use the older `audio/{original,normalized,protected}` layout and a
 `_normalized_protected` step. Mostly WAV → also need transcode.
 
-### D) RAW, unprocessed (out of scope until run through the workchain)
-Folders of loose audio with no workchain output: `footlights/`, `hogtagon/`,
-`masked/`, `pulse/`, `soundcloud/`, `ambulance/`, `animal/`, `elegant-picking/`,
-`reminisce-reprise/`, `HH/`. These are **not** catalog entries yet — they're source
-material. Ingest should ignore them (optionally list them as "unprocessed" for
-Daniel's awareness).
+### D) Albums awaiting workchain processing (raw audio) ⛔ skip for now
+Albums whose tracks are still loose, unprocessed audio with no workchain output:
+`footlights/`, `hogtagon/`, `masked/`, `pulse/`, `soundcloud/`, `ambulance/`,
+`animal/`, `elegant-picking/`, `reminisce-reprise/`, `HH/`. These **are** albums —
+they just haven't been run through `lufs-workchain` yet, so they have no catalog
+number, report, or normalized master to publish. The ingest should **skip their
+tracks** and (optionally) surface them to Daniel as "albums needing processing"
+rather than treat them as publishable entries. Once their tracks go through the
+workchain (producing astro-catalog output), they ingest like any shape A album.
+
+> `soundcloud/` is more of a mixed dumping ground than a coherent album; flag it for
+> Daniel to curate into real albums rather than auto-ingesting. (The PRD already
+> notes the SoundCloud archive as a v2 candidate.)
 
 ---
 

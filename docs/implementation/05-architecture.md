@@ -28,7 +28,7 @@ Mac + NAS (/Volumes/project/continuo/catalogs)
 ```
 Mac + NAS                                  Cloudflare
   pnpm catalog:ingest                       ┌───────────────────────────┐
-    ├─ transcode WAV→MP3 (ffmpeg)           │  R2 bucket: lufs-audio     │
+    ├─ transcode WAV→MP3 (ffmpeg)           │  R2 bucket: lufs-catalog     │
     ├─ upload audio   ───────────────────►  │   releases/  (PRIVATE)     │
     ├─ upload reports ───────────────────►  │   reports/   (public)      │
     ├─ upload artwork ───────────────────►  │   artwork/   (public)      │
@@ -139,6 +139,28 @@ and treat project/year purely as **presentation metadata** (frontmatter
 `project`, derived `year` from `releaseDate`). That way re-organizing the *site* never
 requires re-uploading or moving objects in the bucket. Grouping is a view concern;
 keys are an identity concern — don't couple them.
+
+---
+
+## 5.1 Storage origin switch (env-driven)
+
+Which origin the site actually serves from is **one centralized switch**, not a code
+change. All of it lives in `.env.production` (template `.env.production.example`):
+
+| Var | Values | Role |
+|---|---|---|
+| `STORAGE_MODE` | `local` \| `remote` | local = serve from `public/` (no cloud); remote = object storage |
+| `STORAGE_PRIMARY` | `r2` \| `rustfs` | the active origin (the switch) |
+| `STORAGE_MIRROR` | `none` \| `r2` \| `rustfs` | dual-write a 2nd copy on ingest |
+| `STREAM_FALLBACK_ENABLED` | `true` \| `false` | auto fail over to the other origin on a fetch error |
+
+Both the **ingest** (where it uploads) and the **player/report loader** (where it
+fetches) read these. Identical S3 keys are used on both origins, so switching is just
+"point at the other endpoint." The switch is operated by `scripts/catalog-set-origin.sh`
+(and the `catalog-operator` opencode agent — doc 08), never by hand-editing in the
+common case. Per-origin credentials + URLs (`R2_*`, `PUBLIC_R2_*`, `RUSTFS_*`,
+`PUBLIC_RUSTFS_*`) sit in the same file; only `PUBLIC_*` reach the browser. Design
+details: [`07-nas-rustfs-fallback.md`](./07-nas-rustfs-fallback.md).
 
 ---
 

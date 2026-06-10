@@ -1,11 +1,26 @@
-# 07 — NAS rustfs S3 Fallback
+# 07 — NAS rustfs: Alternative Origin + Fallback
 
-**Goal:** if Cloudflare/R2 is ever unavailable, the catalog keeps serving from a
-**second origin you control** — an S3-compatible **rustfs** server on the NAS — and
-the ingest keeps a **second copy** of every asset there.
+**Goal:** give the catalog a **second origin you control** — an S3-compatible
+**rustfs** server on the NAS — that can be used two ways:
+
+1. **As a deliberate switch** — flip `STORAGE_PRIMARY=rustfs` to make the NAS the
+   thing production serves from (e.g. if you ever don't want to pay Cloudflare, or
+   want full sovereignty). One command: `./scripts/catalog-set-origin.sh rustfs`.
+2. **As an automatic fallback** — with `STREAM_FALLBACK_ENABLED=true`, the player and
+   report loader retry against the NAS if the primary (R2) errors out.
+
+Either way the ingest can keep a **second copy** of every asset there
+(`STORAGE_MIRROR=rustfs`).
 
 **Status:** designed now; **implemented but commented/flagged off** until Daniel
-stands up rustfs + a public, TLS reverse proxy. Nothing here is enabled by default.
+stands up rustfs + a public, TLS reverse proxy. Nothing here is enabled by default,
+and the switch script refuses to point production at rustfs until `RUSTFS_ENDPOINT`
+is configured.
+
+> Note: the headline R2 fees are tiny (see `06-cdn-and-s3-guide.md` §6 — basically
+> just storage above 10 GB, with **zero egress**). So the *practical* reasons to use
+> rustfs are resilience, sovereignty, and avoiding a card-on-file — not big savings.
+> The switch exists so that choice is always yours.
 
 ---
 
@@ -18,7 +33,7 @@ credentials** (see doc 06 §2). That's the whole reason a clean fallback is poss
 without a second codebase.
 
 On the NAS it gives us:
-- a **mirror** of the same `lufs-audio` bucket layout (`releases/`, `reports/`, `artwork/`),
+- a **mirror** of the same `lufs-catalog` bucket layout (`releases/`, `reports/`, `artwork/`),
 - a copy of the data we fully own (sovereignty + a real second home), and
 - a working origin when the primary (R2) is down.
 
@@ -28,11 +43,11 @@ On the NAS it gives us:
 
 ```
             ┌─────────────── primary path ───────────────┐
-Browser ──► Cloudflare edge / Worker ──► R2 (lufs-audio)  │
+Browser ──► Cloudflare edge / Worker ──► R2 (lufs-catalog)  │
    │                                                       │
    │  on failure (network error / 5xx / timeout)           │
    └──────► NAS reverse proxy (TLS) ──► rustfs S3 ─────────┘
-            e.g. https://s3.lufs.audio        (mirror of lufs-audio)
+            e.g. https://s3.lufs.audio        (mirror of lufs-catalog)
 ```
 
 Two integration points:
@@ -65,21 +80,30 @@ and keeps the fallback fully independent. Document the final choice here once ch
 
 ---
 
-## 4. Config (added to `.env`, all OFF by default)
+## 4. Config (centralized in `.env.production`, all OFF by default)
+
+The switch + fallback share the same centralized block as R2 (see
+`.env.production.example`). The rustfs half stays commented until the endpoint exists:
 
 ```bash
-# ─── NAS rustfs fallback (DISABLED until the endpoint is stood up) ───
-# FALLBACK_ENABLED=false
-# RUSTFS_ENDPOINT=https://s3.lufs.audio
+# ─── Storage switch ───
+STORAGE_MODE=remote
+STORAGE_PRIMARY=r2               # flip to rustfs to serve from the NAS
+STORAGE_MIRROR=none              # set to rustfs to dual-write a 2nd copy on ingest
+STREAM_FALLBACK_ENABLED=false    # true = auto fail over to the other origin
+
+# ─── NAS rustfs (commented until stood up) ───
 # RUSTFS_ACCESS_KEY_ID=
 # RUSTFS_SECRET_ACCESS_KEY=
-# RUSTFS_BUCKET_NAME=lufs-audio
-# PUBLIC_FALLBACK_BASE_URL=https://s3.lufs.audio   # public reports/artwork mirror
-# PUBLIC_FALLBACK_STREAM_URL=https://stream-nas.lufs.audio  # optional 2nd signer
+# RUSTFS_BUCKET_NAME=lufs-catalog
+# RUSTFS_ENDPOINT=https://s3.lufs.audio
+# PUBLIC_RUSTFS_BASE_URL=https://s3.lufs.audio            # public reports/artwork mirror
+# PUBLIC_RUSTFS_STREAM_URL=https://stream-nas.lufs.audio  # optional 2nd signer for private audio
 ```
 
-The `PUBLIC_*` ones are browser-safe (used by the player for failover). The
-credentials are server/Worker-only, exactly like the R2 ones.
+`PUBLIC_*` vars are browser-safe (used by the player to fail over / when rustfs is
+primary). The credentials are server/Worker-only, exactly like the R2 ones. Operate
+the switch with `./scripts/catalog-set-origin.sh <r2|rustfs>` rather than hand-editing.
 
 ---
 
@@ -102,9 +126,9 @@ const r2 = new S3Client({
   },
 });
 
-// --- NAS rustfs fallback client (disabled until FALLBACK_ENABLED=true) ---
+// --- NAS rustfs client (disabled until STORAGE_MIRROR=rustfs or STORAGE_PRIMARY=rustfs) ---
 // let rustfs = null;
-// if (process.env.FALLBACK_ENABLED === 'true') {
+// if (process.env.STORAGE_MIRROR === 'rustfs' || process.env.STORAGE_PRIMARY === 'rustfs') {
 //   rustfs = new S3Client({
 //     region: 'auto',
 //     endpoint: process.env.RUSTFS_ENDPOINT,
@@ -157,8 +181,8 @@ async function resolveStreamUrl(r2Key: string): Promise<string> {
     if (!res.ok) throw new Error(`primary ${res.status}`);
     return (await res.json()).url;
   } catch (err) {
-    // --- NAS fallback (disabled until configured) ---
-    // const fb = import.meta.env.PUBLIC_FALLBACK_STREAM_URL;
+    // --- NAS fallback (disabled until STREAM_FALLBACK_ENABLED + rustfs configured) ---
+    // const fb = import.meta.env.PUBLIC_RUSTFS_STREAM_URL;
     // if (fb) {
     //   const res = await fetch(`${fb}?key=${encodeURIComponent(r2Key)}`);
     //   if (res.ok) return (await res.json()).url;
@@ -169,20 +193,22 @@ async function resolveStreamUrl(r2Key: string): Promise<string> {
 ```
 
 For **public** assets (reports/artwork), the equivalent is: try
-`R2_PUBLIC_BASE_URL/<key>`; `onerror`, swap to `PUBLIC_FALLBACK_BASE_URL/<key>`. A
+`PUBLIC_R2_BASE_URL/<key>`; `onerror`, swap to `PUBLIC_RUSTFS_BASE_URL/<key>`. A
 tiny `withFallback(url)` helper on `<img>`/`<iframe>` covers it.
 
 ---
 
 ## 7. Stand-up checklist (when Daniel is ready)
 
-1. Install rustfs on the NAS; create bucket `lufs-audio`; create access keys.
+1. Install rustfs on the NAS; create bucket `lufs-catalog`; create access keys.
 2. Choose + configure a **non-Cloudflare** public TLS path (Caddy + DDNS, or
    Tailscale Funnel) → e.g. `https://s3.lufs.audio`.
 3. (Optional) deploy a second signing endpoint for private audio failover.
-4. Backfill: mirror existing R2 objects to rustfs once (`rclone sync r2:lufs-audio
-   rustfs:lufs-audio` — `rclone` speaks both S3 endpoints).
-5. Fill the `.env` fallback vars; set `FALLBACK_ENABLED=true`.
+4. Backfill: mirror existing R2 objects to rustfs once (`rclone sync r2:lufs-catalog
+   rustfs:lufs-catalog` — `rclone` speaks both S3 endpoints).
+5. Fill the rustfs `.env` vars; set `STREAM_FALLBACK_ENABLED=true` and/or
+   `STORAGE_MIRROR=rustfs`. To make rustfs the *primary* origin:
+   `./scripts/catalog-set-origin.sh rustfs`.
 6. **Uncomment** the stubs in `uploadR2.mjs` and `useHowler.ts` (+ the public-asset
    `withFallback`).
 7. Test: temporarily block R2 (e.g. bad Worker URL in a staging build) and confirm

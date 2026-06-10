@@ -26,8 +26,9 @@ Status keys: ✅ built · 🟡 partial · ⛔ spec-only · 🔜 planned
 **Objective:** lock the foundational choices and capture them so we can always
 come back.
 
-- [x] Stack decision: **R2 + Hostinger** primary; **NAS rustfs** fallback (commented until stood up).
-- [ ] **This docs suite** under `docs/implementation/`, delivered via PR.
+- [x] Stack decision: **R2 (bucket `lufs-catalog`) + Hostinger** primary; **NAS rustfs** as a switchable origin + fallback (commented until stood up).
+- [x] **This docs suite** under `docs/implementation/`, delivered via PR.
+- [x] Define the **`catalog-operator` opencode agent** (`.opencode/agents/`) + helper scripts (`scripts/catalog-config.sh`, `scripts/catalog-set-origin.sh`) + `.env.production.example` (centralized storage switch). See [`08-opencode-agent.md`](./08-opencode-agent.md).
 - [ ] Confirm the run-split (agent builds/tests; Daniel runs locally).
 - [ ] Sort **repo access** for sandbox build verification (fine-grained PAT, or agent reconstructs from the API).
 - [ ] Obtain a **sample astro-catalog output** (the `3434` shape) to design/test against.
@@ -60,9 +61,10 @@ player survives navigation.
 **Objective:** move audio to the CDN and stream it without exposing a permanent
 URL or a download affordance.
 
-- [ ] Create R2 bucket `lufs-audio` with prefixes: `releases/` (private),
+- [ ] Create R2 bucket `lufs-catalog` with prefixes: `releases/` (private),
       `reports/` (public), `artwork/` (public). Apply CORS for `https://catalog.lufs.audio`.
-- [ ] Build `src/scripts/ingest/uploadR2.mjs` (S3 `PutObject` via `@aws-sdk/client-s3`); add it to the ingest flow behind `R2_MODE`.
+- [ ] Build `src/scripts/ingest/uploadR2.mjs` (S3 `PutObject` via `@aws-sdk/client-s3`); add it to the ingest flow behind `STORAGE_MODE`/`STORAGE_PRIMARY`.
+- [ ] Wire the env-driven **R2 ↔ rustfs switch** end to end (ingest upload target + mirror, and the player/report origin selection) so `scripts/catalog-set-origin.sh` actually changes what production serves.
 - [ ] Build & deploy the standalone **signing Worker** (`worker/`) that returns
       short-lived presigned `GET` URLs for `releases/` keys, CORS-restricted to the site.
 - [ ] Wire `useHowler.ts` to fetch a presigned URL from `STREAM_WORKER_URL` before playback; verify **no R2 key appears in the DOM**.

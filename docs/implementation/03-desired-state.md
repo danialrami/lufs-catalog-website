@@ -17,16 +17,18 @@ Where we want to land. This is the contract for "done."
 
 - **Site:** Astro static, deployed to **Hostinger** via git auto-deploy (`dist/` →
   `hostinger` branch webhook), mirroring the existing Hugo blog workflow.
-- **Storage/CDN:** **Cloudflare R2**, bucket `lufs-audio`:
+- **Storage/CDN:** **Cloudflare R2**, bucket `lufs-catalog`:
   - `releases/` — **private** audio (MP3), served only via short-lived presigned URLs.
   - `reports/` — **public** `render_stats.html` (+ large report assets).
   - `artwork/` — **public** cover/identicon/spectrogram/canvas stills.
 - **Streaming protection:** a standalone **Cloudflare Worker** signs `releases/`
   GETs on demand; the browser never sees a durable URL or an R2 key, and there's no
   download affordance.
-- **Resilience fallback:** a **NAS rustfs S3 endpoint** mirrors the same keys; the
-  ingest dual-writes and the player/report loader fails over to it if R2/Cloudflare
-  is unavailable. **Implemented but disabled** until the endpoint is stood up.
+- **Resilience fallback + switch:** a **NAS rustfs S3 endpoint** mirrors the same
+  keys. A single centralized env switch (`STORAGE_PRIMARY=r2|rustfs`) makes the NAS a
+  *deliberate* primary origin on demand, and `STREAM_FALLBACK_ENABLED` makes it an
+  *automatic* fallback if R2/Cloudflare is unavailable. **Implemented but disabled**
+  until the endpoint is stood up.
 - **Archive:** the NAS remains the canonical, full-fidelity archive (WAV, logs,
   everything) regardless of what the website serves.
 
@@ -75,6 +77,8 @@ Then `catalog-deploy.sh` builds and ships.
 
 ## 6. Operability
 
+- A **`catalog-operator` opencode agent** that drives ingest, the storage switch,
+  build, and deploy in natural language (see [`08-opencode-agent.md`](./08-opencode-agent.md)).
 - A **runbook** so publishing a release is a short, known routine.
 - Secrets only in `.env` (gitignored) + Worker secrets; never in the bundle or git.
 - Big files never committed; only small reports + cover art live in the repo.

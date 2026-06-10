@@ -27,7 +27,8 @@ fallback design.
 | 4 | [`04-design-philosophy.md`](./04-design-philosophy.md) | The reasoning and principles behind every major choice |
 | 5 | [`05-architecture.md`](./05-architecture.md) | Local vs production architecture, data flow, content model, organization scheme |
 | 6 | [`06-cdn-and-s3-guide.md`](./06-cdn-and-s3-guide.md) | **Start here if you're new to S3/CDN.** Object storage, the S3 API, CDNs, egress, presigned URLs, CORS, and exact R2 setup steps |
-| 7 | [`07-nas-rustfs-fallback.md`](./07-nas-rustfs-fallback.md) | The NAS rustfs S3 fallback design and how to wire it in (kept commented until the endpoint is live) |
+| 7 | [`07-nas-rustfs-fallback.md`](./07-nas-rustfs-fallback.md) | The NAS rustfs origin: the deliberate R2↔rustfs switch + automatic fallback, and how to wire it in (kept commented until the endpoint is live) |
+| 8 | [`08-opencode-agent.md`](./08-opencode-agent.md) | The `catalog-operator` opencode agent (`.opencode/agents/`) that runs the site in natural language, + its helper scripts and the `.env` storage switch |
 
 ---
 
@@ -54,9 +55,27 @@ Throughout these docs:
 - The **new astro-catalog output** (the `3434` example) is **not yet ingestible**:
   different folder shape, ships `context.json` instead of the old report, and is
   **WAV-only (no web MP3)**, so a transcode step is required. ⛔
-- **Decision:** Cloudflare R2 (zero-egress, cheap for mostly-parked audio) as the
-  primary CDN; **Hostinger** for site hosting; a **NAS rustfs S3 endpoint as a
-  resilience fallback**, implemented but commented until it's stood up.
+- **Decision:** Cloudflare R2 (bucket **`lufs-catalog`**, zero-egress, cheap for
+  mostly-parked audio) as the primary CDN; **Hostinger** for site hosting; a **NAS
+  rustfs S3 endpoint** as both a one-switch alternate origin (`STORAGE_PRIMARY=rustfs`)
+  and an automatic fallback — implemented but commented until it's stood up.
+- A **`catalog-operator` opencode agent** runs the whole thing in natural language.
+
+---
+
+## Clarifications & corrections (supersede PRD.md / TDD.md where they differ)
+
+- **R2 bucket name is `lufs-catalog`** (not `lufs-audio` as written in PRD/TDD) —
+  scoped to this use case.
+- **Every top-level folder under `catalogs/` is an album** (`a98ff_praise-legend-road`,
+  `footlights`, `3434`, …) — some are workchain-processed, some are raw and awaiting
+  processing. See `02-observed-state.md` §4.
+- **Storage is a centralized switch** (`STORAGE_PRIMARY=r2|rustfs` in
+  `.env.production`), operated by `scripts/catalog-set-origin.sh` / the opencode
+  agent — not a code change. See `06` §11 and `07`.
+- **R2 pricing** is spelled out precisely in `06-cdn-and-s3-guide.md` §6 (short
+  version: storage above 10 GB costs cents; uploads and streaming are effectively
+  free; **egress is always \$0**).
 
 ---
 

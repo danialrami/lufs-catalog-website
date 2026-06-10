@@ -28,7 +28,7 @@ the **S3 API**, often **fronted by a CDN**. Let's define each.
 under **keys** (string names), inside a **bucket** (a namespace you own).
 
 ```
-bucket: lufs-audio
+bucket: lufs-catalog
   key: releases/continuo/1/track.mp3   → [the bytes of that mp3] + metadata
   key: reports/continuo/1/render.html  → [bytes] + metadata
   key: artwork/continuo/cover.png      → [bytes] + metadata
@@ -142,6 +142,33 @@ operations, but **not** for bandwidth out. For "audio mostly parked, occasional
 client views," this is the cheapest realistic option, and it removes the "what if a
 track goes semi-viral" bill anxiety.
 
+### Exactly what you pay on R2 (answering "free to upload, small fee to stream?")
+
+Close — here's the precise breakdown. R2 bills **three** things, and egress is not
+one of them:
+
+| What | R2 charge | Free tier / month | At our scale |
+|---|---|---|---|
+| **Store** files | ~\$0.015 / GB-month | first **10 GB** free | pennies (e.g. 50 GB stored → (50−10)×\$0.015 ≈ **\$0.60/mo**) |
+| **Upload / write** ("Class A" ops: PutObject, list) | \$4.50 / million | first **1,000,000** free | effectively **\$0** (you write hundreds of objects, not millions) |
+| **Stream / read** ("Class B" ops: GetObject) | \$0.36 / million | first **10,000,000** free | effectively **\$0** (you'd need millions of plays/mo to owe cents) |
+| **Egress** (bandwidth out) | **\$0** | — | **always free** |
+
+So: **uploading is effectively free** (Class A ops, huge free tier), **streaming is
+effectively free** (Class B reads + zero bandwidth charge), and the only bill you'll
+realistically see is **storage above the 10 GB free tier** — cents to a couple
+dollars a month. The thing that makes other clouds expensive for audio (per-GB
+egress) simply doesn't exist on R2. The signing **Worker** also runs on the Workers
+free tier (100k requests/day), so it's free at this scale too.
+
+> Because even that storage bill is real (if small), we also build a deliberate
+> **switch to the NAS rustfs origin** — see §11 and `07-nas-rustfs-fallback.md`. If
+> you ever don't want to pay Cloudflare at all, flip `STORAGE_PRIMARY=rustfs` and
+> serve from the NAS.
+>
+> *(Rates as of this writing — verify current Cloudflare R2 pricing; the zero-egress
+> model is the durable point.)*
+
 ### Rough cost comparison (illustrative — check current pricing)
 
 Assume ~**20 GB** stored and ~**50 GB/month** streamed out:
@@ -203,7 +230,7 @@ is the knob. Our policy:
 > scoped API token).
 
 ### 9.1 Create the bucket
-1. Sign in at Cloudflare → **R2** → **Create bucket** → name it **`lufs-audio`**.
+1. Sign in at Cloudflare → **R2** → **Create bucket** → name it **`lufs-catalog`**.
    (R2 requires a card on file even though usage here is near-free.)
 2. We'll use prefixes inside it: `releases/`, `reports/`, `artwork/`.
 
@@ -215,7 +242,7 @@ is the knob. Our policy:
 
 ### 9.3 Create an API token 🔑
 - R2 → **Manage R2 API Tokens** → **Create** → permission **Object Read & Write**,
-  scoped to the `lufs-audio` bucket.
+  scoped to the `lufs-catalog` bucket.
 - You get: **Access Key ID**, **Secret Access Key**, and an **endpoint**
   `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`. Save them somewhere safe.
 
@@ -225,7 +252,7 @@ is the knob. Our policy:
 R2_ACCOUNT_ID=...
 R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
-R2_BUCKET_NAME=lufs-audio
+R2_BUCKET_NAME=lufs-catalog
 R2_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
 R2_PUBLIC_BASE_URL=https://pub-xxxx.r2.dev      # or https://cdn.lufs.audio
 PUBLIC_STREAM_WORKER_URL=https://stream.lufs.audio
@@ -234,7 +261,7 @@ R2_MODE=true
 
 ### 9.5 Configure CORS
 - R2 bucket → **Settings** → **CORS policy** → paste the JSON from §7.
-  (Or `wrangler r2 bucket cors put lufs-audio --file cors.json`.)
+  (Or `wrangler r2 bucket cors put lufs-catalog --file cors.json`.)
 
 ### 9.6 Deploy the signing Worker 🔑
 1. Install the CLI: `npm i -g wrangler` then `wrangler login`.
@@ -274,3 +301,31 @@ R2_MODE=true
 That's the whole mental model: *files in a bucket, keys not folders, public vs
 private, sign the private ones, let the edge cache do the rest, and never pay for
 egress.*
+
+---
+
+## 11. The R2 ↔ rustfs switch (centralized in `.env`)
+
+Because S3 is a *standard*, swapping storage providers is mostly an endpoint +
+credentials change. We expose that as a deliberate switch in one place — the
+`.env.production` file (template: `.env.production.example`):
+
+| Var | Values | Meaning |
+|---|---|---|
+| `STORAGE_MODE` | `local` \| `remote` | `local` serves from `public/` (no cloud); `remote` uses object storage |
+| `STORAGE_PRIMARY` | `r2` \| `rustfs` | **the switch** — which origin the site serves from |
+| `STORAGE_MIRROR` | `none` \| `r2` \| `rustfs` | also upload a second copy on ingest (dual-write) |
+| `STREAM_FALLBACK_ENABLED` | `true` \| `false` | auto fail over to the other origin if a fetch fails |
+
+You don't hand-edit this for the common case — the opencode agent (doc 08) or the
+helper script does it safely:
+
+```bash
+./scripts/catalog-set-origin.sh rustfs   # point production at the NAS
+./scripts/catalog-set-origin.sh r2       # back to Cloudflare
+./scripts/catalog-config.sh              # show the effective config (secrets masked)
+```
+
+`catalog-set-origin.sh` refuses to switch to `rustfs` until `RUSTFS_ENDPOINT` is
+configured (so you can't point production at a NAS that isn't up yet). Full design +
+the stand-up checklist live in [`07-nas-rustfs-fallback.md`](./07-nas-rustfs-fallback.md).
