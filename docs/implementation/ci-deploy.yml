@@ -1,0 +1,57 @@
+name: Build & Deploy → hostinger
+
+# Builds the static site and publishes the built output to the `hostinger` branch,
+# which Hostinger's Git auto-deploy webhook pulls into public_html (catalog.lufs.audio).
+#
+# This is the remote counterpart to ./catalog-deploy.sh: it lets a push to `main`
+# (e.g. committed content from a local `pnpm catalog:ingest`) deploy WITHOUT anyone
+# running a local build — including a zero-release "blank" deploy to prove the
+# pipeline end to end before any audio exists. The manual script still works for
+# offline/local deploys; both publish the same `hostinger` branch.
+#
+# No secrets required for a local-mode / blank build. For a remote (R2) build, add
+# the PUBLIC_* vars as repository variables and reference them in the build step.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-hostinger
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # Repo currently ships package-lock.json (not pnpm-lock.yaml), so don't use
+      # --frozen-lockfile here.
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build (static)
+        run: pnpm build
+
+      - name: Publish dist/ to the hostinger branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: hostinger
+          force_orphan: true
+          commit_message: "deploy ${{ github.sha }}"
