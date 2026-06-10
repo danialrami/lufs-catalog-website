@@ -42,6 +42,12 @@ come back.
 **Objective:** a real, browsable URL as fast as possible, using what already works
 (the *Continuo* album).
 
+> **Note:** `pnpm install` / `pnpm build` can't run in the agent sandbox (the npm
+> registry is blocked there), so the Astro build is verified on Daniel's Mac (or the
+> optional CI build-check). Logic that needs only Node + ffmpeg (the ingest) *is*
+> verified in-sandbox. Deploy = `catalog-deploy.sh` + Hostinger webhook (no CI) —
+> see [`09-ingest-and-deploy.md`](./09-ingest-and-deploy.md) §3.
+
 - [ ] Clone the repo into the sandbox, `npm install`, and run `npm run build`; capture any errors.
 - [ ] Fix build/schema issues; keep the existing `continuo.md` example rendering.
 - [ ] Choose an **interim asset strategy**:
@@ -81,6 +87,14 @@ and no download link; reports/artwork load from the public prefixes.
 
 **Objective:** one command turns a workchain astro-catalog export into a published
 catalog entry.
+
+> **Status (2026-06-10): the ingest is built + tested.** `catalog-ingest.mjs`
+> classifies shapes, parses `context.json` + `catalog_info.txt` + `normalization.json`,
+> transcodes WAV→MP3 @320k, computes duration via ffprobe, sanitizes the report, and
+> writes an edit-preserving release `.md` — validated end-to-end against the real
+> `3434` sample. `catalog-deploy.sh` is written. Remaining: R2/rustfs upload
+> (`STORAGE_MODE=remote`, Phase 2), organize-by-project/year, and legacy-shape
+> support. Full detail in [`09-ingest-and-deploy.md`](./09-ingest-and-deploy.md).
 
 - [ ] Get a real `context.json` (from the workchain repo's astro-catalog chain, or a sample export) to design against.
 - [ ] Rewrite the ingest to recognize **three source shapes** (see [`02-observed-state.md`](./02-observed-state.md)):

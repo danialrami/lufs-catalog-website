@@ -1,0 +1,368 @@
+#!/usr/bin/env node
+/**
+ * catalog-ingest.mjs — unified LUFS Audio catalog ingest.
+ *
+ * Canonical input = the lufs-workchain "astro-catalog" output shape. Reads
+ * structured metadata from context.json / catalog/catalog_info.txt /
+ * logs/normalization.json, transcodes the normalized WAV -> MP3 (default 320k),
+ * computes duration with ffprobe, sanitizes the HTML report (strips WAV audio +
+ * download links), copies web assets, and writes/merges an edit-preserving
+ * release Markdown file per album.
+ *
+ * Shapes handled now:
+ *   - astro-catalog single-track  (<album>/astro-catalog/context.json)
+ *   - astro-catalog multi-track   (<album>/<n>/astro-catalog/context.json)
+ * Shapes detected but skipped (run them through the workchain first, or use the
+ * legacy catalog-ingest-local.mjs): legacy hex_slug albums, single *_final, raw.
+ *
+ * Storage:
+ *   STORAGE_MODE=local (default) -> copies web assets into public/.
+ *   STORAGE_MODE=remote          -> Phase 2: upload to R2/rustfs (uploadR2.mjs). Not wired yet.
+ *
+ * Env:
+ *   CATALOG_SOURCE_PATH   albums dir (default /Volumes/project/continuo/catalogs)
+ *   CATALOG_OUTPUT_ROOT   repo root to write into (default: this repo)
+ *   MP3_BITRATE           libmp3lame bitrate (default 320k)
+ *   STORAGE_MODE          local | remote (default local)
+ *   CATALOG_ONLY          process only this album dir name (handy for testing)
+ */
+
+import {
+  readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, copyFileSync,
+} from 'node:fs';
+import { join, dirname, basename } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+
+// node-html-parser is a repo dependency; fall back to regex if unavailable.
+let parseHTML = null;
+try { ({ parse: parseHTML } = await import('node-html-parser')); } catch { /* regex fallback */ }
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const SRC = process.env.CATALOG_SOURCE_PATH || '/Volumes/project/continuo/catalogs';
+const OUTPUT_ROOT = process.env.CATALOG_OUTPUT_ROOT || join(__dirname, '..', '..', '..');
+const PUBLIC_DIR = join(OUTPUT_ROOT, 'public');
+const CONTENT_DIR = join(OUTPUT_ROOT, 'src', 'content', 'releases');
+const MP3_BITRATE = process.env.MP3_BITRATE || '320k';
+const STORAGE_MODE = process.env.STORAGE_MODE || 'local';
+const ONLY = process.env.CATALOG_ONLY || '';
+
+// ---------- small utils ----------
+const log = (...a) => console.log(...a);
+const warn = (...a) => console.warn('  ⚠', ...a);
+const ensureDir = (d) => { if (!existsSync(d)) mkdirSync(d, { recursive: true }); };
+const isIgnored = (n) => n === '.DS_Store' || n === '__MACOSX' || n.startsWith('._') || n.startsWith('.');
+const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const listDirs = (p) => existsSync(p)
+  ? readdirSync(p, { withFileTypes: true }).filter((d) => d.isDirectory() && !isIgnored(d.name))
+  : [];
+
+function copy(src, dest) {
+  if (!existsSync(src)) { warn(`missing source: ${src}`); return false; }
+  if (statSync(src).isDirectory()) return false;
+  ensureDir(dirname(dest));
+  copyFileSync(src, dest);
+  return true;
+}
+function copyTree(srcDir, destDir, { skipWav = true } = {}) {
+  if (!existsSync(srcDir)) return;
+  for (const name of readdirSync(srcDir)) {
+    if (isIgnored(name)) continue;
+    const s = join(srcDir, name);
+    const d = join(destDir, name);
+    if (statSync(s).isDirectory()) copyTree(s, d, { skipWav });
+    else if (!(skipWav && /\.wav$/i.test(name))) copy(s, d);
+  }
+}
+
+// ---------- media ----------
+function ffprobeDuration(file) {
+  try {
+    const out = execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file], { encoding: 'utf8' });
+    return Math.round(parseFloat(out.trim()) || 0);
+  } catch (e) { warn(`ffprobe failed (${basename(file)}): ${e.message}`); return 0; }
+}
+function transcodeMp3(wav, mp3) {
+  ensureDir(dirname(mp3));
+  execFileSync('ffmpeg', [
+    '-hide_banner', '-loglevel', 'error', '-y', '-i', wav,
+    '-codec:a', 'libmp3lame', '-b:a', MP3_BITRATE, '-joint_stereo', '1', '-map_metadata', '-1', mp3,
+  ], { stdio: 'inherit' });
+}
+
+// ---------- report sanitize ----------
+function sanitizeReport(html) {
+  if (parseHTML) {
+    const root = parseHTML(html);
+    root.querySelectorAll('audio, source').forEach((el) => el.remove());
+    root.querySelectorAll('a, button').forEach((el) => {
+      const href = (el.getAttribute && (el.getAttribute('href') || '')).toLowerCase();
+      const isDownload = (el.getAttribute && el.getAttribute('download') !== null)
+        || href.endsWith('.wav') || href.endsWith('.mp3')
+        || (el.text || '').toLowerCase().includes('download');
+      if (isDownload) el.remove();
+    });
+    return root.toString();
+  }
+  return html
+    .replace(/<audio[\s\S]*?<\/audio>/gi, '')
+    .replace(/<source\b[^>]*>/gi, '')
+    .replace(/<a\b[^>]*href="[^"]*\.(wav|mp3)"[^>]*>[\s\S]*?<\/a>/gi, '');
+}
+
+// ---------- astro-catalog metadata ----------
+function parseAstroCatalog(acDir) {
+  const ctx = JSON.parse(readFileSync(join(acDir, 'context.json'), 'utf8'));
+  const name = ctx.input_name;
+  const ext = ctx.input_ext || 'wav';
+  const tmpl = (t) => t.replace('{input_name}', name).replace('{input_ext}', ext);
+  const steps = ctx.steps || {};
+  // Resolve outputs from path_template relative to acDir (NOT the absolute paths
+  // baked into context.json, which point at Daniel's machine).
+  const out = (step, key = 'primary_output') => {
+    const o = steps[step]?.outputs?.[key];
+    return o?.path_template ? join(acDir, tmpl(o.path_template)) : null;
+  };
+
+  const normalizedWav = out('normalization') || join(acDir, `${name}_normalized.${ext}`);
+  const reportHtml = out('reporting') || join(acDir, `${name}_report.html`);
+  const artworkMain = out('artwork_01') || join(acDir, 'artwork', `${name}_artwork.png`);
+
+  let catalogNumber = '';
+  let sha256 = '';
+  const catInfo = join(acDir, 'catalog', 'catalog_info.txt');
+  if (existsSync(catInfo)) {
+    const t = readFileSync(catInfo, 'utf8');
+    catalogNumber = t.match(/Catalog Number:\s*(lufs-[a-f0-9]+)/i)?.[1] || '';
+    sha256 = t.match(/Full SHA256 Hash:\s*([a-f0-9]{64})/i)?.[1] || '';
+  }
+
+  let loudness = {};
+  const nj = join(acDir, 'logs', 'normalization.json');
+  if (existsSync(nj)) {
+    try {
+      const j = JSON.parse(readFileSync(nj, 'utf8'));
+      const num = (v) => (v === undefined || v === null || v === '' ? undefined : Number(v));
+      loudness = {
+        targetLufs: num(j.target_lufs), finalLufs: num(j.final_lufs), truePeak: num(j.true_peak),
+        lra: num(j.lra), sampleRate: num(j.sample_rate), channels: num(j.channels),
+      };
+    } catch (e) { warn(`bad normalization.json: ${e.message}`); }
+  }
+
+  return {
+    name, ext, acDir, normalizedWav, reportHtml, artworkMain,
+    catalogNumber, sha256,
+    processedDate: ctx.end_time || ctx.start_time || new Date().toISOString(),
+    saturation: ctx.globals?.saturation,
+    loudness,
+  };
+}
+
+// ---------- classify ----------
+function classify(albumPath) {
+  if (existsSync(join(albumPath, 'astro-catalog', 'context.json'))) return 'astro-catalog-single';
+  const numbered = listDirs(albumPath).filter((d) => /^\d+$/.test(d.name));
+  if (numbered.some((d) => existsSync(join(albumPath, d.name, 'astro-catalog', 'context.json')))) return 'astro-catalog-album';
+  if (/^[a-f0-9]{4,}_/.test(basename(albumPath)) && numbered.length) return 'legacy-album';
+  if (basename(albumPath).endsWith('_final') || listDirs(albumPath).some((d) => d.name.endsWith('_final'))) return 'legacy-final';
+  return 'raw';
+}
+
+// ---------- per-track (astro-catalog) ----------
+function processAstroTrack(collectionId, trackNumber, acDir) {
+  const m = parseAstroCatalog(acDir);
+  const n = String(trackNumber);
+  log(`    track ${n}: "${m.name}"  ${m.catalogNumber || '(no catalog#)'}`);
+
+  const audioDest = join(PUBLIC_DIR, 'audio', collectionId, n, `${m.name}.mp3`);
+  const reportDir = join(PUBLIC_DIR, 'reports', collectionId, n);
+  const coverDir = join(PUBLIC_DIR, 'covers', collectionId, n);
+
+  // 1) transcode normalized WAV -> MP3 + duration
+  let duration = 0;
+  if (existsSync(m.normalizedWav)) {
+    transcodeMp3(m.normalizedWav, audioDest);
+    duration = ffprobeDuration(audioDest);
+  } else { warn(`normalized WAV not found: ${m.normalizedWav}`); }
+
+  // 2) sanitized report + its relative assets so embedded links resolve
+  if (existsSync(m.reportHtml)) {
+    ensureDir(reportDir);
+    writeFileSync(join(reportDir, 'final_report.html'), sanitizeReport(readFileSync(m.reportHtml, 'utf8')));
+    for (const sub of ['artwork', 'canvas', 'logs']) copyTree(join(acDir, sub), join(reportDir, sub), { skipWav: true });
+  } else { warn(`report not found: ${m.reportHtml}`); }
+
+  // 3) covers for the site UI
+  copy(m.artworkMain, join(coverDir, 'artwork.png'));
+  const comp = join(acDir, 'artwork', 'components');
+  for (const f of ['identicon.png', 'spectrogram.png', 'rectangle_spectrogram.png']) copy(join(comp, f), join(coverDir, f));
+  copy(join(acDir, 'canvas', `${m.name}_canvas_static.png`), join(coverDir, 'canvas_static.png'));
+
+  return {
+    trackNumber,
+    displayTitle: m.name,
+    filename: m.name,
+    catalogNumber: m.catalogNumber,
+    sha256: m.sha256,
+    processedDate: m.processedDate,
+    saturation: m.saturation,
+    audioPath: `/audio/${collectionId}/${n}/${m.name}.mp3`,
+    finalReport: `/reports/${collectionId}/${n}/final_report.html`,
+    duration,
+    loudness: m.loudness,
+    artwork: {
+      main: `/covers/${collectionId}/${n}/artwork.png`,
+      identicon: `/covers/${collectionId}/${n}/identicon.png`,
+      spectrogram: `/covers/${collectionId}/${n}/spectrogram.png`,
+      canvasStatic: `/covers/${collectionId}/${n}/canvas_static.png`,
+    },
+  };
+}
+
+// ---------- markdown (read human fields, then write) ----------
+function readHumanFields(slug) {
+  const p = join(CONTENT_DIR, `${slug}.md`);
+  if (!existsSync(p)) return {};
+  const fm = readFileSync(p, 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1] || '';
+  const scalar = (k) => fm.match(new RegExp(`^${k}:\\s*"?(.*?)"?\\s*$`, 'm'))?.[1];
+  const nested = (k) => fm.match(new RegExp(`^\\s+${k}:\\s*"?(.*?)"?\\s*$`, 'm'))?.[1] || '';
+  const tagsBlock = fm.match(/^tags:\s*\n([\s\S]*?)(?=^\S)/m)?.[1] || '';
+  const tags = [...tagsBlock.matchAll(/^\s*-\s*"?([^"\n]+?)"?\s*$/gm)].map((x) => x[1].trim());
+  return {
+    title: scalar('title'),
+    project: scalar('project'),
+    releaseDate: scalar('releaseDate'),
+    status: scalar('status'),
+    isrc: scalar('isrc'),
+    tags,
+    streamingLinks: {
+      spotify: nested('spotify'), appleMusic: nested('appleMusic'),
+      bandcamp: nested('bandcamp'), soundcloud: nested('soundcloud'),
+    },
+  };
+}
+
+function writeReleaseMarkdown(slug, data) {
+  const q = (v) => JSON.stringify(v ?? '');
+  const trackYaml = data.tracks.map((t) => {
+    const L = [
+      `  - trackNumber: ${t.trackNumber}`,
+      `    displayTitle: ${q(t.displayTitle)}`,
+      `    filename: ${q(t.filename)}`,
+      `    catalogNumber: ${q(t.catalogNumber)}`,
+      `    sha256: ${q(t.sha256)}`,
+      `    processedDate: ${q(t.processedDate)}`,
+    ];
+    if (t.saturation !== undefined) L.push(`    saturation: ${t.saturation}`);
+    L.push(`    audioPath: ${q(t.audioPath)}`);
+    if (t.renderStatsPath) L.push(`    renderStatsPath: ${q(t.renderStatsPath)}`);
+    L.push(`    finalReport: ${q(t.finalReport)}`);
+    L.push(`    duration: ${t.duration ?? 0}`);
+    const loud = t.loudness && Object.entries(t.loudness).filter(([, v]) => v !== undefined);
+    if (loud && loud.length) { L.push('    loudness:'); for (const [k, v] of loud) L.push(`      ${k}: ${v}`); }
+    L.push('    artwork:');
+    for (const [k, v] of Object.entries(t.artwork)) if (v) L.push(`      ${k}: ${q(v)}`);
+    return L.join('\n');
+  }).join('\n');
+
+  const sl = data.streamingLinks || {};
+  const body = [
+    '---',
+    `title: ${q(data.title)}`,
+    `collectionId: ${q(data.collectionId)}`,
+    `project: ${q(data.project)}`,
+    `artist: ${q(data.artist || 'Daniel Ramirez')}`,
+    `releaseDate: ${data.releaseDate}`,
+    `status: ${q(data.status)}`,
+    `coverArt: ${q(data.coverArt)}`,
+    ...(data.isrc ? [`isrc: ${q(data.isrc)}`] : []),
+    'streamingLinks:',
+    `  spotify: ${q(sl.spotify)}`,
+    `  appleMusic: ${q(sl.appleMusic)}`,
+    `  bandcamp: ${q(sl.bandcamp)}`,
+    `  soundcloud: ${q(sl.soundcloud)}`,
+    'tags:',
+    ...((data.tags || []).map((t) => `  - ${q(t)}`)),
+    'tracks:',
+    trackYaml,
+    '---',
+    '',
+  ].join('\n');
+
+  ensureDir(CONTENT_DIR);
+  writeFileSync(join(CONTENT_DIR, `${slug}.md`), body);
+}
+
+// ---------- orchestrator ----------
+function deriveIds(dirName) {
+  const m = dirName.match(/^([a-f0-9]{4,})_(.+)$/);
+  return { collectionId: dirName, slug: m ? slugify(m[2]) : slugify(dirName) };
+}
+
+async function main() {
+  log('=== LUFS catalog ingest ===');
+  log(`source : ${SRC}`);
+  log(`output : ${OUTPUT_ROOT}  (mode=${STORAGE_MODE}, mp3=${MP3_BITRATE}, html-parser=${parseHTML ? 'node-html-parser' : 'regex-fallback'})`);
+  if (!existsSync(SRC)) { console.error(`CATALOG_SOURCE_PATH not found: ${SRC}`); process.exit(1); }
+  if (STORAGE_MODE !== 'local') warn(`STORAGE_MODE=${STORAGE_MODE}: R2/rustfs upload is Phase 2 (not wired). Writing local assets only.`);
+
+  let albums = listDirs(SRC).map((d) => d.name).sort();
+  if (ONLY) albums = albums.filter((n) => n === ONLY);
+
+  const processed = [];
+  const skipped = [];
+
+  for (const dirName of albums) {
+    const albumPath = join(SRC, dirName);
+    const shape = classify(albumPath);
+    const { collectionId, slug } = deriveIds(dirName);
+    log(`\nalbum: ${dirName}  [${shape}]`);
+
+    const tracks = [];
+    if (shape === 'astro-catalog-single') {
+      tracks.push(processAstroTrack(collectionId, 1, join(albumPath, 'astro-catalog')));
+    } else if (shape === 'astro-catalog-album') {
+      const numbered = listDirs(albumPath).filter((d) => /^\d+$/.test(d.name)).sort((a, b) => +a.name - +b.name);
+      for (const d of numbered) {
+        const ac = join(albumPath, d.name, 'astro-catalog');
+        if (existsSync(join(ac, 'context.json'))) tracks.push(processAstroTrack(collectionId, +d.name, ac));
+      }
+    } else {
+      warn(`shape '${shape}' not handled by the new ingest yet — skipping. Run it through the workchain to get astro-catalog output (legacy albums: see catalog-ingest-local.mjs).`);
+      skipped.push(`${dirName} (${shape})`);
+      continue;
+    }
+
+    if (!tracks.length) { warn(`no processable tracks in ${dirName}`); skipped.push(`${dirName} (no tracks)`); continue; }
+
+    // collection cover = first track's artwork
+    copy(join(PUBLIC_DIR, 'covers', collectionId, String(tracks[0].trackNumber), 'artwork.png'),
+         join(PUBLIC_DIR, 'covers', collectionId, 'cover.png'));
+
+    const human = readHumanFields(slug);
+    const single = tracks.length === 1;
+    writeReleaseMarkdown(slug, {
+      title: human.title || (single ? tracks[0].displayTitle : slug),
+      collectionId,
+      project: human.project || (single ? 'Singles' : (human.title || slug)),
+      artist: 'Daniel Ramirez',
+      releaseDate: human.releaseDate || (tracks[0].processedDate || '').slice(0, 10) || new Date().toISOString().slice(0, 10),
+      status: human.status || 'draft',
+      coverArt: `/covers/${collectionId}/cover.png`,
+      isrc: human.isrc || '',
+      streamingLinks: human.streamingLinks,
+      tags: human.tags || [],
+      tracks,
+    });
+    log(`  ✓ wrote src/content/releases/${slug}.md  (${tracks.length} track(s), status=${human.status || 'draft'})`);
+    processed.push(`${slug} <- ${dirName} (${tracks.length} track(s))`);
+  }
+
+  log('\n=== summary ===');
+  log(`processed: ${processed.length ? processed.join('; ') : '(none)'}`);
+  log(`skipped  : ${skipped.length ? skipped.join('; ') : '(none)'}`);
+}
+
+main().catch((e) => { console.error('FATAL', e); process.exit(1); });

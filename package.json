@@ -3,6 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "catalog:ingest": "node ./src/scripts/ingest/catalog-ingest.mjs",
     "catalog:ingest:local": "node ./src/scripts/ingest/catalog-ingest-local.mjs",
     "dev": "astro dev",
     "build": "astro build",
@@ -18,7 +19,7 @@
     "astro": "^5.17.3",
     "svelte": "^5.53.2"
   },
-  "description": "```sh npm create astro@latest -- --template minimal ```",
+  "description": "LUFS Audio catalog website — static Astro + Svelte + Howler, fed by the lufs-workchain astro-catalog pipeline.",
   "main": "index.js",
   "directories": {
     "doc": "docs"

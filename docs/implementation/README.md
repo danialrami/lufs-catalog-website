@@ -29,6 +29,7 @@ fallback design.
 | 6 | [`06-cdn-and-s3-guide.md`](./06-cdn-and-s3-guide.md) | **Start here if you're new to S3/CDN.** Object storage, the S3 API, CDNs, egress, presigned URLs, CORS, and exact R2 setup steps |
 | 7 | [`07-nas-rustfs-fallback.md`](./07-nas-rustfs-fallback.md) | The NAS rustfs origin: the deliberate R2↔rustfs switch + automatic fallback, and how to wire it in (kept commented until the endpoint is live) |
 | 8 | [`08-opencode-agent.md`](./08-opencode-agent.md) | The `catalog-operator` opencode agent (`.opencode/agents/`) that runs the site in natural language, + its helper scripts and the `.env` storage switch |
+| 9 | [`09-ingest-and-deploy.md`](./09-ingest-and-deploy.md) | **Built in Phase 3.** How `catalog-ingest.mjs` (context.json-driven, WAV→MP3, edit-preserving) and `catalog-deploy.sh` work, the validation results, and the decision to drop the GitHub Actions workflow in favor of `catalog-deploy.sh` + the Hostinger webhook |
 
 ---
 
