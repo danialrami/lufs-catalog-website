@@ -5,7 +5,13 @@ const trackSchema = z.object({
   displayTitle: z.string(),
   filename: z.string(),
   catalogNumber: z.string(),
-  sha256: z.string().length(64),
+
+  // Content hash from the workchain catalog step (catalog/catalog_info.txt).
+  // Tolerant of an empty string so a single track whose catalog_info.txt is
+  // missing/unreadable degrades to a hash-less entry instead of failing the
+  // WHOLE `astro build`. A present value must still be a real 64-char SHA-256.
+  sha256: z.string().regex(/^[a-f0-9]{64}$/i).or(z.literal('')),
+
   processedDate: z.coerce.date(),
   saturation: z.number().optional(),
 
@@ -28,8 +34,10 @@ const trackSchema = z.object({
   // Optional render stats (legacy REAPER export; astro-catalog has none)
   renderStatsPath: z.string().optional(),
 
-  // Final report path (embedded, sanitized) — local path or public R2 URL
-  finalReport: z.string(),
+  // Final report path (embedded, sanitized) — local path or public R2 URL.
+  // EMPTY when the workchain run had no `--report` output; the UI hides the
+  // link/iframe in that case (see src/pages/releases/[slug].astro).
+  finalReport: z.string().default(''),
 
   duration: z.number().default(0),
 
@@ -58,8 +66,12 @@ const releases = defineCollection({
       bandcamp: z.string().url().optional().or(z.literal('')),
       soundcloud: z.string().url().optional().or(z.literal('')),
     }).optional(),
-    tags: z.array(z.string()).default([]),
-    tracks: z.array(trackSchema).default([]),
+    // Tolerate a bare `tags:` / `tracks:` (which YAML parses as null, not []):
+    // an empty list or a hand-edit can serialize that way, and a plain
+    // `.default([])` only fills `undefined` — so null would otherwise hard-fail
+    // the whole `astro build`. Coerce null/undefined → [] before validating.
+    tags: z.preprocess((v) => (v == null ? [] : v), z.array(z.string())),
+    tracks: z.preprocess((v) => (v == null ? [] : v), z.array(trackSchema)),
   }),
 });
 
