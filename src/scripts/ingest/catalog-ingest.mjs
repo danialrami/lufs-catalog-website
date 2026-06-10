@@ -2,33 +2,37 @@
 /**
  * catalog-ingest.mjs — unified LUFS Audio catalog ingest.
  *
- * Canonical input = the lufs-workchain "astro-catalog" output shape. Reads
- * structured metadata from context.json / catalog/catalog_info.txt /
- * logs/normalization.json, transcodes the normalized WAV -> MP3 (default 320k),
- * computes duration with ffprobe, sanitizes the HTML report (strips WAV audio +
- * download links + the heavy Spotify-canvas GIF), copies web assets, and
- * writes/merges an edit-preserving release Markdown file per album.
+ * Canonical source shape (one album per top-level dir under CATALOG_SOURCE_PATH):
  *
- * Shapes handled now:
- *   - astro-catalog single-track  (<album>/astro-catalog/context.json)
- *   - astro-catalog multi-track   (<album>/<n>/astro-catalog/context.json)
- * Shapes detected but skipped (run them through the workchain first, or use the
- * legacy catalog-ingest-local.mjs): legacy hex_slug albums, single *_final, raw.
+ *   {album}/
+ *     {track-name}.wav                 source audio (input; ignored here)
+ *     {track-name}_astro-catalog/      lufs-workchain output — the unit we read
+ *         context.json
+ *         {track-name}_normalized.wav
+ *         {track-name}_report.html
+ *         artwork/  canvas/  catalog/catalog_info.txt  logs/
+ *     {another-track}.wav
+ *     {another-track}_astro-catalog/
+ *
+ * An album may hold any number of `*_astro-catalog/` dirs (a single like 3434 has
+ * one). Track identity = the dir name minus `_astro-catalog`, reconciled with
+ * context.json `input_name`. Track order = alphabetical by dir name (prefix a
+ * number like `01_` for explicit order). Albums with no `*_astro-catalog/` dir are
+ * skipped (they still need to go through the workchain).
+ *
+ * Metadata comes from context.json (output paths via path_template),
+ * catalog/catalog_info.txt (catalog # + SHA256), logs/normalization.json (loudness).
+ * Audio is transcoded WAV->MP3 (default 320k) with duration via ffprobe; the report
+ * HTML is sanitized (no WAV audio / download links / canvas GIF).
  *
  * Storage:
  *   STORAGE_MODE=local (default) -> MP3 + report + covers written into public/.
  *   STORAGE_MODE=remote          -> MP3 uploaded to the PRIVATE R2 bucket
- *                                   (releases/…, signed at play time by the Worker);
- *                                   report HTML + cover thumbnails still go to
- *                                   public/ (committed, cacheable). See doc 09.
+ *                                   (releases/…, signed at play time); report +
+ *                                   covers still committed to public/. See doc 09.
  *
- * Env:
- *   CATALOG_SOURCE_PATH   albums dir (default /Volumes/project/continuo/catalogs)
- *   CATALOG_OUTPUT_ROOT   repo root to write into (default: this repo)
- *   MP3_BITRATE           libmp3lame bitrate (default 320k)
- *   STORAGE_MODE          local | remote (default local)
- *   R2_*                  (remote) bucket + creds for uploadR2.mjs
- *   CATALOG_ONLY          process only this album dir name (handy for testing)
+ * Env: CATALOG_SOURCE_PATH, CATALOG_OUTPUT_ROOT, MP3_BITRATE (320k), STORAGE_MODE,
+ *      R2_* (remote), CATALOG_ONLY (process one album, for testing).
  */
 
 import {
@@ -66,7 +70,7 @@ const log = (...a) => console.log(...a);
 const warn = (...a) => console.warn('  ⚠', ...a);
 const ensureDir = (d) => { if (!existsSync(d)) mkdirSync(d, { recursive: true }); };
 const isIgnored = (n) => n === '.DS_Store' || n === '__MACOSX' || n.startsWith('._') || n.startsWith('.');
-const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const slugify = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 const listDirs = (p) => existsSync(p)
   ? readdirSync(p, { withFileTypes: true }).filter((d) => d.isDirectory() && !isIgnored(d.name))
   : [];
@@ -130,15 +134,24 @@ function sanitizeReport(html) {
     .replace(/<a\b[^>]*href="[^"]*\.(wav|mp3)"[^>]*>[\s\S]*?<\/a>/gi, '');
 }
 
-// ---------- astro-catalog metadata ----------
+// ---------- astro-catalog discovery + metadata ----------
+// Find every `*_astro-catalog/` (or bare `astro-catalog/`) dir with a context.json.
+function findAstroTracks(albumPath) {
+  return listDirs(albumPath)
+    .filter((d) => /_astro-catalog$/.test(d.name) || d.name === 'astro-catalog')
+    .map((d) => ({ acDir: join(albumPath, d.name), dirName: d.name }))
+    .filter((t) => existsSync(join(t.acDir, 'context.json')))
+    .sort((a, b) => a.dirName.localeCompare(b.dirName, undefined, { numeric: true, sensitivity: 'base' }));
+}
+
 function parseAstroCatalog(acDir) {
   const ctx = JSON.parse(readFileSync(join(acDir, 'context.json'), 'utf8'));
-  const name = ctx.input_name;
+  const name = ctx.input_name || basename(acDir).replace(/_astro-catalog$/, '');
   const ext = ctx.input_ext || 'wav';
   const tmpl = (t) => t.replace('{input_name}', name).replace('{input_ext}', ext);
   const steps = ctx.steps || {};
   // Resolve outputs from path_template relative to acDir (NOT the absolute paths
-  // baked into context.json, which point at Daniel's machine).
+  // baked into context.json, which point at the machine that produced them).
   const out = (step, key = 'primary_output') => {
     const o = steps[step]?.outputs?.[key];
     return o?.path_template ? join(acDir, tmpl(o.path_template)) : null;
@@ -179,20 +192,11 @@ function parseAstroCatalog(acDir) {
   };
 }
 
-// ---------- classify ----------
-function classify(albumPath) {
-  if (existsSync(join(albumPath, 'astro-catalog', 'context.json'))) return 'astro-catalog-single';
-  const numbered = listDirs(albumPath).filter((d) => /^\d+$/.test(d.name));
-  if (numbered.some((d) => existsSync(join(albumPath, d.name, 'astro-catalog', 'context.json')))) return 'astro-catalog-album';
-  if (/^[a-f0-9]{4,}_/.test(basename(albumPath)) && numbered.length) return 'legacy-album';
-  if (basename(albumPath).endsWith('_final') || listDirs(albumPath).some((d) => d.name.endsWith('_final'))) return 'legacy-final';
-  return 'raw';
-}
-
-// ---------- per-track (astro-catalog) ----------
+// ---------- per-track ----------
 async function processAstroTrack(collectionId, trackNumber, acDir) {
   const m = parseAstroCatalog(acDir);
   const n = String(trackNumber);
+  const base = slugify(m.name) || `track-${n}`; // path/URL-safe (track names may have spaces)
   log(`    track ${n}: "${m.name}"  ${m.catalogNumber || '(no catalog#)'}`);
 
   const reportDir = join(PUBLIC_DIR, 'reports', collectionId, n);
@@ -205,38 +209,38 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
   if (!existsSync(m.normalizedWav)) {
     warn(`normalized WAV not found: ${m.normalizedWav}`);
   } else if (REMOTE) {
-    const tmpMp3 = join(tmpdir(), `lufs-${collectionId}-${n}-${m.name}.mp3`);
+    const tmpMp3 = join(tmpdir(), `lufs-${slugify(collectionId)}-${n}-${base}.mp3`);
     transcodeMp3(m.normalizedWav, tmpMp3);
     duration = ffprobeDuration(tmpMp3);
-    const key = `releases/${collectionId}/${n}/${m.name}.mp3`;
+    const key = `releases/${collectionId}/${n}/${base}.mp3`;
     if (uploadObject) await uploadObject(tmpMp3, key, 'audio/mpeg');
     else warn('remote mode but uploader unavailable; audio not uploaded');
     rmSync(tmpMp3, { force: true });
     audioPath = key; // the player exchanges this key for a signed URL via the Worker
   } else {
-    const audioDest = join(PUBLIC_DIR, 'audio', collectionId, n, `${m.name}.mp3`);
+    const audioDest = join(PUBLIC_DIR, 'audio', collectionId, n, `${base}.mp3`);
     transcodeMp3(m.normalizedWav, audioDest);
     duration = ffprobeDuration(audioDest);
-    audioPath = `/audio/${collectionId}/${n}/${m.name}.mp3`;
+    audioPath = `/audio/${collectionId}/${n}/${base}.mp3`;
   }
 
   // 2) sanitized report + its relative assets (no WAV, no canvas GIF) so links resolve
   if (existsSync(m.reportHtml)) {
     ensureDir(reportDir);
     writeFileSync(join(reportDir, 'final_report.html'), sanitizeReport(readFileSync(m.reportHtml, 'utf8')));
-    for (const sub of ['artwork', 'canvas', 'logs']) copyTree(join(acDir, sub), join(reportDir, sub), { skipWav: true, skipGif: true });
+    for (const sub of ['artwork', 'canvas', 'logs']) copyTree(join(m.acDir, sub), join(reportDir, sub), { skipWav: true, skipGif: true });
   } else { warn(`report not found: ${m.reportHtml}`); }
 
   // 3) covers for the site UI
   copy(m.artworkMain, join(coverDir, 'artwork.png'));
-  const comp = join(acDir, 'artwork', 'components');
+  const comp = join(m.acDir, 'artwork', 'components');
   for (const f of ['identicon.png', 'spectrogram.png', 'rectangle_spectrogram.png']) copy(join(comp, f), join(coverDir, f));
-  copy(join(acDir, 'canvas', `${m.name}_canvas_static.png`), join(coverDir, 'canvas_static.png'));
+  copy(join(m.acDir, 'canvas', `${m.name}_canvas_static.png`), join(coverDir, 'canvas_static.png'));
 
   return {
     trackNumber,
     displayTitle: m.name,
-    filename: m.name,
+    filename: base,
     catalogNumber: m.catalogNumber,
     sha256: m.sha256,
     processedDate: m.processedDate,
@@ -349,29 +353,25 @@ async function main() {
 
   for (const dirName of albums) {
     const albumPath = join(SRC, dirName);
-    const shape = classify(albumPath);
     const { collectionId, slug } = deriveIds(dirName);
-    log(`\nalbum: ${dirName}  [${shape}]`);
+    const found = findAstroTracks(albumPath);
+    log(`\nalbum: ${dirName}  (${found.length} astro-catalog track(s))`);
 
-    const tracks = [];
-    if (shape === 'astro-catalog-single') {
-      tracks.push(await processAstroTrack(collectionId, 1, join(albumPath, 'astro-catalog')));
-    } else if (shape === 'astro-catalog-album') {
-      const numbered = listDirs(albumPath).filter((d) => /^\d+$/.test(d.name)).sort((a, b) => +a.name - +b.name);
-      for (const d of numbered) {
-        const ac = join(albumPath, d.name, 'astro-catalog');
-        if (existsSync(join(ac, 'context.json'))) tracks.push(await processAstroTrack(collectionId, +d.name, ac));
-      }
-    } else {
-      warn(`shape '${shape}' not handled by the new ingest yet — skipping. Run it through the workchain to get astro-catalog output (legacy albums: see catalog-ingest-local.mjs).`);
-      skipped.push(`${dirName} (${shape})`);
+    if (!found.length) {
+      warn(`no *_astro-catalog/ output in ${dirName} — skipping (run it through the lufs-workchain first).`);
+      skipped.push(`${dirName} (unprocessed)`);
       continue;
     }
 
-    if (!tracks.length) { warn(`no processable tracks in ${dirName}`); skipped.push(`${dirName} (no tracks)`); continue; }
+    const tracks = [];
+    let i = 0;
+    for (const t of found) {
+      i += 1;
+      tracks.push(await processAstroTrack(collectionId, i, t.acDir));
+    }
 
     // collection cover = first track's artwork
-    copy(join(PUBLIC_DIR, 'covers', collectionId, String(tracks[0].trackNumber), 'artwork.png'),
+    copy(join(PUBLIC_DIR, 'covers', collectionId, '1', 'artwork.png'),
          join(PUBLIC_DIR, 'covers', collectionId, 'cover.png'));
 
     const human = readHumanFields(slug);

@@ -6,7 +6,7 @@
 #
 # This script:
 # 1. Loads .env.local if it exists
-# 2. Runs catalog:ingest:local (if --ingest flag)
+# 2. Runs catalog:ingest (the astro-catalog ingest) if --ingest flag
 # 3. Starts the Astro dev server
 #
 # Make executable: chmod +x catalog-dev.sh
@@ -46,7 +46,7 @@ fi
 if [[ "$INGEST_AFTER" == "true" ]]; then
   echo ""
   echo "Running catalog ingest from $CATALOG_SOURCE_PATH..."
-  pnpm catalog:ingest:local || {
+  pnpm catalog:ingest || {
     echo "Error: Catalog ingest failed."
     exit 1
   }

@@ -85,8 +85,11 @@ Full walkthrough + the "what is S3/CDN" primer: `docs/implementation/06-cdn-and-
 
 (Full loop + troubleshooting: `docs/implementation/11-runbook.md`.)
 
-1. Run the **workchain** (`astro-catalog` chain) on the finished audio → output lands
-   in `…/catalogs/<album>/astro-catalog/`.
+1. Run the **workchain** (`astro-catalog` chain) on the finished audio. The output
+   dir must be named **`{track-name}_astro-catalog/`** and sit in the album root,
+   alongside the source audio — so an album holds one such dir per track:
+   `…/catalogs/{album}/{track-name}_astro-catalog/` (a single like `3434` just has
+   one). Albums with no `*_astro-catalog/` dir are skipped by the ingest.
 2. `./catalog-deploy.sh --ingest` → ingests (transcode + upload to R2 + write `.md`),
    builds, pushes `main`, publishes `dist/` to `hostinger` → auto-deploys.
 3. Edit `src/content/releases/<slug>.md`: set `title`, `status: released`,

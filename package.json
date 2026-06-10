@@ -4,7 +4,6 @@
   "version": "0.0.1",
   "scripts": {
     "catalog:ingest": "node ./src/scripts/ingest/catalog-ingest.mjs",
-    "catalog:ingest:local": "node ./src/scripts/ingest/catalog-ingest-local.mjs",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",

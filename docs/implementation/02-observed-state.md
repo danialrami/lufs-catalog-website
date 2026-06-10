@@ -63,6 +63,12 @@ collection `a98ff_praise-legend-road`.
 
 ## 4. Source-shape taxonomy (critical for Phase 3)
 
+> **Superseded (2026-06-10):** the catalog was standardized so the canonical shape is
+> now `{album}/{track-name}_astro-catalog/` — one workchain-output dir per track in the
+> album root (a single like `3434` just has one). See `09-ingest-and-deploy.md` §1 for
+> the live contract. The taxonomy below is the historical snapshot from before that
+> cleanup (when only `3434/astro-catalog/` existed and other albums were raw).
+
 **Each top-level folder under `/Volumes/project/continuo/catalogs` is one album**
 (a collection / release) — `a98ff_praise-legend-road`, `footlights`, `3434`,
 `my-mind`, `hogtagon`, etc. are all albums. They differ along two axes: **how many

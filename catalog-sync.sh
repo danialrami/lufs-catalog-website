@@ -48,9 +48,9 @@ if [ ! -d "$CATALOG_SOURCE_PATH" ]; then
   exit 1
 fi
 
-# Run ingest
+# Run ingest (the astro-catalog ingest; mode via STORAGE_MODE)
 echo "Running catalog ingest..."
-pnpm catalog:ingest:local
+pnpm catalog:ingest
 
 echo ""
 echo "=== Sync complete ==="

@@ -12,17 +12,33 @@ A single, dependency-light Node script (Node stdlib + `ffmpeg`/`ffprobe` + the
 existing `node-html-parser` dep, with a regex fallback) that turns workchain output
 into catalog content.
 
-### Shapes it recognizes (`classify()`)
-| Shape | Detector | Handled |
-|---|---|---|
-| astro-catalog single-track | `<album>/astro-catalog/context.json` | ✅ full |
-| astro-catalog multi-track | `<album>/<n>/astro-catalog/context.json` | ✅ full |
-| legacy hex_slug album | `^[a-f0-9]+_…` + numbered `*_final/` | ⛔ skipped (use `catalog-ingest-local.mjs`, or re-run through the workchain) |
-| legacy single `*_final` | dir ends `_final` | ⛔ skipped |
-| raw / unprocessed | none of the above | ⛔ skipped (needs the workchain first) |
+### Source shape (canonical)
+One album per top-level dir. Each track is a **`{track-name}_astro-catalog/`** dir in
+the album root (side by side with the source audio), so an album can hold any number
+of tracks:
 
-Skipped albums are reported, never fatal. `__MACOSX/` and `._*` resource forks are
-ignored.
+```
+{album}/
+  {track-name}.wav                 source audio (ignored)
+  {track-name}_astro-catalog/      ← one per track; the unit the ingest reads
+  {another-track}.wav
+  {another-track}_astro-catalog/
+```
+
+The ingest finds every `*_astro-catalog/` (or a bare `astro-catalog/`) dir that
+contains a `context.json`, sorted alphabetically (prefix `01_`, `02_`, … for explicit
+order). Track identity = the dir name minus `_astro-catalog`, reconciled with
+context.json `input_name`; **track names are slugified for filenames/R2 keys** while
+`displayTitle` keeps the real name (e.g. `Beta Two` → `beta-two.mp3`). Albums with no
+`*_astro-catalog/` dir are **skipped** (reported, never fatal) — they still need the
+workchain. `__MACOSX/` and `._*` are ignored.
+
+> The earlier `astro-catalog/` (single) and `<n>/astro-catalog/` (numbered) shapes and
+> the legacy `_final` handling are gone — everything is reprocessed into the
+> `{track-name}_astro-catalog/` shape. There is now **one** ingest (`catalog:ingest` →
+> `catalog-ingest.mjs`); `catalog-dev.sh` and `catalog-sync.sh` call it, and the old
+> interactive `catalog-ingest-local.mjs` / `catalog:ingest:local` were removed (that
+> legacy script is what produced the confusing 33-track run + `Title:` prompt).
 
 ### Metadata sources (structured, not scraped)
 Per the confirmed sample (see also `02-observed-state.md`):
