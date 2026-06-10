@@ -29,6 +29,9 @@ fallback design.
 | 6 | [`06-cdn-and-s3-guide.md`](./06-cdn-and-s3-guide.md) | **Start here if you're new to S3/CDN.** Object storage, the S3 API, CDNs, egress, presigned URLs, CORS, and exact R2 setup steps |
 | 7 | [`07-nas-rustfs-fallback.md`](./07-nas-rustfs-fallback.md) | The NAS rustfs origin: the deliberate R2↔rustfs switch + automatic fallback, and how to wire it in (kept commented until the endpoint is live) |
 | 8 | [`08-opencode-agent.md`](./08-opencode-agent.md) | The `catalog-operator` opencode agent (`.opencode/agents/`) that runs the site in natural language, + its helper scripts and the `.env` storage switch |
+| 9 | [`09-ingest-and-deploy.md`](./09-ingest-and-deploy.md) | **Built in Phase 3 + 2.** How `catalog-ingest.mjs` (context.json-driven, WAV→MP3, edit-preserving), `catalog-deploy.sh`, the R2 signing Worker, and the player resolver work; the no-CI deploy decision; the one-private-bucket model |
+| 10 | [`10-brand-and-ux.md`](./10-brand-and-ux.md) | **Built in Phase 4.** The LUFS brand pass — tokens/fonts, custom cursor + scroll-reveal, the now-working project filter, and the embedded proof-of-work report |
+| 11 | [`11-runbook.md`](./11-runbook.md) | **Phase 5.** The repeatable publish-a-release loop + troubleshooting. See also the root [`SETUP.md`](../../SETUP.md) for one-time setup |
 
 ---
 

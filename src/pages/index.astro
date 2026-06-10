@@ -35,7 +35,7 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
     <main class="container">
       <div class="grid" id="releases-grid">
         {filteredReleases.map((release) => (
-          <a href={`/releases/${release.slug}`} class="card">
+          <a href={`/releases/${release.slug}`} class="card reveal" data-project={release.data.project}>
             {release.data.coverArt && (
               <img 
                 src={release.data.coverArt} 
@@ -81,21 +81,19 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
     </main>
 
     <script>
-      // Simple client-side filtering
+      // Client-side filtering by project (cards carry data-project)
       const buttons = document.querySelectorAll('.legend-item');
       const cards = document.querySelectorAll('.card');
-      
+
       buttons.forEach(btn => {
         btn.addEventListener('click', () => {
           const filter = (btn as HTMLElement).dataset.filter;
-          
-          // Update active state
           buttons.forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          
-          // Filter cards (would need project data on cards for real filtering)
           cards.forEach(card => {
-            (card as HTMLElement).style.display = 'block';
+            const project = (card as HTMLElement).dataset.project;
+            const show = filter === 'all' || project === filter;
+            (card as HTMLElement).style.display = show ? 'block' : 'none';
           });
         });
       });
@@ -136,8 +134,12 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
         padding: 0;
         background-color: var(--color-bg);
         color: var(--color-text);
-        font-family: system-ui, -apple-system, sans-serif;
+        font-family: var(--font-body);
       }
+
+      .site-title { font-family: var(--font-display); letter-spacing: -0.02em; }
+      .legend-item { font-family: var(--font-mono); letter-spacing: 0.04em; }
+      .badge { letter-spacing: 0.04em; }
       
       .container {
         max-width: 1200px;
@@ -208,17 +210,19 @@ const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
       
       .card {
         background-color: var(--color-surface);
+        border: 1px solid var(--color-hairline);
         border-radius: 4px;
         overflow: hidden;
         text-decoration: none;
         color: inherit;
         display: block;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
       }
-      
+
       .card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border-color: var(--color-teal);
       }
       
       .card-cover {
