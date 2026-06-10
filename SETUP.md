@@ -74,31 +74,51 @@ Full walkthrough + the "what is S3/CDN" primer: `docs/implementation/06-cdn-and-
 
 1. **DNS:** point `catalog.lufs.audio` → Hostinger; `stream.lufs.audio` → the Worker.
 2. **Hostinger Git auto-deploy:** connect this repo and set the auto-deploy webhook to
-   watch the **`hostinger`** branch (same as your Hugo blog). `catalog-deploy.sh`
-   publishes built output there; Hostinger pulls it into `public_html`. (There is **no
-   GitHub Actions CI** — see `docs/implementation/09` §3 for why and how to add a
-   build-check later if you want one.)
+   watch the **`hostinger`** branch (same as your Hugo blog). The branch must contain
+   **built output** (Hostinger doesn't run `astro build`). Two ways to publish it:
+   - **CI (recommended, no local build):** a ready-made workflow ships at
+     `docs/implementation/ci-deploy.yml` — copy it into place (the PR bot can't commit
+     workflow files itself):
+     ```bash
+     mkdir -p .github/workflows && cp docs/implementation/ci-deploy.yml .github/workflows/deploy.yml
+     git add .github/workflows/deploy.yml && git commit -m "ci: deploy to hostinger" && git push
+     ```
+     It builds on every push to `main` and publishes `dist/` to `hostinger`. This is how
+     you can get a **blank** site live (zero releases) to confirm DNS + the webhook
+     *before any audio exists*. No secrets needed for a local-mode/blank build.
+   - **Manual:** `./catalog-deploy.sh` builds locally and publishes `dist/` to
+     `hostinger`. Use this for offline/local deploys. (There is no other GitHub Actions
+     CI; see `docs/implementation/09` §3.)
 
 ---
 
 ## Phase D — Publish a release 🔁
 
-(Full loop + troubleshooting: `docs/implementation/11-runbook.md`.)
+(Full loop + troubleshooting: `docs/implementation/11-runbook.md`; this round's
+hardening: `docs/implementation/12-hardening-and-verification.md`.)
 
 1. Run the **workchain** (`astro-catalog` chain) on the finished audio. The output
    dir must be named **`{track-name}_astro-catalog/`** and sit in the album root,
    alongside the source audio — so an album holds one such dir per track:
    `…/catalogs/{album}/{track-name}_astro-catalog/` (a single like `3434` just has
-   one). Albums with no `*_astro-catalog/` dir are skipped by the ingest. The helper
-   `./scripts/catalog-process.sh --album <album-dir>` does this for you — it runs the
-   chain and names each output `{track-name}_astro-catalog/` (needs the `lufs-workchain`
-   CLI on PATH).
-2. `./catalog-deploy.sh --ingest` → ingests (transcode + upload to R2 + write `.md`),
-   builds, pushes `main`, publishes `dist/` to `hostinger` → auto-deploys.
-3. Edit `src/content/releases/<slug>.md`: set `title`, `status: released`,
+   one). The helper does this for you and is the easiest path:
+   ```bash
+   ./scripts/catalog-process.sh --all        # every album under $CATALOG_SOURCE_PATH
+   #   or: --album <album-dir>   |   <audio-file>...   |   --force to reprocess
+   ```
+   It runs the chain **with `--report`**, names each output `{track-name}_astro-catalog/`,
+   and **skips tracks that are already complete** (needs the `lufs-workchain` CLI on PATH).
+2. **Sanity-check the batch** (catches any incomplete/failed/report-less track):
+   ```bash
+   bash <lufs-workchain>/tests/verify_astro_catalog.sh "$CATALOG_SOURCE_PATH"
+   #   add --rerun to re-process anything unfinished (also with --report)
+   ```
+3. `./catalog-deploy.sh --ingest` → ingests (transcode + upload to R2 + write `.md`),
+   builds, pushes `main`, publishes `dist/` to `hostinger` → auto-deploys. (Or just
+   `pnpm catalog:ingest`, commit to `main`, and let CI deploy.)
+4. Edit `src/content/releases/<slug>.md`: set `title`, `status: released`,
    `releaseDate`, `isrc`, `streamingLinks`, `tags`, `project` (these are preserved on
    re-ingest).
-4. `./catalog-deploy.sh` again to publish the edits.
 5. **Smoke test:** plays in prod, **no R2 key in page source**, report embeds, player
    persists.
 
@@ -118,13 +138,19 @@ Full walkthrough + the "what is S3/CDN" primer: `docs/implementation/06-cdn-and-
 
 ---
 
-## ⚠️ Please verify (the agent couldn't, in-sandbox)
+## ⚠️ Please verify (the agent couldn't fully, in-sandbox)
 
-1. **`pnpm build` succeeds** with the new `config.ts` (loudness field) + generated `.md`.
+1. **`pnpm build` succeeds** with the full app (player + brand). The ingest→content→
+   `astro build` *contract* was verified in-sandbox against generated content
+   (incl. empty-hash and report-less edge cases) and a zero-release blank build —
+   see `docs/implementation/12-hardening-and-verification.md` — but the agent did not
+   build the full real app, so confirm the whole `pnpm build` once.
 2. **Local audio playback** still works (preserved by design; the player edit is the
    one frontend change worth eyeballing).
 3. **Remote streaming** once R2 + Worker are live: a track plays and the page contains
    no durable R2 URL/key.
 4. **Brand pass** renders (fonts load, legend filters, report embed shows, reduced-motion respected).
+5. **`catalog.spec.ts`** (Playwright e2e) still references the old `Continuo` fixture;
+   update it to a current release once the real catalog is ingested.
 
 If any of these trip, paste the error here and I'll fix it.

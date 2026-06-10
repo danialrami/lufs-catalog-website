@@ -40,7 +40,7 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, basename } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 // node-html-parser is a repo dependency; fall back to regex if unavailable.
@@ -233,12 +233,16 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
     audioPath = `/audio/${collectionId}/${n}/${base}.mp3`;
   }
 
-  // 2) sanitized report + its relative assets (no WAV, no canvas GIF) so links resolve
-  if (existsSync(m.reportHtml)) {
+  // 2) sanitized report + its relative assets (no WAV, no canvas GIF) so links resolve.
+  //    The report is OPTIONAL: the astro-catalog chain only emits `{name}_report.html`
+  //    when run with `--report`. When it's absent we leave finalReport empty so the UI
+  //    hides the link instead of publishing a guaranteed 404 (see [slug].astro).
+  const hasReport = existsSync(m.reportHtml);
+  if (hasReport) {
     ensureDir(reportDir);
     writeFileSync(join(reportDir, 'final_report.html'), sanitizeReport(readFileSync(m.reportHtml, 'utf8')));
     for (const sub of ['artwork', 'canvas', 'logs']) copyTree(join(m.acDir, sub), join(reportDir, sub), { skipWav: true, skipGif: true });
-  } else { warn(`report not found: ${m.reportHtml}`); }
+  } else { warn(`report not found (re-run the chain with --report to include it): ${m.reportHtml}`); }
 
   // 3) covers for the site UI
   copy(m.artworkMain, join(coverDir, 'artwork.png'));
@@ -255,7 +259,7 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
     processedDate: m.processedDate,
     saturation: m.saturation,
     audioPath,
-    finalReport: `/reports/${collectionId}/${n}/final_report.html`,
+    finalReport: hasReport ? `/reports/${collectionId}/${n}/final_report.html` : '',
     duration,
     loudness: m.loudness,
     artwork: {
@@ -329,8 +333,11 @@ function writeReleaseMarkdown(slug, data) {
     `  appleMusic: ${q(sl.appleMusic)}`,
     `  bandcamp: ${q(sl.bandcamp)}`,
     `  soundcloud: ${q(sl.soundcloud)}`,
-    'tags:',
-    ...((data.tags || []).map((t) => `  - ${q(t)}`)),
+    // Emit an explicit empty array, not a bare `tags:` (which YAML reads as null
+    // and the content schema then rejects). Same care anywhere a list can be empty.
+    ...((data.tags && data.tags.length)
+      ? ['tags:', ...data.tags.map((t) => `  - ${q(t)}`)]
+      : ['tags: []']),
     'tracks:',
     trackYaml,
     '---',
@@ -364,6 +371,12 @@ async function main() {
   for (const dirName of albums) {
     const albumPath = join(SRC, dirName);
     const { collectionId, slug } = deriveIds(dirName);
+    // collectionId is used verbatim in /audio|reports|covers/<id>/ paths. Dots,
+    // underscores and case are URL-safe; spaces and the like are not. Warn (don't
+    // mangle) so the operator can rename the album folder if needed.
+    if (/[^A-Za-z0-9._-]/.test(collectionId)) {
+      warn(`album "${dirName}" has URL-unsafe characters; consider renaming the folder (track names are slugified, but album folder names are used verbatim in paths/keys).`);
+    }
     const found = findAstroTracks(albumPath);
     log(`\nalbum: ${dirName}  (${found.length} astro-catalog track(s))`);
 
@@ -375,8 +388,14 @@ async function main() {
 
     const tracks = [];
     for (const t of found) {
-      const track = await processAstroTrack(collectionId, tracks.length + 1, t.acDir);
-      if (track) tracks.push(track); // null = incomplete/failed run, skipped
+      try {
+        const track = await processAstroTrack(collectionId, tracks.length + 1, t.acDir);
+        if (track) tracks.push(track); // null = incomplete/failed run, skipped
+      } catch (e) {
+        // One bad track (e.g. a corrupt/zero-byte normalized file that fails ffmpeg)
+        // must NEVER abort the whole catalog ingest. Skip it loudly and continue.
+        warn(`track failed in "${dirName}" (${t.dirName}): ${e.message} — skipping`);
+      }
     }
     if (!tracks.length) {
       warn(`no completed astro-catalog tracks in ${dirName} — skipping.`);
@@ -412,4 +431,11 @@ async function main() {
   log(`skipped  : ${skipped.length ? skipped.join('; ') : '(none)'}`);
 }
 
-main().catch((e) => { console.error('FATAL', e); process.exit(1); });
+// Run only when invoked directly (`node catalog-ingest.mjs`); stay importable so
+// the unit tests can exercise the pure helpers without running a full ingest.
+const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (invokedDirectly) {
+  main().catch((e) => { console.error('FATAL', e); process.exit(1); });
+}
+
+export { slugify, deriveIds, sanitizeReport, parseAstroCatalog, findAstroTracks };

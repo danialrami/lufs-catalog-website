@@ -34,6 +34,7 @@ permission:
     "git log*": allow
     "./catalog-dev.sh*": allow
     "./catalog-sync.sh": allow
+    "./scripts/catalog-process.sh --verify-only*": allow
     "./scripts/catalog-set-origin.sh*": ask
     "./scripts/catalog-process.sh*": ask
     "lufs-workchain*": ask
@@ -65,7 +66,8 @@ touches production or storage, and always tell Daniel exactly what changed.
 - Audio (MP3) lives in a **private R2 bucket** and streams via short-lived signed
   URLs from the Worker; small report HTML + cover thumbnails are committed in `public/`.
 - Full reasoning + details: read `docs/implementation/` (esp. `09-ingest-and-deploy.md`
-  for the ingest/deploy contract, `06-cdn-and-s3-guide.md`, `07-nas-rustfs-fallback.md`).
+  for the ingest/deploy contract, `06-cdn-and-s3-guide.md`, `07-nas-rustfs-fallback.md`,
+  and `12-hardening-and-verification.md` for the current ingest/build robustness rules).
   Treat those as your source of truth; re-read them when unsure rather than guessing.
 
 ## Source material — the catalogs directory shape (CANONICAL)
@@ -83,7 +85,9 @@ output dir sitting in the album root next to the source audio:
 
 A single (like `3434`) is just an album with one `{name}_astro-catalog/`. An album
 with NO `*_astro-catalog/` dir is **unprocessed** — its audio still needs to go
-through the workchain (see "process new audio" below); the ingest skips it.
+through the workchain (see "process new audio" below); the ingest skips it. The
+album **folder name is used verbatim** as the collectionId and in `/audio|reports|
+covers/<id>/` paths, so keep it URL-safe (track names are slugified automatically).
 
 ## The storage switch (R2 <-> rustfs) — read carefully
 Centralized in `.env(.production|.local)`:
@@ -99,9 +103,16 @@ refuses rustfs until its endpoint is configured). Inspect with `./scripts/catalo
 - **"What's the current config / where are we serving from?"**
   -> `./scripts/catalog-config.sh` (read-only; masks secrets). Summarize it.
 - **"Process the new audio I added" / "run the workchain on these."**
-  -> `./scripts/catalog-process.sh <file>...` or `--album <album-dir>`. This runs the
-  lufs-workchain `astro-catalog` chain per file and leaves a `{track-name}_astro-catalog/`
-  dir ready to ingest. 🛑 hard stop — it's heavy and writes to the catalog source.
+  -> `./scripts/catalog-process.sh --all` (every album under the source) or
+  `--album <album-dir>` or `<file>...`. It runs the `astro-catalog` chain **with
+  `--report`**, writes each `{track-name}_astro-catalog/`, and **skips tracks that are
+  already complete** (add `--force` to reprocess). 🛑 hard stop — heavy; writes to the
+  catalog source.
+- **"Did the processing actually work? / verify the batch."**
+  -> `./scripts/catalog-process.sh --verify-only` (read-only tally), or the workchain's
+  `tests/verify_astro_catalog.sh "$CATALOG_SOURCE_PATH"` (add `--rerun` to re-process
+  anything unfinished, with `--report`). Report completed / incomplete / missing /
+  completed-without-report.
 - **"Update the site with the new audio."**
   -> if there's unprocessed audio, run `catalog-process.sh` first, then
   `pnpm catalog:ingest` (local preview) or via `./catalog-deploy.sh --ingest` (to ship).
@@ -109,7 +120,9 @@ refuses rustfs until its endpoint is configured). Inspect with `./scripts/catalo
 - **"Run it locally / preview."** -> `./catalog-dev.sh --ingest` or `pnpm dev`.
 - **"Build."** -> `pnpm build`.
 - **"Switch production to rustfs / back to R2."** -> 🛑 `./scripts/catalog-set-origin.sh <origin>`, then remind a rebuild/redeploy is needed.
-- **"Deploy / publish."** -> 🛑 `./catalog-deploy.sh` (build -> push main -> publish dist to the `hostinger` branch; Hostinger auto-deploys).
+- **"Deploy / publish."** -> two paths: (a) commit content to `main` and let the
+  `deploy.yml` GitHub Action build + publish `dist/` to the `hostinger` branch
+  (Hostinger auto-deploys); or (b) 🛑 `./catalog-deploy.sh` to build + publish locally.
 - **"Add streaming links / fix a title / set the ISRC / reorder tracks."** -> edit the
   release's `.md` frontmatter directly (human-owned fields; ingest preserves them).
 
@@ -121,15 +134,16 @@ refuses rustfs until its endpoint is configured). Inspect with `./scripts/catalo
    step (rebuild/redeploy, DNS, DSP links).
 
 ## 🛑 Hard stops (confirm BEFORE running)
-- `catalog-process.sh` / `lufs-workchain` (heavy; writes into the catalog source).
+- `catalog-process.sh` (without `--verify-only`) / `lufs-workchain` (heavy; writes into the catalog source).
 - Switching `STORAGE_PRIMARY`.
 - `pnpm catalog:ingest` / `catalog-deploy.sh` when they upload to R2/rustfs or publish.
 - Any `git push`, or anything that mutates a bucket or deletes files.
 Present the exact command, wait for an explicit "yes/approved/go", then proceed.
 
 ## Scope
-DO: process audio via the workchain helper, ingest, origin switching, build/preview/
-deploy, editing release frontmatter + `.env`, inspecting/explaining config + pipeline.
+DO: process audio via the workchain helper, verify the batch, ingest, origin switching,
+build/preview/deploy, editing release frontmatter + `.env`, inspecting/explaining
+config + pipeline.
 DO NOT: invent credentials, expose secrets, commit `.env*`, hardcode R2 keys into the
 bundle, or overwrite human-edited frontmatter (`title`, `isrc`, `streamingLinks`,
 `displayTitle`, `tags`, `status`, track order).
@@ -139,6 +153,8 @@ bundle, or overwrite human-edited frontmatter (`title`, `isrc`, `streamingLinks`
 - `CATALOG_SOURCE_PATH` not found -> the NAS isn't mounted; stop and say so.
 - `lufs-workchain` not found -> the CLI isn't on PATH (install per the workchain repo); stop.
 - Album skipped as "unprocessed" -> it has no `*_astro-catalog/` dir; offer to run `catalog-process.sh`.
+- Track flagged incomplete / completed-without-report -> offer `catalog-process.sh --force`
+  on it, or the verifier's `--rerun` (both re-run with `--report`).
 - Build fails -> show the error, propose the minimal fix, re-run once; if still failing, summarize and stop.
 - A storage/network op fails -> report it; never silently switch origins or retry a mutation in a loop.
 - Anything ambiguous -> ask, don't guess.
