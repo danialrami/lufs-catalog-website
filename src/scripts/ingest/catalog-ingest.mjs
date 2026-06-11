@@ -49,6 +49,35 @@ try { ({ parse: parseHTML } = await import('node-html-parser')); } catch { /* re
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// Auto-load a .env file when the caller hasn't already provided the environment, so
+// `pnpm catalog:ingest` honors .env.production / .env.local (like Astro does for builds)
+// and never silently runs in local mode when you meant remote. The wrappers
+// (catalog-dev.sh / catalog-deploy.sh) pre-source their env (STORAGE_MODE is set), so
+// this is a no-op for them. Parser is shell-free: it ignores comments (incl. inline
+// `value  # note`) and strips surrounding quotes, so placeholders like `pub-<hash>` are
+// harmless. Only fills vars that aren't already set.
+function loadDotenv() {
+  if (process.env.STORAGE_MODE) return;
+  const root = process.env.CATALOG_OUTPUT_ROOT || join(__dirname, '..', '..', '..');
+  for (const name of ['.env.production', '.env.local', '.env']) {
+    const p = join(root, name);
+    if (!existsSync(p)) continue;
+    for (const raw of readFileSync(p, 'utf8').split('\n')) {
+      const line = raw.trim();
+      if (!line || line.startsWith('#')) continue;
+      const eq = line.indexOf('=');
+      if (eq < 0) continue;
+      const key = line.slice(0, eq).trim();
+      let val = line.slice(eq + 1).replace(/\s+#.*$/, '').trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) val = val.slice(1, -1);
+      if (key && process.env[key] === undefined) process.env[key] = val;
+    }
+    console.log(`env    : loaded ${name}`);
+    break;
+  }
+}
+loadDotenv();
+
 const SRC = process.env.CATALOG_SOURCE_PATH || '/Volumes/project/continuo/catalogs';
 const OUTPUT_ROOT = process.env.CATALOG_OUTPUT_ROOT || join(__dirname, '..', '..', '..');
 const PUBLIC_DIR = join(OUTPUT_ROOT, 'public');

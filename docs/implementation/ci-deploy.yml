@@ -3,14 +3,19 @@ name: Build & Deploy → hostinger
 # Builds the static site and publishes the built output to the `hostinger` branch,
 # which Hostinger's Git auto-deploy webhook pulls into public_html (catalog.lufs.audio).
 #
-# This is the remote counterpart to ./catalog-deploy.sh: it lets a push to `main`
-# (e.g. committed content from a local `pnpm catalog:ingest`) deploy WITHOUT anyone
-# running a local build — including a zero-release "blank" deploy to prove the
-# pipeline end to end before any audio exists. The manual script still works for
-# offline/local deploys; both publish the same `hostinger` branch.
+# Copy this into place (the PR bot can't commit workflow files itself):
+#   mkdir -p .github/workflows && cp docs/implementation/ci-deploy.yml .github/workflows/deploy.yml
 #
-# No secrets required for a local-mode / blank build. For a remote (R2) build, add
-# the PUBLIC_* vars as repository variables and reference them in the build step.
+# This is the remote counterpart to ./catalog-deploy.sh: a push to `main` (e.g. committed
+# content from a local `pnpm catalog:ingest`) deploys WITHOUT anyone running a local build.
+# The manual script still works for offline/local deploys; both publish the `hostinger` branch.
+#
+# REMOTE (R2) BUILDS: the player resolves audio keys via PUBLIC_R2_STREAM_URL, which is
+# baked into the bundle at BUILD time. .env.production is gitignored (not in CI), so set
+# these as repo *Variables* (Settings → Secrets and variables → Actions → Variables):
+#   - PUBLIC_R2_STREAM_URL   e.g. https://stream.lufsaud.io
+#   - PUBLIC_SITE_URL        e.g. https://catalog.lufs.audio
+# A local-mode / blank build needs no variables.
 
 on:
   push:
@@ -39,13 +44,15 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      # Repo currently ships package-lock.json (not pnpm-lock.yaml), so don't use
-      # --frozen-lockfile here.
       - name: Install dependencies
         run: pnpm install
 
       - name: Build (static)
         run: pnpm build
+        env:
+          # Exposed to the browser bundle. Safe to be public; empty is fine for local-mode.
+          PUBLIC_R2_STREAM_URL: ${{ vars.PUBLIC_R2_STREAM_URL }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
 
       - name: Publish dist/ to the hostinger branch
         uses: peaceiris/actions-gh-pages@v4
