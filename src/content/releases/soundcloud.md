@@ -4,7 +4,7 @@ collectionId: "soundcloud"
 project: "soundcloud"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
-status: "draft"
+status: "released"
 coverArt: "/covers/soundcloud/cover.png"
 streamingLinks:
   spotify: ""
@@ -20,7 +20,7 @@ tracks:
     sha256: "cb1c9633e214a7476080d5a5d3f5c41fd4f04c2e8aaed25511b18995ee64d6f7"
     processedDate: "2026-06-10T23:16:39Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/1/01-don-t-let-me-fall-asleep.mp3"
+    audioPath: "releases/soundcloud/1/01-don-t-let-me-fall-asleep.mp3"
     finalReport: "/reports/soundcloud/1/final_report.html"
     duration: 313
     loudness:
@@ -42,7 +42,7 @@ tracks:
     sha256: "87a56b5004ccea42e6b1f08e22170b6288f68815717d05a386f015ef5624d3ee"
     processedDate: "2026-06-10T23:22:03Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/2/01-opposite-over-high-2.mp3"
+    audioPath: "releases/soundcloud/2/01-opposite-over-high-2.mp3"
     finalReport: "/reports/soundcloud/2/final_report.html"
     duration: 222
     loudness:
@@ -64,7 +64,7 @@ tracks:
     sha256: "e4a8b40f84bb4d1ff13c9e849dad7a7566524aad1923ae6cc2921153d6d4be21"
     processedDate: "2026-06-10T23:25:28Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/3/05-hole-in-my-head.mp3"
+    audioPath: "releases/soundcloud/3/05-hole-in-my-head.mp3"
     finalReport: "/reports/soundcloud/3/final_report.html"
     duration: 300
     loudness:
@@ -86,7 +86,7 @@ tracks:
     sha256: "403c4272a77d944bd924cbf442c9ecf653c890649fca4d3e14ff3ea105a98efc"
     processedDate: "2026-06-10T23:31:24Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/4/a-trip-to-london-suite-for-dghs.mp3"
+    audioPath: "releases/soundcloud/4/a-trip-to-london-suite-for-dghs.mp3"
     finalReport: "/reports/soundcloud/4/final_report.html"
     duration: 201
     loudness:
@@ -108,7 +108,7 @@ tracks:
     sha256: "cc6858d3063419b724aeebb32686ea501063d15ac7b26aadf1c027a4e382d7a9"
     processedDate: "2026-06-10T23:14:05Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/5/abisselfa-suite.mp3"
+    audioPath: "releases/soundcloud/5/abisselfa-suite.mp3"
     finalReport: "/reports/soundcloud/5/final_report.html"
     duration: 146
     loudness:
@@ -130,7 +130,7 @@ tracks:
     sha256: "bafc15ad76778b3b38548b5490b3a97ab90915d608817da5faab901ebe0f1b63"
     processedDate: "2026-06-10T23:11:53Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/6/abstractions.mp3"
+    audioPath: "releases/soundcloud/6/abstractions.mp3"
     finalReport: "/reports/soundcloud/6/final_report.html"
     duration: 71
     loudness:
@@ -152,7 +152,7 @@ tracks:
     sha256: "70aa1ba9965d715f5a36f1722cc0e11bae29e62ade6fa73b98dcb56bbb72cf5c"
     processedDate: "2026-06-10T23:18:53Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/7/buchla-piece.mp3"
+    audioPath: "releases/soundcloud/7/buchla-piece.mp3"
     finalReport: "/reports/soundcloud/7/final_report.html"
     duration: 211
     loudness:
@@ -174,7 +174,7 @@ tracks:
     sha256: "5358fa37ae858dfcb997722092c9a587de0b1e97f56ee30c5c9b19d23256649e"
     processedDate: "2026-06-10T23:33:46Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/8/chorale-1.mp3"
+    audioPath: "releases/soundcloud/8/chorale-1.mp3"
     finalReport: "/reports/soundcloud/8/final_report.html"
     duration: 56
     loudness:
@@ -196,7 +196,7 @@ tracks:
     sha256: "10c70d40846cc70ae75156fc257a9584502248c77650df2232f30c54bd8422ab"
     processedDate: "2026-06-10T23:09:45Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/9/crater-lake-live-from-frederick-lowe-theatre.mp3"
+    audioPath: "releases/soundcloud/9/crater-lake-live-from-frederick-lowe-theatre.mp3"
     finalReport: "/reports/soundcloud/9/final_report.html"
     duration: 158
     loudness:
@@ -218,7 +218,7 @@ tracks:
     sha256: "684b05adee71cf5cea14fb4b3441b3f430d97da26f068c719fa73c352e5f92ea"
     processedDate: "2026-06-10T23:28:39Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/10/e-o-i-o-m.mp3"
+    audioPath: "releases/soundcloud/10/e-o-i-o-m.mp3"
     finalReport: "/reports/soundcloud/10/final_report.html"
     duration: 277
     loudness:
@@ -240,7 +240,7 @@ tracks:
     sha256: "369548cab41f74718632c0d21bbedc94d3eb79bffcbf7c5a77a983db2d961f29"
     processedDate: "2026-06-10T23:24:41Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/11/everywhere-undone.mp3"
+    audioPath: "releases/soundcloud/11/everywhere-undone.mp3"
     finalReport: "/reports/soundcloud/11/final_report.html"
     duration: 299
     loudness:
@@ -262,7 +262,7 @@ tracks:
     sha256: "c297c4ed0b847912c39b327564e8d65919cf85f2a1add4fbdcee7c0b266c51c8"
     processedDate: "2026-06-10T23:34:13Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/12/exodus.mp3"
+    audioPath: "releases/soundcloud/12/exodus.mp3"
     finalReport: "/reports/soundcloud/12/final_report.html"
     duration: 85
     loudness:
@@ -284,7 +284,7 @@ tracks:
     sha256: "f7488b2944a4fc56273e8ef813b55b94a6b2965a078c4d273e902a98b3bb9d66"
     processedDate: "2026-06-10T23:32:57Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/13/here-s-the-song-piano-sketch-master.mp3"
+    audioPath: "releases/soundcloud/13/here-s-the-song-piano-sketch-master.mp3"
     finalReport: "/reports/soundcloud/13/final_report.html"
     duration: 124
     loudness:
@@ -306,7 +306,7 @@ tracks:
     sha256: "5ea960922cf5e6574f66b2e9eebbb7b677f7e9bfe50f2ae835fce015694d70bc"
     processedDate: "2026-06-10T23:29:25Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/14/here-s-the-song.mp3"
+    audioPath: "releases/soundcloud/14/here-s-the-song.mp3"
     finalReport: "/reports/soundcloud/14/final_report.html"
     duration: 265
     loudness:
@@ -328,7 +328,7 @@ tracks:
     sha256: "52887c2ca2e781c7a96bbe5a2cd5d33ecded44d7ba524a70ca548def161b60f4"
     processedDate: "2026-06-10T23:17:08Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/15/hm.mp3"
+    audioPath: "releases/soundcloud/15/hm.mp3"
     finalReport: "/reports/soundcloud/15/final_report.html"
     duration: 94
     loudness:
@@ -350,7 +350,7 @@ tracks:
     sha256: "1e6efe1bd7f590829324af04ffa4dbf3b0d51836ca782983a0dc1d28e00dad72"
     processedDate: "2026-06-10T23:33:22Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/16/honk-mock-up-1.mp3"
+    audioPath: "releases/soundcloud/16/honk-mock-up-1.mp3"
     finalReport: "/reports/soundcloud/16/final_report.html"
     duration: 64
     loudness:
@@ -372,7 +372,7 @@ tracks:
     sha256: "5d302c408b823dc3b7dfc6062202ea63be77b6c27a87943de3031b29a07b2cdd"
     processedDate: "2026-06-10T23:30:45Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/17/kudos.mp3"
+    audioPath: "releases/soundcloud/17/kudos.mp3"
     finalReport: "/reports/soundcloud/17/final_report.html"
     duration: 219
     loudness:
@@ -394,7 +394,7 @@ tracks:
     sha256: "2de994205d58731a92ac1a3a9b8a869a38b3fb17b3ba7b8918aba691c95f2294"
     processedDate: "2026-06-10T23:26:40Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/18/learn-to-ride-learn-to-fly.mp3"
+    audioPath: "releases/soundcloud/18/learn-to-ride-learn-to-fly.mp3"
     finalReport: "/reports/soundcloud/18/final_report.html"
     duration: 93
     loudness:
@@ -416,7 +416,7 @@ tracks:
     sha256: "ee3436bf614244977bc67c902edc61a2f7bf5e7336900e660d7027c9d6948d81"
     processedDate: "2026-06-10T23:19:21Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/19/leyna-1st-draft.mp3"
+    audioPath: "releases/soundcloud/19/leyna-1st-draft.mp3"
     finalReport: "/reports/soundcloud/19/final_report.html"
     duration: 101
     loudness:
@@ -438,7 +438,7 @@ tracks:
     sha256: "944d6975d2cde94955ee6d80da7d62e4fa5c8e0b04fd1c4023ab53164b22ae2e"
     processedDate: "2026-06-10T23:27:53Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/20/lion.mp3"
+    audioPath: "releases/soundcloud/20/lion.mp3"
     finalReport: "/reports/soundcloud/20/final_report.html"
     duration: 147
     loudness:
@@ -460,7 +460,7 @@ tracks:
     sha256: "4492458f2ac4eedf99c5c98c2eb78a36afaccc6dc8ceb839800bf9d6a4991067"
     processedDate: "2026-06-10T23:20:32Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/21/mux-remount.mp3"
+    audioPath: "releases/soundcloud/21/mux-remount.mp3"
     finalReport: "/reports/soundcloud/21/final_report.html"
     duration: 185
     loudness:
@@ -482,7 +482,7 @@ tracks:
     sha256: "c3e725463d839232020e974e26ae9470d603c28f5c4126af81f8d7d1d626d26c"
     processedDate: "2026-06-10T23:23:21Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/22/mux.mp3"
+    audioPath: "releases/soundcloud/22/mux.mp3"
     finalReport: "/reports/soundcloud/22/final_report.html"
     duration: 186
     loudness:
@@ -504,7 +504,7 @@ tracks:
     sha256: "da11843e82152a7067a4306c1bca3d16d80041bed99ffc659c7aa2601e1f5327"
     processedDate: "2026-06-10T23:35:39Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/23/prelude-no-1-in-bb-major.mp3"
+    audioPath: "releases/soundcloud/23/prelude-no-1-in-bb-major.mp3"
     finalReport: "/reports/soundcloud/23/final_report.html"
     duration: 72
     loudness:
@@ -526,7 +526,7 @@ tracks:
     sha256: "64de61bd8459a6198fa22016e8f16651e5b0bcdc8774f0efd013b11da257b5fc"
     processedDate: "2026-06-10T23:35:13Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/24/prelude-to-cold-sweats.mp3"
+    audioPath: "releases/soundcloud/24/prelude-to-cold-sweats.mp3"
     finalReport: "/reports/soundcloud/24/final_report.html"
     duration: 117
     loudness:
@@ -548,7 +548,7 @@ tracks:
     sha256: "9f18c2603764738e83c059b36271b6a49d60ac156d949744ed75b51f58f6051d"
     processedDate: "2026-06-10T23:32:28Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/25/ramirez-daniel-assig05-101317.mp3"
+    audioPath: "releases/soundcloud/25/ramirez-daniel-assig05-101317.mp3"
     finalReport: "/reports/soundcloud/25/final_report.html"
     duration: 148
     loudness:
@@ -570,7 +570,7 @@ tracks:
     sha256: "53d65e772b8a7553535ae4203127043ce4a7f01578e50f766bdc7b9ad86a021b"
     processedDate: "2026-06-10T23:13:26Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/26/ramirez-daniel-assign4-v1-022018.mp3"
+    audioPath: "releases/soundcloud/26/ramirez-daniel-assign4-v1-022018.mp3"
     finalReport: "/reports/soundcloud/26/final_report.html"
     duration: 126
     loudness:
@@ -592,7 +592,7 @@ tracks:
     sha256: "bde7cfa4e43d6a43e0a3812195ce8e33ba6fee11545827307116a7fad80f9c1c"
     processedDate: "2026-06-10T23:23:52Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/27/ramirez-daniel-assign09-v1-040318.mp3"
+    audioPath: "releases/soundcloud/27/ramirez-daniel-assign09-v1-040318.mp3"
     finalReport: "/reports/soundcloud/27/final_report.html"
     duration: 94
     loudness:
@@ -614,7 +614,7 @@ tracks:
     sha256: "1533aba5037a712e56bed58f82fcc003bacf0a5980713b182e51080f5729c824"
     processedDate: "2026-06-10T23:31:54Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/28/ramirez-daniel-assignment1-v3-092518.mp3"
+    audioPath: "releases/soundcloud/28/ramirez-daniel-assignment1-v3-092518.mp3"
     finalReport: "/reports/soundcloud/28/final_report.html"
     duration: 86
     loudness:
@@ -636,7 +636,7 @@ tracks:
     sha256: "f38392cec2dabf100b0f08a9a40fde830d7ef55a95396ae04228ba5608f050fa"
     processedDate: "2026-06-10T23:21:22Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/29/rec004l.mp3"
+    audioPath: "releases/soundcloud/29/rec004l.mp3"
     finalReport: "/reports/soundcloud/29/final_report.html"
     duration: 315
     loudness:
@@ -658,7 +658,7 @@ tracks:
     sha256: "448482655acc9e2db352c44391df36db69443cb6c252101f8ba3d6e10c0bb979"
     processedDate: "2026-06-10T23:19:54Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/30/samplemedley.mp3"
+    audioPath: "releases/soundcloud/30/samplemedley.mp3"
     finalReport: "/reports/soundcloud/30/final_report.html"
     duration: 126
     loudness:
@@ -680,7 +680,7 @@ tracks:
     sha256: "0defc76b09805836f4b20703a0401b5723fcc3fb8540bac3500db51c31202d76"
     processedDate: "2026-06-10T23:11:21Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/31/soapboxers-recital.mp3"
+    audioPath: "releases/soundcloud/31/soapboxers-recital.mp3"
     finalReport: "/reports/soundcloud/31/final_report.html"
     duration: 326
     loudness:
@@ -702,7 +702,7 @@ tracks:
     sha256: "e6ac8d268d82977cd5627bf08e0a323c9a55d42a483d5450f063b9c4b62a574d"
     processedDate: "2026-06-10T23:22:44Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/32/string-practicum-final-solo-piece-thermostat.mp3"
+    audioPath: "releases/soundcloud/32/string-practicum-final-solo-piece-thermostat.mp3"
     finalReport: "/reports/soundcloud/32/final_report.html"
     duration: 211
     loudness:
@@ -724,7 +724,7 @@ tracks:
     sha256: "e1f51b189750798c845f07dd3341beb42ff70d45503fcf46fae31b99d5467ad5"
     processedDate: "2026-06-10T23:14:57Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/33/superman-v2.mp3"
+    audioPath: "releases/soundcloud/33/superman-v2.mp3"
     finalReport: "/reports/soundcloud/33/final_report.html"
     duration: 243
     loudness:
@@ -746,7 +746,7 @@ tracks:
     sha256: "158e28c317cadab85abc63728d99673528e4891f9571b108398ca4eb97f55841"
     processedDate: "2026-06-10T23:30:03Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/34/supposed-to-be-v2-b2-landr-high.mp3"
+    audioPath: "releases/soundcloud/34/supposed-to-be-v2-b2-landr-high.mp3"
     finalReport: "/reports/soundcloud/34/final_report.html"
     duration: 235
     loudness:
@@ -768,7 +768,7 @@ tracks:
     sha256: "21fe1925176bfb1031bb0a01bc2a364fd789099bf08f1682088c557c12b080ce"
     processedDate: "2026-06-10T23:10:20Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/35/syncopia.mp3"
+    audioPath: "releases/soundcloud/35/syncopia.mp3"
     finalReport: "/reports/soundcloud/35/final_report.html"
     duration: 92
     loudness:
@@ -790,7 +790,7 @@ tracks:
     sha256: "8c601315af218ec73e2708a5b097380ec9058a13fc7d43513253900deaf14a8a"
     processedDate: "2026-06-10T23:17:39Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/36/the-middle.mp3"
+    audioPath: "releases/soundcloud/36/the-middle.mp3"
     finalReport: "/reports/soundcloud/36/final_report.html"
     duration: 173
     loudness:
@@ -812,7 +812,7 @@ tracks:
     sha256: "dd4d5151c99779596b282c5acc6ff1644c3b56c9db11a69d9ed69764f6e530c7"
     processedDate: "2026-06-10T23:07:50Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/37/the-story-of-our-lives.mp3"
+    audioPath: "releases/soundcloud/37/the-story-of-our-lives.mp3"
     finalReport: "/reports/soundcloud/37/final_report.html"
     duration: 376
     loudness:
@@ -834,7 +834,7 @@ tracks:
     sha256: "4535df1024e6fb2ade333d48e462df8bb3604356023c3643e0f0b2f6b8490e27"
     processedDate: "2026-06-10T23:12:48Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/38/the-worm-ft-morgan-lennon-master.mp3"
+    audioPath: "releases/soundcloud/38/the-worm-ft-morgan-lennon-master.mp3"
     finalReport: "/reports/soundcloud/38/final_report.html"
     duration: 283
     loudness:
@@ -856,7 +856,7 @@ tracks:
     sha256: "c9766b1faaace4defea7bd8c0a659ad1e3e58a7d1a23d1fbccc08b566166bb07"
     processedDate: "2026-06-10T23:15:40Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/39/these-city-lights.mp3"
+    audioPath: "releases/soundcloud/39/these-city-lights.mp3"
     finalReport: "/reports/soundcloud/39/final_report.html"
     duration: 122
     loudness:
@@ -878,7 +878,7 @@ tracks:
     sha256: "52f5ae2f27e8f7618ff8695621fac6c3b34944636c8aa821c147f760d3ccd315"
     processedDate: "2026-06-10T23:27:18Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/40/tidal-disruption-live-from-nyu-education-building-penthouse.mp3"
+    audioPath: "releases/soundcloud/40/tidal-disruption-live-from-nyu-education-building-penthouse.mp3"
     finalReport: "/reports/soundcloud/40/final_report.html"
     duration: 185
     loudness:
@@ -900,7 +900,7 @@ tracks:
     sha256: "b47b823309842b8ef487dbebfefa3e4c61c1f5755b8222b8dedd1f1c7e23dd24"
     processedDate: "2026-06-10T23:34:42Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/41/untitled-1ramirez-daniel-assig06-102017-101.mp3"
+    audioPath: "releases/soundcloud/41/untitled-1ramirez-daniel-assig06-102017-101.mp3"
     finalReport: "/reports/soundcloud/41/final_report.html"
     duration: 121
     loudness:
@@ -922,7 +922,7 @@ tracks:
     sha256: "1c3157b4f88e61287755042cf34fd050db21d3432f9fa98d17a182304943bda2"
     processedDate: "2026-06-10T23:18:16Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/42/variations-on.mp3"
+    audioPath: "releases/soundcloud/42/variations-on.mp3"
     finalReport: "/reports/soundcloud/42/final_report.html"
     duration: 181
     loudness:
@@ -944,7 +944,7 @@ tracks:
     sha256: "9651805d252fb9f92104cc86e5f9fbbd7905700f3a1d38bf773cdaf1b28053a1"
     processedDate: "2026-06-10T23:26:10Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/43/wacko-prophet.mp3"
+    audioPath: "releases/soundcloud/43/wacko-prophet.mp3"
     finalReport: "/reports/soundcloud/43/final_report.html"
     duration: 235
     loudness:
@@ -966,7 +966,7 @@ tracks:
     sha256: "737e65a33ff3b1fddfbb17eb946298f5dabf5fe62223009facb683717361d241"
     processedDate: "2026-06-10T23:06:52Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/44/wasteland.mp3"
+    audioPath: "releases/soundcloud/44/wasteland.mp3"
     finalReport: "/reports/soundcloud/44/final_report.html"
     duration: 255
     loudness:
@@ -988,7 +988,7 @@ tracks:
     sha256: "3ef1a0fad79a614353b4b38fd5e762b34f33dbba9d2535592210044c24907768"
     processedDate: "2026-06-10T23:09:00Z"
     saturation: 0.5
-    audioPath: "/audio/soundcloud/45/welcome-to-fame.mp3"
+    audioPath: "releases/soundcloud/45/welcome-to-fame.mp3"
     finalReport: "/reports/soundcloud/45/final_report.html"
     duration: 460
     loudness:

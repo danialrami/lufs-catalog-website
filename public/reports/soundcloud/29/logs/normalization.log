@@ -1,0 +1,50 @@
+# Normalization Log - Wed Jun 10 18:20:33 CDT 2026
+Target LUFS: -14
+Two-pass: true
+LRA: 7
+True Peak: -1.5 dB
+
+ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.101 / 60. 26.101
+  libavcodec     62. 28.101 / 62. 28.101
+  libavformat    62. 12.101 / 62. 12.101
+  libavdevice    62.  3.101 / 62.  3.101
+  libavfilter    11. 14.101 / 11. 14.101
+  libswscale      9.  5.101 /  9.  5.101
+  libswresample   6.  3.101 /  6.  3.101
+[in#0 @ 0x974c14000] Skipping 512 bytes of junk at 0.
+[in#0/mp3 @ 0x974c14000] Estimating duration from bitrate, this may be inaccurate
+Input #0, mp3, from '/Volumes/project/continuo/catalogs/soundcloud/REC004L.mp3':
+  Duration: 00:05:15.17, start: 0.000000, bitrate: 128 kb/s
+  Stream #0:0: Audio: mp3 (mp3float), 44100 Hz, stereo, fltp, 128 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (mp3 (mp3float) -> mp3 (libmp3lame))
+Press [q] to stop, [?] for help
+Output #0, mp3, to '/Volumes/project/continuo/catalogs/soundcloud/REC004L_astro-catalog/REC004L_normalized.mp3':
+  Metadata:
+    TSSE            : Lavf62.12.101
+  Stream #0:0: Audio: mp3, 44100 Hz, stereo, fltp
+    Metadata:
+      encoder         : Lavc62.28.101 libmp3lame
+size=     198KiB time=00:00:12.67 bitrate= 128.1kbits/s speed=25.3x elapsed=0:00:00.50    [mp3float @ 0x975020e00] overread, skip -9 enddists: -1 -1
+size=     256KiB time=00:00:25.88 bitrate=  81.0kbits/s speed=25.9x elapsed=0:00:01.00    size=     512KiB time=00:00:39.31 bitrate= 106.7kbits/s speed=26.1x elapsed=0:00:01.50    [mp3float @ 0x975020e00] overread, skip -9 enddists: -2 -2
+size=     768KiB time=00:00:52.58 bitrate= 119.6kbits/s speed=26.2x elapsed=0:00:02.00    [mp3float @ 0x975020e00] overread, skip -9 enddists: -6 -6
+size=    1024KiB time=00:01:09.17 bitrate= 121.3kbits/s speed=27.6x elapsed=0:00:02.50    size=    1280KiB time=00:01:26.98 bitrate= 120.5kbits/s speed=28.9x elapsed=0:00:03.00    [mp3float @ 0x975020e00] overread, skip -9 enddists: -3 -3
+size=    1536KiB time=00:01:44.98 bitrate= 119.9kbits/s speed=29.9x elapsed=0:00:03.51    size=    1792KiB time=00:02:03.27 bitrate= 119.1kbits/s speed=30.7x elapsed=0:00:04.01    [mp3float @ 0x975020e00] overread, skip -9 enddists: -2 -2
+size=    2048KiB time=00:02:21.37 bitrate= 118.7kbits/s speed=31.3x elapsed=0:00:04.51    [mp3float @ 0x975020e00] overread, skip -9 enddists: -5 -5
+size=    2304KiB time=00:02:38.98 bitrate= 118.7kbits/s speed=31.7x elapsed=0:00:05.02    size=    2560KiB time=00:02:57.50 bitrate= 118.1kbits/s speed=32.1x elapsed=0:00:05.52    size=    2816KiB time=00:03:15.97 bitrate= 117.7kbits/s speed=32.5x elapsed=0:00:06.03    size=    3328KiB time=00:03:34.28 bitrate= 127.2kbits/s speed=32.8x elapsed=0:00:06.53    [mp3float @ 0x975020e00] overread, skip -9 enddists: -2 -2
+size=    3584KiB time=00:03:52.28 bitrate= 126.4kbits/s speed=  33x elapsed=0:00:07.03    size=    3840KiB time=00:04:10.59 bitrate= 125.5kbits/s speed=33.2x elapsed=0:00:07.54    size=    4096KiB time=00:04:28.77 bitrate= 124.8kbits/s speed=33.4x elapsed=0:00:08.04    [mp3float @ 0x975020e00] overread, skip -9 enddists: -8 -8
+[mp3float @ 0x975020e00] overread, skip -9 enddists: -3 -3
+[mp3float @ 0x975020e00] overread, skip -9 enddists: -8 -8
+[mp3float @ 0x975020e00] overread, skip -9 enddists: -5 -5
+[mp3float @ 0x975020e00] overread, skip -9 enddists: -2 -2
+[mp3float @ 0x975020e00] overread, skip -9 enddists: -5 -5
+[mp3float @ 0x975020e00] overread, skip -9 enddists: -8 -8
+[mp3float @ 0x975020e00] overread, skip -9 enddists: -2 -2
+[mp3float @ 0x975020e00] overread, skip -7 enddists: -4 -4
+[mp3float @ 0x975020e00] overread, skip -9 enddists: -5 -5
+size=    4352KiB time=00:04:46.87 bitrate= 124.3kbits/s speed=33.6x elapsed=0:00:08.54    size=    4608KiB time=00:05:04.98 bitrate= 123.8kbits/s speed=33.7x elapsed=0:00:09.04    [mp3float @ 0x975020e00] invalid new backstep -1
+[out#0/mp3 @ 0x974c3c180] video:0KiB audio:4925KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.005016%
+size=    4926KiB time=00:05:15.20 bitrate= 128.0kbits/s speed=33.9x elapsed=0:00:09.30    

@@ -1,0 +1,69 @@
+# Normalization Log - Wed Jun 10 18:10:21 CDT 2026
+Target LUFS: -14
+Two-pass: true
+LRA: 7
+True Peak: -1.5 dB
+
+ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.101 / 60. 26.101
+  libavcodec     62. 28.101 / 62. 28.101
+  libavformat    62. 12.101 / 62. 12.101
+  libavdevice    62.  3.101 / 62.  3.101
+  libavfilter    11. 14.101 / 11. 14.101
+  libswscale      9.  5.101 /  9.  5.101
+  libswresample   6.  3.101 /  6.  3.101
+[aist#0:0/pcm_s24le @ 0x9cac0c180] Guessed Channel Layout: stereo
+Input #0, wav, from '/Volumes/project/continuo/catalogs/soundcloud/Soapboxers Recital.wav':
+  Duration: 00:05:26.00, bitrate: 2307 kb/s
+  Chapters:
+    Chapter #0:0: start 0.000000, end 16.000000
+      Metadata:
+        title           : Tempo: 120.0
+    Chapter #0:1: start 16.000000, end 72.000000
+      Metadata:
+        title           : History of Boxes
+    Chapter #0:2: start 72.000000, end 144.000000
+      Metadata:
+        title           : Vocoder Intro
+    Chapter #0:3: start 144.000000, end 154.000000
+      Metadata:
+        title           : I Can't Get Clean
+    Chapter #0:4: start 154.000000, end 239.000000
+      Metadata:
+        title           : History of Red
+    Chapter #0:5: start 239.000000, end 326.000000
+      Metadata:
+        title           : Cannot Stop Screaming
+  Stream #0:0: Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s24le (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, wav, to '/Volumes/project/continuo/catalogs/soundcloud/Soapboxers Recital_astro-catalog/Soapboxers Recital_normalized.wav':
+  Metadata:
+    ISFT            : Lavf62.12.101
+  Chapters:
+    Chapter #0:0: start 0.000000, end 16.000000
+      Metadata:
+        title           : Tempo: 120.0
+    Chapter #0:1: start 16.000000, end 72.000000
+      Metadata:
+        title           : History of Boxes
+    Chapter #0:2: start 72.000000, end 144.000000
+      Metadata:
+        title           : Vocoder Intro
+    Chapter #0:3: start 144.000000, end 154.000000
+      Metadata:
+        title           : I Can't Get Clean
+    Chapter #0:4: start 154.000000, end 239.000000
+      Metadata:
+        title           : History of Red
+    Chapter #0:5: start 239.000000, end 326.000000
+      Metadata:
+        title           : Cannot Stop Screaming
+  Stream #0:0: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
+    Metadata:
+      encoder         : Lavc62.28.101 pcm_s16le
+size=    1536KiB time=00:00:08.29 bitrate=1516.1kbits/s speed=16.6x elapsed=0:00:00.50    size=    3328KiB time=00:00:18.49 bitrate=1473.7kbits/s speed=18.4x elapsed=0:00:01.00    size=    5376KiB time=00:00:28.99 bitrate=1518.6kbits/s speed=19.3x elapsed=0:00:01.50    size=    7680KiB time=00:00:41.79 bitrate=1505.1kbits/s speed=20.8x elapsed=0:00:02.00    size=   10496KiB time=00:00:57.09 bitrate=1505.8kbits/s speed=22.8x elapsed=0:00:02.50    size=   13568KiB time=00:01:12.49 bitrate=1533.1kbits/s speed=24.1x elapsed=0:00:03.01    size=   16384KiB time=00:01:27.89 bitrate=1526.9kbits/s speed=  25x elapsed=0:00:03.51    size=   19200KiB time=00:01:42.89 bitrate=1528.5kbits/s speed=25.6x elapsed=0:00:04.02    size=   21760KiB time=00:01:56.99 bitrate=1523.6kbits/s speed=25.9x elapsed=0:00:04.52    size=   24576KiB time=00:02:11.49 bitrate=1531.0kbits/s speed=26.2x elapsed=0:00:05.02    size=   27136KiB time=00:02:25.89 bitrate=1523.6kbits/s speed=26.4x elapsed=0:00:05.52    size=   29952KiB time=00:02:40.99 bitrate=1524.0kbits/s speed=26.7x elapsed=0:00:06.02    size=   33024KiB time=00:02:56.39 bitrate=1533.6kbits/s speed=  27x elapsed=0:00:06.52    size=   36096KiB time=00:03:12.89 bitrate=1532.9kbits/s speed=27.4x elapsed=0:00:07.03    size=   39168KiB time=00:03:30.29 bitrate=1525.7kbits/s speed=27.9x elapsed=0:00:07.53    size=   42496KiB time=00:03:47.99 bitrate=1526.9kbits/s speed=28.4x elapsed=0:00:08.04    size=   45824KiB time=00:04:05.29 bitrate=1530.3kbits/s speed=28.7x elapsed=0:00:08.54    size=   49152KiB time=00:04:22.79 bitrate=1532.2kbits/s speed=  29x elapsed=0:00:09.04    size=   52224KiB time=00:04:39.89 bitrate=1528.5kbits/s speed=29.3x elapsed=0:00:09.55    size=   55552KiB time=00:04:56.99 bitrate=1532.3kbits/s speed=29.5x elapsed=0:00:10.05    size=   58624KiB time=00:05:13.99 bitrate=1529.5kbits/s speed=29.7x elapsed=0:00:10.55    [out#0/wav @ 0x9cb01c240] video:0KiB audio:61125KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000125%
+size=   61125KiB time=00:05:26.00 bitrate=1536.0kbits/s speed=29.7x elapsed=0:00:10.96    

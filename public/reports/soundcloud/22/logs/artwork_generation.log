@@ -1,0 +1,37 @@
+2026-06-10 18:22:59,443 - INFO - Ultra-High Resolution Album Artwork Generator v7 (5000x5000 Edition)
+2026-06-10 18:22:59,443 - INFO - -------------------------------------------------
+2026-06-10 18:22:59,443 - INFO - Using saturation level: 0.5
+2026-06-10 18:22:59,443 - INFO - Processing audio file: /Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/Mux_normalized.aiff
+2026-06-10 18:22:59,443 - INFO - Output will be saved as: /Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/artwork/Mux_normalized_artwork.png
+2026-06-10 18:22:59,443 - INFO - Component files will be saved in: /Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/artwork/components
+2026-06-10 18:22:59,443 - INFO - Starting the v7 Ultra-High Resolution Album Artwork Generator
+2026-06-10 18:22:59,446 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/artwork
+2026-06-10 18:22:59,446 - INFO - Components directory: /Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/artwork/components
+2026-06-10 18:22:59,446 - INFO - Analyzing audio fingerprint...
+2026-06-10 18:22:59,459 - INFO - Audio hash: c3e72546...d626d26c
+2026-06-10 18:22:59,459 - INFO - Generating identicon...
+2026-06-10 18:22:59,459 - INFO - Trying jdenticon approach 1: /Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain/node_modules/.bin/jdenticon c3e725463d839232020e974e26ae9470d603c28f5c4126af81f8d7d1d626d26c
+2026-06-10 18:22:59,461 - WARNING - jdenticon approach 1 - command not found
+2026-06-10 18:22:59,461 - INFO - Trying jdenticon approach 2: npx --prefix
+2026-06-10 18:22:59,663 - WARNING - jdenticon approach 2 failed: Command '['npx', '--prefix', '/Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain', 'jdenticon', 'c3e725463d839232020e974e26ae9470d603c28f5c4126af81f8d7d1d626d26c', '--size', '5000', '--output', '/Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/artwork/components/identicon.png']' returned non-zero exit status 254.
+2026-06-10 18:22:59,663 - INFO - Trying jdenticon approach 3: npx jdenticon
+2026-06-10 18:23:00,119 - INFO - Identicon created successfully.
+2026-06-10 18:23:00,148 - INFO - Generating ultra-high-resolution spectrogram...
+2026-06-10 18:23:00,989 - INFO - Using figure dimensions: 50.0x12.5 inches at 400 DPI
+2026-06-10 18:23:00,989 - INFO - Target pixel dimensions: 20000x5000
+/Users/danielramirez/repos/lufs-workchain/.venv/lib/python3.12/site-packages/PIL/Image.py:3574: DecompressionBombWarning: Image size (100000000 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+2026-06-10 18:23:04,014 - INFO - Raw spectrogram dimensions: 20000x5000 pixels
+2026-06-10 18:23:04,014 - INFO - Initial dimensions: 20000x5000 pixels
+2026-06-10 18:23:04,014 - INFO - Adjusting saturation to 0.5...
+2026-06-10 18:23:06,454 - INFO - Saved full rectangular spectrogram to: /Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/artwork/components/rectangle_spectrogram.png
+2026-06-10 18:23:06,462 - INFO - Square crop dimensions: 5000x5000
+2026-06-10 18:23:07,121 - INFO - Saved 5000x5000 square spectrogram to: /Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/artwork/components/spectrogram.png
+2026-06-10 18:23:07,121 - INFO - Spectrogram segment covers audio from 69.75s to 116.25s
+2026-06-10 18:23:07,144 - INFO - Working with spectrogram: 5000x5000, identicon: 5000x5000
+2026-06-10 18:23:07,144 - INFO - Enhancing spectrogram contrast...
+2026-06-10 18:23:07,245 - INFO - Resizing identicon for overlay...
+2026-06-10 18:23:07,381 - INFO - Creating final composite image...
+2026-06-10 18:23:08,228 - INFO - Album artwork generated successfully: /Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/artwork/Mux_normalized_artwork.png
+2026-06-10 18:23:08,233 - INFO - Ultra-high resolution (5000x5000) artwork generation finished successfully.
+2026-06-10 18:23:08,233 - INFO - Final artwork saved at: /Volumes/project/continuo/catalogs/soundcloud/Mux_astro-catalog/artwork/Mux_normalized_artwork.png

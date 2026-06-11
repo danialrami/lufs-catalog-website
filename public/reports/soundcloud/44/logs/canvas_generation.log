@@ -1,0 +1,19 @@
+2026-06-10 18:06:38,529 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:06:38,529 - INFO - ---------------------------------------------
+2026-06-10 18:06:38,529 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Wasteland_astro-catalog/artwork/Wasteland_normalized_artwork.png
+2026-06-10 18:06:38,531 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Wasteland_astro-catalog/canvas
+2026-06-10 18:06:38,531 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:06:38,531 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:06:38,531 - INFO - Opening and processing image...
+2026-06-10 18:06:38,759 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:06:38,760 - INFO - Generating glitch effects...
+2026-06-10 18:06:39,277 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:06:40,295 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:06:40,295 - INFO - Saving output files...
+2026-06-10 18:06:40,338 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Wasteland_astro-catalog/canvas/Wasteland_normalized_canvas_static.png
+2026-06-10 18:06:50,845 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Wasteland_astro-catalog/canvas/Wasteland_normalized_canvas.gif
+2026-06-10 18:06:50,845 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:06:50,872 - INFO - FFmpeg found.
+2026-06-10 18:06:51,787 - INFO - MP4 conversion successful.
+2026-06-10 18:06:51,787 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Wasteland_astro-catalog/canvas/Wasteland_normalized_canvas.mp4
+2026-06-10 18:06:51,793 - INFO - Canvas generation finished.

@@ -1,0 +1,19 @@
+2026-06-10 18:16:54,969 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:16:54,971 - INFO - ---------------------------------------------
+2026-06-10 18:16:54,971 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Hm._astro-catalog/artwork/Hm._normalized_artwork.png
+2026-06-10 18:16:54,974 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Hm._astro-catalog/canvas
+2026-06-10 18:16:54,974 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:16:54,974 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:16:54,974 - INFO - Opening and processing image...
+2026-06-10 18:16:55,196 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:16:55,197 - INFO - Generating glitch effects...
+2026-06-10 18:16:55,711 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:16:56,770 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:16:56,770 - INFO - Saving output files...
+2026-06-10 18:16:56,809 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Hm._astro-catalog/canvas/Hm._normalized_canvas_static.png
+2026-06-10 18:17:07,601 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Hm._astro-catalog/canvas/Hm._normalized_canvas.gif
+2026-06-10 18:17:07,601 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:17:07,625 - INFO - FFmpeg found.
+2026-06-10 18:17:08,440 - INFO - MP4 conversion successful.
+2026-06-10 18:17:08,440 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Hm._astro-catalog/canvas/Hm._normalized_canvas.mp4
+2026-06-10 18:17:08,446 - INFO - Canvas generation finished.

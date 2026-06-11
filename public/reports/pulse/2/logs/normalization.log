@@ -1,0 +1,51 @@
+# Normalization Log - Wed Jun 10 18:04:02 CDT 2026
+Target LUFS: -14
+Two-pass: true
+LRA: 7
+True Peak: -1.5 dB
+
+ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.101 / 60. 26.101
+  libavcodec     62. 28.101 / 62. 28.101
+  libavformat    62. 12.101 / 62. 12.101
+  libavdevice    62.  3.101 / 62.  3.101
+  libavfilter    11. 14.101 / 11. 14.101
+  libswscale      9.  5.101 /  9.  5.101
+  libswresample   6.  3.101 /  6.  3.101
+[aist#0:0/pcm_s24le @ 0x8ccc0c180] Guessed Channel Layout: stereo
+Input #0, wav, from '/Volumes/project/continuo/catalogs/pulse/wheels (theme in variations).wav':
+  Metadata:
+    encoded_by      : Logic Pro
+    date            : 2024-11-20
+    creation_time   : 17:10:16
+    time_reference  : 176255985
+    umid            : 0x000000000064786B0100000000000000000000000000000000000000A05D786B01000000705D786B010000005422FD07018053B00000000000000000A05D786B
+    coding_history  : 
+  Duration: 00:02:39.43, bitrate: 2307 kb/s
+  Chapters:
+    Chapter #0:0: start 0.000000, end 159.428562
+      Metadata:
+        title           : in
+  Stream #0:0: Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s24le (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, wav, to '/Volumes/project/continuo/catalogs/pulse/wheels (theme in variations)_astro-catalog/wheels (theme in variations)_normalized.wav':
+  Metadata:
+    ITCH            : Logic Pro
+    ICRD            : 2024-11-20
+    coding_history  : 
+    time_reference  : 176255985
+    umid            : 0x000000000064786B0100000000000000000000000000000000000000A05D786B01000000705D786B010000005422FD07018053B00000000000000000A05D786B
+    ISFT            : Lavf62.12.101
+  Chapters:
+    Chapter #0:0: start 0.000000, end 159.428562
+      Metadata:
+        title           : in
+  Stream #0:0: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
+    Metadata:
+      encoder         : Lavc62.28.101 pcm_s16le
+[out#0/wav @ 0x8ccc18240] video:0KiB audio:29893KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000379%
+size=   29893KiB time=00:02:39.42 bitrate=1536.0kbits/s speed= 360x elapsed=0:00:00.44    

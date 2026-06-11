@@ -1,0 +1,19 @@
+2026-06-10 17:43:40,784 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 17:43:40,784 - INFO - ---------------------------------------------
+2026-06-10 17:43:40,784 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/a98ff_praise-legend-road/11-10-44.4371-13-03.957_astro-catalog/artwork/11-10-44.4371-13-03.957_normalized_artwork.png
+2026-06-10 17:43:40,786 - INFO - Output directory: /Volumes/project/continuo/catalogs/a98ff_praise-legend-road/11-10-44.4371-13-03.957_astro-catalog/canvas
+2026-06-10 17:43:40,788 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 17:43:40,788 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 17:43:40,788 - INFO - Opening and processing image...
+2026-06-10 17:43:41,021 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 17:43:41,021 - INFO - Generating glitch effects...
+2026-06-10 17:43:41,533 - INFO - Applying crossfade and smearing effects...
+2026-06-10 17:43:42,568 - INFO - Generated 96 frames after crossfade.
+2026-06-10 17:43:42,568 - INFO - Saving output files...
+2026-06-10 17:43:42,610 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/a98ff_praise-legend-road/11-10-44.4371-13-03.957_astro-catalog/canvas/11-10-44.4371-13-03.957_normalized_canvas_static.png
+2026-06-10 17:43:52,854 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/a98ff_praise-legend-road/11-10-44.4371-13-03.957_astro-catalog/canvas/11-10-44.4371-13-03.957_normalized_canvas.gif
+2026-06-10 17:43:52,854 - INFO - Converting GIF to MP4 format...
+2026-06-10 17:43:52,879 - INFO - FFmpeg found.
+2026-06-10 17:43:53,707 - INFO - MP4 conversion successful.
+2026-06-10 17:43:53,707 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/a98ff_praise-legend-road/11-10-44.4371-13-03.957_astro-catalog/canvas/11-10-44.4371-13-03.957_normalized_canvas.mp4
+2026-06-10 17:43:53,712 - INFO - Canvas generation finished.

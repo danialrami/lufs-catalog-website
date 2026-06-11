@@ -1,0 +1,43 @@
+2026-06-10 18:24:16,323 - INFO - Ultra-High Resolution Album Artwork Generator v7 (5000x5000 Edition)
+2026-06-10 18:24:16,323 - INFO - -------------------------------------------------
+2026-06-10 18:24:16,323 - INFO - Using saturation level: 0.5
+2026-06-10 18:24:16,323 - INFO - Processing audio file: /Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/Everywhere Undone_normalized.m4a
+2026-06-10 18:24:16,323 - INFO - Output will be saved as: /Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/artwork/Everywhere Undone_normalized_artwork.png
+2026-06-10 18:24:16,323 - INFO - Component files will be saved in: /Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/artwork/components
+2026-06-10 18:24:16,323 - INFO - Starting the v7 Ultra-High Resolution Album Artwork Generator
+2026-06-10 18:24:16,326 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/artwork
+2026-06-10 18:24:16,326 - INFO - Components directory: /Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/artwork/components
+2026-06-10 18:24:16,326 - INFO - Analyzing audio fingerprint...
+2026-06-10 18:24:16,328 - INFO - Audio hash: 369548ca...2d961f29
+2026-06-10 18:24:16,328 - INFO - Generating identicon...
+2026-06-10 18:24:16,328 - INFO - Trying jdenticon approach 1: /Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain/node_modules/.bin/jdenticon 369548cab41f74718632c0d21bbedc94d3eb79bffcbf7c5a77a983db2d961f29
+2026-06-10 18:24:16,330 - WARNING - jdenticon approach 1 - command not found
+2026-06-10 18:24:16,330 - INFO - Trying jdenticon approach 2: npx --prefix
+2026-06-10 18:24:16,529 - WARNING - jdenticon approach 2 failed: Command '['npx', '--prefix', '/Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain', 'jdenticon', '369548cab41f74718632c0d21bbedc94d3eb79bffcbf7c5a77a983db2d961f29', '--size', '5000', '--output', '/Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/artwork/components/identicon.png']' returned non-zero exit status 254.
+2026-06-10 18:24:16,529 - INFO - Trying jdenticon approach 3: npx jdenticon
+2026-06-10 18:24:16,923 - INFO - Identicon created successfully.
+2026-06-10 18:24:16,952 - INFO - Generating ultra-high-resolution spectrogram...
+/Users/danielramirez/repos/lufs-workchain/components/artwork_01/v7_album_artwork.py:149: UserWarning: PySoundFile failed. Trying audioread instead.
+  y, sr = librosa.load(audio_file_path)
+/Users/danielramirez/repos/lufs-workchain/.venv/lib/python3.12/site-packages/librosa/core/audio.py:184: FutureWarning: librosa.core.audio.__audioread_load
+	Deprecated as of librosa version 0.10.0.
+	It will be removed in librosa version 1.0.
+  y, sr_native = __audioread_load(path, offset, duration, dtype)
+2026-06-10 18:24:18,050 - INFO - Using figure dimensions: 50.0x12.5 inches at 400 DPI
+2026-06-10 18:24:18,050 - INFO - Target pixel dimensions: 20000x5000
+/Users/danielramirez/repos/lufs-workchain/.venv/lib/python3.12/site-packages/PIL/Image.py:3574: DecompressionBombWarning: Image size (100000000 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+2026-06-10 18:24:22,154 - INFO - Raw spectrogram dimensions: 20000x5000 pixels
+2026-06-10 18:24:22,154 - INFO - Initial dimensions: 20000x5000 pixels
+2026-06-10 18:24:22,154 - INFO - Adjusting saturation to 0.5...
+2026-06-10 18:24:24,735 - INFO - Saved full rectangular spectrogram to: /Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/artwork/components/rectangle_spectrogram.png
+2026-06-10 18:24:24,744 - INFO - Square crop dimensions: 5000x5000
+2026-06-10 18:24:25,459 - INFO - Saved 5000x5000 square spectrogram to: /Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/artwork/components/spectrogram.png
+2026-06-10 18:24:25,459 - INFO - Spectrogram segment covers audio from 111.94s to 186.57s
+2026-06-10 18:24:25,492 - INFO - Working with spectrogram: 5000x5000, identicon: 5000x5000
+2026-06-10 18:24:25,492 - INFO - Enhancing spectrogram contrast...
+2026-06-10 18:24:25,603 - INFO - Resizing identicon for overlay...
+2026-06-10 18:24:25,737 - INFO - Creating final composite image...
+2026-06-10 18:24:26,664 - INFO - Album artwork generated successfully: /Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/artwork/Everywhere Undone_normalized_artwork.png
+2026-06-10 18:24:26,670 - INFO - Ultra-high resolution (5000x5000) artwork generation finished successfully.
+2026-06-10 18:24:26,670 - INFO - Final artwork saved at: /Volumes/project/continuo/catalogs/soundcloud/Everywhere Undone_astro-catalog/artwork/Everywhere Undone_normalized_artwork.png

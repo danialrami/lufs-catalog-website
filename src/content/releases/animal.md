@@ -4,7 +4,7 @@ collectionId: "animal"
 project: "Singles"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
-status: "draft"
+status: "released"
 coverArt: "/covers/animal/cover.png"
 streamingLinks:
   spotify: ""
@@ -20,7 +20,7 @@ tracks:
     sha256: "10918ff3b6fe9c7ca31cb4caef46860a96be4e6acd1d45176f595c156c025e9b"
     processedDate: "2026-06-10T22:53:42Z"
     saturation: 0.5
-    audioPath: "/audio/animal/1/animal.mp3"
+    audioPath: "releases/animal/1/animal.mp3"
     finalReport: "/reports/animal/1/final_report.html"
     duration: 87
     loudness:

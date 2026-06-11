@@ -1,0 +1,19 @@
+2026-06-10 17:33:50,546 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 17:33:50,546 - INFO - ---------------------------------------------
+2026-06-10 17:33:50,546 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/10-00.0006-37.182_final/10-00.0006-37.182_astro-catalog/artwork/10-00.0006-37.182_normalized_artwork.png
+2026-06-10 17:33:50,553 - INFO - Output directory: /Volumes/project/continuo/catalogs/10-00.0006-37.182_final/10-00.0006-37.182_astro-catalog/canvas
+2026-06-10 17:33:50,553 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 17:33:50,553 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 17:33:50,553 - INFO - Opening and processing image...
+2026-06-10 17:33:50,778 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 17:33:50,779 - INFO - Generating glitch effects...
+2026-06-10 17:33:51,222 - INFO - Applying crossfade and smearing effects...
+2026-06-10 17:33:52,294 - INFO - Generated 96 frames after crossfade.
+2026-06-10 17:33:52,294 - INFO - Saving output files...
+2026-06-10 17:33:52,328 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/10-00.0006-37.182_final/10-00.0006-37.182_astro-catalog/canvas/10-00.0006-37.182_normalized_canvas_static.png
+2026-06-10 17:34:02,281 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/10-00.0006-37.182_final/10-00.0006-37.182_astro-catalog/canvas/10-00.0006-37.182_normalized_canvas.gif
+2026-06-10 17:34:02,281 - INFO - Converting GIF to MP4 format...
+2026-06-10 17:34:02,308 - INFO - FFmpeg found.
+2026-06-10 17:34:03,091 - INFO - MP4 conversion successful.
+2026-06-10 17:34:03,091 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/10-00.0006-37.182_final/10-00.0006-37.182_astro-catalog/canvas/10-00.0006-37.182_normalized_canvas.mp4
+2026-06-10 17:34:03,097 - INFO - Canvas generation finished.

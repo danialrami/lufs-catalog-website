@@ -4,7 +4,7 @@ collectionId: "masked"
 project: "masked"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
-status: "draft"
+status: "released"
 coverArt: "/covers/masked/cover.png"
 streamingLinks:
   spotify: ""
@@ -20,7 +20,7 @@ tracks:
     sha256: "38272a94da8790a273a559136e437fa13e64998be6ef115f7d2335c02ffd0437"
     processedDate: "2026-06-10T23:01:57Z"
     saturation: 0.5
-    audioPath: "/audio/masked/1/mx-2-01-r.mp3"
+    audioPath: "releases/masked/1/mx-2-01-r.mp3"
     finalReport: "/reports/masked/1/final_report.html"
     duration: 78
     loudness:
@@ -42,7 +42,7 @@ tracks:
     sha256: "befac4391cacd09ddddefbb74cf9f42547959e455be6435a607594b0c71793cb"
     processedDate: "2026-06-10T23:02:25Z"
     saturation: 0.5
-    audioPath: "/audio/masked/2/mx-3-01-l.mp3"
+    audioPath: "releases/masked/2/mx-3-01-l.mp3"
     finalReport: "/reports/masked/2/final_report.html"
     duration: 134
     loudness:
@@ -64,7 +64,7 @@ tracks:
     sha256: "518e369ddfce991a32f0eaf2ed90f67f959639efecbc5792b6532ff20bf0275c"
     processedDate: "2026-06-10T23:01:32Z"
     saturation: 0.5
-    audioPath: "/audio/masked/3/score-1-all-l.mp3"
+    audioPath: "releases/masked/3/score-1-all-l.mp3"
     finalReport: "/reports/masked/3/final_report.html"
     duration: 45
     loudness:

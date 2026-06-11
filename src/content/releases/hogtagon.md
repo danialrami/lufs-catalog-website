@@ -4,7 +4,7 @@ collectionId: "hogtagon"
 project: "hogtagon"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
-status: "draft"
+status: "released"
 coverArt: "/covers/hogtagon/cover.png"
 streamingLinks:
   spotify: ""
@@ -20,7 +20,7 @@ tracks:
     sha256: "70f57b1f81a696d3902a5f3ddf42fb7dce89162ef82a3da01605447e381fa288"
     processedDate: "2026-06-10T23:00:14Z"
     saturation: 0.5
-    audioPath: "/audio/hogtagon/1/face.mp3"
+    audioPath: "releases/hogtagon/1/face.mp3"
     finalReport: "/reports/hogtagon/1/final_report.html"
     duration: 86
     loudness:
@@ -42,7 +42,7 @@ tracks:
     sha256: "405cb479a3f3b39b2708171270bcc8f396a23f3fba4a18098b4e155c3cb87679"
     processedDate: "2026-06-10T22:59:18Z"
     saturation: 0.5
-    audioPath: "/audio/hogtagon/2/jungle.mp3"
+    audioPath: "releases/hogtagon/2/jungle.mp3"
     finalReport: "/reports/hogtagon/2/final_report.html"
     duration: 99
     loudness:
@@ -64,7 +64,7 @@ tracks:
     sha256: "3b61cf5280b760dc9302d26f68136e5356a7ee62a99842f3b5c5ec6f9c1c5fcf"
     processedDate: "2026-06-10T22:58:50Z"
     saturation: 0.5
-    audioPath: "/audio/hogtagon/3/level-music.mp3"
+    audioPath: "releases/hogtagon/3/level-music.mp3"
     finalReport: "/reports/hogtagon/3/final_report.html"
     duration: 149
     loudness:
@@ -86,7 +86,7 @@ tracks:
     sha256: "310d64beb2b92beb0dde6b82b746a1f72f05cdfece9f6ef71ac843d38edfbe11"
     processedDate: "2026-06-10T23:00:42Z"
     saturation: 0.5
-    audioPath: "/audio/hogtagon/4/lobby.mp3"
+    audioPath: "releases/hogtagon/4/lobby.mp3"
     finalReport: "/reports/hogtagon/4/final_report.html"
     duration: 107
     loudness:
@@ -108,7 +108,7 @@ tracks:
     sha256: "38776972ed7513f46fe7eb8d72941f7062e8979256322ad9d3dc586486c036c6"
     processedDate: "2026-06-10T22:59:46Z"
     saturation: 0.5
-    audioPath: "/audio/hogtagon/5/main.mp3"
+    audioPath: "releases/hogtagon/5/main.mp3"
     finalReport: "/reports/hogtagon/5/final_report.html"
     duration: 115
     loudness:
@@ -130,7 +130,7 @@ tracks:
     sha256: "0e31aa217f9fd3966900d86ff348a62b74692ac416953c564499887939cb2439"
     processedDate: "2026-06-10T23:01:09Z"
     saturation: 0.5
-    audioPath: "/audio/hogtagon/6/wanna-go-fast.mp3"
+    audioPath: "releases/hogtagon/6/wanna-go-fast.mp3"
     finalReport: "/reports/hogtagon/6/final_report.html"
     duration: 95
     loudness:

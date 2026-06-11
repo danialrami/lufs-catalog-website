@@ -1,0 +1,19 @@
+2026-06-10 18:00:56,540 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:00:56,540 - INFO - ---------------------------------------------
+2026-06-10 18:00:56,540 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/hogtagon/wanna-go-fast_astro-catalog/artwork/wanna-go-fast_normalized_artwork.png
+2026-06-10 18:00:56,542 - INFO - Output directory: /Volumes/project/continuo/catalogs/hogtagon/wanna-go-fast_astro-catalog/canvas
+2026-06-10 18:00:56,549 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:00:56,549 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:00:56,549 - INFO - Opening and processing image...
+2026-06-10 18:00:56,766 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:00:56,766 - INFO - Generating glitch effects...
+2026-06-10 18:00:57,276 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:00:58,306 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:00:58,306 - INFO - Saving output files...
+2026-06-10 18:00:58,353 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/hogtagon/wanna-go-fast_astro-catalog/canvas/wanna-go-fast_normalized_canvas_static.png
+2026-06-10 18:01:08,432 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/hogtagon/wanna-go-fast_astro-catalog/canvas/wanna-go-fast_normalized_canvas.gif
+2026-06-10 18:01:08,432 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:01:08,456 - INFO - FFmpeg found.
+2026-06-10 18:01:09,365 - INFO - MP4 conversion successful.
+2026-06-10 18:01:09,366 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/hogtagon/wanna-go-fast_astro-catalog/canvas/wanna-go-fast_normalized_canvas.mp4
+2026-06-10 18:01:09,372 - INFO - Canvas generation finished.

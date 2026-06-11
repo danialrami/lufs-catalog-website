@@ -1,0 +1,63 @@
+# Normalization Log - Wed Jun 10 17:56:24 CDT 2026
+Target LUFS: -14
+Two-pass: true
+LRA: 7
+True Peak: -1.5 dB
+
+ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.101 / 60. 26.101
+  libavcodec     62. 28.101 / 62. 28.101
+  libavformat    62. 12.101 / 62. 12.101
+  libavdevice    62.  3.101 / 62.  3.101
+  libavfilter    11. 14.101 / 11. 14.101
+  libswscale      9.  5.101 /  9.  5.101
+  libswresample   6.  3.101 /  6.  3.101
+[aist#0:0/pcm_s24le @ 0x9d8c0c180] Guessed Channel Layout: stereo
+Input #0, wav, from '/Volumes/project/continuo/catalogs/footlights/Footlights Arabesque.wav':
+  Metadata:
+    encoded_by      : Logic Pro X
+    date            : 2016-05-02
+    creation_time   : 22:50:15
+    time_reference  : 158760000
+    umid            : 0x0000000064340CE9B6000053905CD958FF7F0000006A180000000000000000000000000080D8EC070100000064340CE9B60000538054D958FF7F0000ED9E099B
+    coding_history  : 
+  Duration: 00:00:45.00, bitrate: 2119 kb/s
+  Chapters:
+    Chapter #0:0: start 0.000000, end 45.000000
+      Metadata:
+        title           : Tempo: 160.0
+    Chapter #0:1: start 0.000000, end 21.000000
+      Metadata:
+        title           : Marker 1
+    Chapter #0:2: start 21.000000, end 45.000000
+      Metadata:
+        title           : "Finally!"
+  Stream #0:0: Audio: pcm_s24le ([1][0][0][0] / 0x0001), 44100 Hz, stereo, s32 (24 bit), 2116 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s24le (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, wav, to '/Volumes/project/continuo/catalogs/footlights/Footlights Arabesque_astro-catalog/Footlights Arabesque_normalized.wav':
+  Metadata:
+    ITCH            : Logic Pro X
+    ICRD            : 2016-05-02
+    coding_history  : 
+    time_reference  : 158760000
+    umid            : 0x0000000064340CE9B6000053905CD958FF7F0000006A180000000000000000000000000080D8EC070100000064340CE9B60000538054D958FF7F0000ED9E099B
+    ISFT            : Lavf62.12.101
+  Chapters:
+    Chapter #0:0: start 0.000000, end 45.000000
+      Metadata:
+        title           : Tempo: 160.0
+    Chapter #0:1: start 0.000000, end 21.000000
+      Metadata:
+        title           : Marker 1
+    Chapter #0:2: start 21.000000, end 45.000000
+      Metadata:
+        title           : "Finally!"
+  Stream #0:0: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 44100 Hz, stereo, s16, 1411 kb/s
+    Metadata:
+      encoder         : Lavc62.28.101 pcm_s16le
+size=    3072KiB time=00:00:19.19 bitrate=1310.7kbits/s speed=38.1x elapsed=0:00:00.50    size=    6656KiB time=00:00:38.89 bitrate=1401.7kbits/s speed=38.7x elapsed=0:00:01.00    [out#0/wav @ 0x9d8c18240] video:0KiB audio:7752KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.001487%
+size=    7752KiB time=00:00:45.00 bitrate=1411.2kbits/s speed=39.5x elapsed=0:00:01.13    

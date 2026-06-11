@@ -1,0 +1,37 @@
+2026-06-10 18:35:20,305 - INFO - Ultra-High Resolution Album Artwork Generator v7 (5000x5000 Edition)
+2026-06-10 18:35:20,305 - INFO - -------------------------------------------------
+2026-06-10 18:35:20,305 - INFO - Using saturation level: 0.5
+2026-06-10 18:35:20,305 - INFO - Processing audio file: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/Prelude No. 1 in Bb Major_normalized.aiff
+2026-06-10 18:35:20,305 - INFO - Output will be saved as: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork/Prelude No. 1 in Bb Major_normalized_artwork.png
+2026-06-10 18:35:20,305 - INFO - Component files will be saved in: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork/components
+2026-06-10 18:35:20,305 - INFO - Starting the v7 Ultra-High Resolution Album Artwork Generator
+2026-06-10 18:35:20,307 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork
+2026-06-10 18:35:20,307 - INFO - Components directory: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork/components
+2026-06-10 18:35:20,307 - INFO - Analyzing audio fingerprint...
+2026-06-10 18:35:20,313 - INFO - Audio hash: da11843e...1e1f5327
+2026-06-10 18:35:20,313 - INFO - Generating identicon...
+2026-06-10 18:35:20,313 - INFO - Trying jdenticon approach 1: /Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain/node_modules/.bin/jdenticon da11843e82152a7067a4306c1bca3d16d80041bed99ffc659c7aa2601e1f5327
+2026-06-10 18:35:20,315 - WARNING - jdenticon approach 1 - command not found
+2026-06-10 18:35:20,315 - INFO - Trying jdenticon approach 2: npx --prefix
+2026-06-10 18:35:20,513 - WARNING - jdenticon approach 2 failed: Command '['npx', '--prefix', '/Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain', 'jdenticon', 'da11843e82152a7067a4306c1bca3d16d80041bed99ffc659c7aa2601e1f5327', '--size', '5000', '--output', '/Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork/components/identicon.png']' returned non-zero exit status 254.
+2026-06-10 18:35:20,513 - INFO - Trying jdenticon approach 3: npx jdenticon
+2026-06-10 18:35:21,101 - INFO - Identicon created successfully.
+2026-06-10 18:35:21,123 - INFO - Generating ultra-high-resolution spectrogram...
+2026-06-10 18:35:21,905 - INFO - Using figure dimensions: 50.0x12.5 inches at 400 DPI
+2026-06-10 18:35:21,905 - INFO - Target pixel dimensions: 20000x5000
+/Users/danielramirez/repos/lufs-workchain/.venv/lib/python3.12/site-packages/PIL/Image.py:3574: DecompressionBombWarning: Image size (100000000 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+2026-06-10 18:35:23,943 - INFO - Raw spectrogram dimensions: 20000x5000 pixels
+2026-06-10 18:35:23,943 - INFO - Initial dimensions: 20000x5000 pixels
+2026-06-10 18:35:23,943 - INFO - Adjusting saturation to 0.5...
+2026-06-10 18:35:25,606 - INFO - Saved full rectangular spectrogram to: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork/components/rectangle_spectrogram.png
+2026-06-10 18:35:25,614 - INFO - Square crop dimensions: 5000x5000
+2026-06-10 18:35:26,075 - INFO - Saved 5000x5000 square spectrogram to: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork/components/spectrogram.png
+2026-06-10 18:35:26,075 - INFO - Spectrogram segment covers audio from 27.06s to 45.10s
+2026-06-10 18:35:26,092 - INFO - Working with spectrogram: 5000x5000, identicon: 5000x5000
+2026-06-10 18:35:26,092 - INFO - Enhancing spectrogram contrast...
+2026-06-10 18:35:26,207 - INFO - Resizing identicon for overlay...
+2026-06-10 18:35:26,348 - INFO - Creating final composite image...
+2026-06-10 18:35:26,876 - INFO - Album artwork generated successfully: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork/Prelude No. 1 in Bb Major_normalized_artwork.png
+2026-06-10 18:35:26,880 - INFO - Ultra-high resolution (5000x5000) artwork generation finished successfully.
+2026-06-10 18:35:26,880 - INFO - Final artwork saved at: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork/Prelude No. 1 in Bb Major_normalized_artwork.png

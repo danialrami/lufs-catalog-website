@@ -1,0 +1,19 @@
+2026-06-10 18:34:28,589 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:34:28,589 - INFO - ---------------------------------------------
+2026-06-10 18:34:28,589 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Untitled 1Ramirez_Daniel_Assig06_102017.101_astro-catalog/artwork/Untitled 1Ramirez_Daniel_Assig06_102017.101_normalized_artwork.png
+2026-06-10 18:34:28,591 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Untitled 1Ramirez_Daniel_Assig06_102017.101_astro-catalog/canvas
+2026-06-10 18:34:28,591 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:34:28,591 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:34:28,591 - INFO - Opening and processing image...
+2026-06-10 18:34:28,875 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:34:28,876 - INFO - Generating glitch effects...
+2026-06-10 18:34:29,390 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:34:30,435 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:34:30,435 - INFO - Saving output files...
+2026-06-10 18:34:30,476 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Untitled 1Ramirez_Daniel_Assig06_102017.101_astro-catalog/canvas/Untitled 1Ramirez_Daniel_Assig06_102017.101_normalized_canvas_static.png
+2026-06-10 18:34:41,497 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Untitled 1Ramirez_Daniel_Assig06_102017.101_astro-catalog/canvas/Untitled 1Ramirez_Daniel_Assig06_102017.101_normalized_canvas.gif
+2026-06-10 18:34:41,497 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:34:41,522 - INFO - FFmpeg found.
+2026-06-10 18:34:42,301 - INFO - MP4 conversion successful.
+2026-06-10 18:34:42,301 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Untitled 1Ramirez_Daniel_Assig06_102017.101_astro-catalog/canvas/Untitled 1Ramirez_Daniel_Assig06_102017.101_normalized_canvas.mp4
+2026-06-10 18:34:42,307 - INFO - Canvas generation finished.

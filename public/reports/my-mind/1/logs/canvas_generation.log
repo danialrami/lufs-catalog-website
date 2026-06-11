@@ -1,0 +1,19 @@
+2026-06-10 18:03:19,931 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:03:19,931 - INFO - ---------------------------------------------
+2026-06-10 18:03:19,931 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/my-mind/if-you-only-knew_astro-catalog/artwork/if-you-only-knew_normalized_artwork.png
+2026-06-10 18:03:19,933 - INFO - Output directory: /Volumes/project/continuo/catalogs/my-mind/if-you-only-knew_astro-catalog/canvas
+2026-06-10 18:03:19,933 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:03:19,933 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:03:19,933 - INFO - Opening and processing image...
+2026-06-10 18:03:20,124 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:03:20,125 - INFO - Generating glitch effects...
+2026-06-10 18:03:20,634 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:03:21,666 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:03:21,666 - INFO - Saving output files...
+2026-06-10 18:03:21,707 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/my-mind/if-you-only-knew_astro-catalog/canvas/if-you-only-knew_normalized_canvas_static.png
+2026-06-10 18:03:32,826 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/my-mind/if-you-only-knew_astro-catalog/canvas/if-you-only-knew_normalized_canvas.gif
+2026-06-10 18:03:32,826 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:03:32,851 - INFO - FFmpeg found.
+2026-06-10 18:03:33,759 - INFO - MP4 conversion successful.
+2026-06-10 18:03:33,759 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/my-mind/if-you-only-knew_astro-catalog/canvas/if-you-only-knew_normalized_canvas.mp4
+2026-06-10 18:03:33,766 - INFO - Canvas generation finished.

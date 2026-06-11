@@ -1,0 +1,19 @@
+2026-06-10 18:00:00,264 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:00:00,264 - INFO - ---------------------------------------------
+2026-06-10 18:00:00,265 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork/face_normalized_artwork.png
+2026-06-10 18:00:00,266 - INFO - Output directory: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/canvas
+2026-06-10 18:00:00,266 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:00:00,266 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:00:00,266 - INFO - Opening and processing image...
+2026-06-10 18:00:00,536 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:00:00,537 - INFO - Generating glitch effects...
+2026-06-10 18:00:01,048 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:00:02,059 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:00:02,059 - INFO - Saving output files...
+2026-06-10 18:00:02,100 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/canvas/face_normalized_canvas_static.png
+2026-06-10 18:00:12,605 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/canvas/face_normalized_canvas.gif
+2026-06-10 18:00:12,605 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:00:12,630 - INFO - FFmpeg found.
+2026-06-10 18:00:13,592 - INFO - MP4 conversion successful.
+2026-06-10 18:00:13,592 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/canvas/face_normalized_canvas.mp4
+2026-06-10 18:00:13,598 - INFO - Canvas generation finished.

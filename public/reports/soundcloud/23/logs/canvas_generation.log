@@ -1,0 +1,19 @@
+2026-06-10 18:35:27,566 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:35:27,566 - INFO - ---------------------------------------------
+2026-06-10 18:35:27,566 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/artwork/Prelude No. 1 in Bb Major_normalized_artwork.png
+2026-06-10 18:35:27,567 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/canvas
+2026-06-10 18:35:27,567 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:35:27,567 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:35:27,567 - INFO - Opening and processing image...
+2026-06-10 18:35:27,794 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:35:27,795 - INFO - Generating glitch effects...
+2026-06-10 18:35:28,223 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:35:29,236 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:35:29,237 - INFO - Saving output files...
+2026-06-10 18:35:29,271 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/canvas/Prelude No. 1 in Bb Major_normalized_canvas_static.png
+2026-06-10 18:35:38,211 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/canvas/Prelude No. 1 in Bb Major_normalized_canvas.gif
+2026-06-10 18:35:38,212 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:35:38,236 - INFO - FFmpeg found.
+2026-06-10 18:35:38,948 - INFO - MP4 conversion successful.
+2026-06-10 18:35:38,948 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Prelude No. 1 in Bb Major_astro-catalog/canvas/Prelude No. 1 in Bb Major_normalized_canvas.mp4
+2026-06-10 18:35:38,954 - INFO - Canvas generation finished.

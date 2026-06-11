@@ -4,7 +4,7 @@ collectionId: "footlights"
 project: "footlights"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
-status: "draft"
+status: "released"
 coverArt: "/covers/footlights/cover.png"
 streamingLinks:
   spotify: ""
@@ -20,7 +20,7 @@ tracks:
     sha256: "2190d9934b0506c3650ffc3fad981ab8121021ad9e1275345f7f2e500b40a933"
     processedDate: "2026-06-10T22:55:30Z"
     saturation: 0.5
-    audioPath: "/audio/footlights/1/footlight-when-i-fall.mp3"
+    audioPath: "releases/footlights/1/footlight-when-i-fall.mp3"
     finalReport: "/reports/footlights/1/final_report.html"
     duration: 95
     loudness:
@@ -42,7 +42,7 @@ tracks:
     sha256: "9e95709618ce559ec608fa53e25a78a072d53516bc172875fb6d5ec3c3a299d4"
     processedDate: "2026-06-10T22:55:58Z"
     saturation: 0.5
-    audioPath: "/audio/footlights/2/footlights-collapse-full.mp3"
+    audioPath: "releases/footlights/2/footlights-collapse-full.mp3"
     finalReport: "/reports/footlights/2/final_report.html"
     duration: 105
     loudness:
@@ -64,7 +64,7 @@ tracks:
     sha256: "274de7fc21e68afc25d3982e4612b56fc075179dc7743e629307dd9626c234db"
     processedDate: "2026-06-10T22:57:51Z"
     saturation: 0.5
-    audioPath: "/audio/footlights/3/footlights-agree-to-disagree.mp3"
+    audioPath: "releases/footlights/3/footlights-agree-to-disagree.mp3"
     finalReport: "/reports/footlights/3/final_report.html"
     duration: 42
     loudness:
@@ -86,7 +86,7 @@ tracks:
     sha256: "c0624aef734a6a3f3ceee16fa0bb2dced916eeb2e8eb4ff2da04ff8fb1339dc8"
     processedDate: "2026-06-10T22:56:48Z"
     saturation: 0.5
-    audioPath: "/audio/footlights/4/footlights-arabesque.mp3"
+    audioPath: "releases/footlights/4/footlights-arabesque.mp3"
     finalReport: "/reports/footlights/4/final_report.html"
     duration: 45
     loudness:
@@ -108,7 +108,7 @@ tracks:
     sha256: "d3006134b597e57bf48edf160264f7e1580723882b989950fd515746e52d6712"
     processedDate: "2026-06-10T22:55:01Z"
     saturation: 0.5
-    audioPath: "/audio/footlights/5/footlights-danza-footlights.mp3"
+    audioPath: "releases/footlights/5/footlights-danza-footlights.mp3"
     finalReport: "/reports/footlights/5/final_report.html"
     duration: 44
     loudness:
@@ -130,7 +130,7 @@ tracks:
     sha256: "4410cfb09b25bed059efc7bc082af55e1c405e0a66245a6577c52340e8a202f6"
     processedDate: "2026-06-10T22:57:26Z"
     saturation: 0.5
-    audioPath: "/audio/footlights/6/footlights-lost-cause.mp3"
+    audioPath: "releases/footlights/6/footlights-lost-cause.mp3"
     finalReport: "/reports/footlights/6/final_report.html"
     duration: 186
     loudness:
@@ -152,7 +152,7 @@ tracks:
     sha256: "6cd5e0ad0c0524dcb60f0b3873492284b75e6ea6ad652c5fbf1c3d50bb98da98"
     processedDate: "2026-06-10T22:56:23Z"
     saturation: 0.5
-    audioPath: "/audio/footlights/7/footlights-releve.mp3"
+    audioPath: "releases/footlights/7/footlights-releve.mp3"
     finalReport: "/reports/footlights/7/final_report.html"
     duration: 49
     loudness:

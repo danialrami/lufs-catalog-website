@@ -1,0 +1,19 @@
+2026-06-10 18:23:37,554 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:23:37,554 - INFO - ---------------------------------------------
+2026-06-10 18:23:37,554 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Ramirez_Daniel_Assign09_v1_040318_astro-catalog/artwork/Ramirez_Daniel_Assign09_v1_040318_normalized_artwork.png
+2026-06-10 18:23:37,555 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Ramirez_Daniel_Assign09_v1_040318_astro-catalog/canvas
+2026-06-10 18:23:37,555 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:23:37,555 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:23:37,555 - INFO - Opening and processing image...
+2026-06-10 18:23:37,806 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:23:37,807 - INFO - Generating glitch effects...
+2026-06-10 18:23:38,319 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:23:39,351 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:23:39,351 - INFO - Saving output files...
+2026-06-10 18:23:39,392 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Ramirez_Daniel_Assign09_v1_040318_astro-catalog/canvas/Ramirez_Daniel_Assign09_v1_040318_normalized_canvas_static.png
+2026-06-10 18:23:51,048 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Ramirez_Daniel_Assign09_v1_040318_astro-catalog/canvas/Ramirez_Daniel_Assign09_v1_040318_normalized_canvas.gif
+2026-06-10 18:23:51,048 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:23:51,074 - INFO - FFmpeg found.
+2026-06-10 18:23:51,964 - INFO - MP4 conversion successful.
+2026-06-10 18:23:51,964 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Ramirez_Daniel_Assign09_v1_040318_astro-catalog/canvas/Ramirez_Daniel_Assign09_v1_040318_normalized_canvas.mp4
+2026-06-10 18:23:51,974 - INFO - Canvas generation finished.

@@ -1,0 +1,19 @@
+2026-06-10 18:30:31,510 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:30:31,510 - INFO - ---------------------------------------------
+2026-06-10 18:30:31,510 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Kudos_astro-catalog/artwork/Kudos_normalized_artwork.png
+2026-06-10 18:30:31,511 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Kudos_astro-catalog/canvas
+2026-06-10 18:30:31,511 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:30:31,511 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:30:31,511 - INFO - Opening and processing image...
+2026-06-10 18:30:31,784 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:30:31,784 - INFO - Generating glitch effects...
+2026-06-10 18:30:32,295 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:30:33,323 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:30:33,323 - INFO - Saving output files...
+2026-06-10 18:30:33,364 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Kudos_astro-catalog/canvas/Kudos_normalized_canvas_static.png
+2026-06-10 18:30:43,887 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Kudos_astro-catalog/canvas/Kudos_normalized_canvas.gif
+2026-06-10 18:30:43,887 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:30:43,914 - INFO - FFmpeg found.
+2026-06-10 18:30:44,745 - INFO - MP4 conversion successful.
+2026-06-10 18:30:44,746 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Kudos_astro-catalog/canvas/Kudos_normalized_canvas.mp4
+2026-06-10 18:30:44,752 - INFO - Canvas generation finished.

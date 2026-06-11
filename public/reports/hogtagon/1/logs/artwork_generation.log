@@ -1,0 +1,37 @@
+2026-06-10 17:59:52,625 - INFO - Ultra-High Resolution Album Artwork Generator v7 (5000x5000 Edition)
+2026-06-10 17:59:52,625 - INFO - -------------------------------------------------
+2026-06-10 17:59:52,625 - INFO - Using saturation level: 0.5
+2026-06-10 17:59:52,625 - INFO - Processing audio file: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/face_normalized.wav
+2026-06-10 17:59:52,625 - INFO - Output will be saved as: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork/face_normalized_artwork.png
+2026-06-10 17:59:52,625 - INFO - Component files will be saved in: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork/components
+2026-06-10 17:59:52,625 - INFO - Starting the v7 Ultra-High Resolution Album Artwork Generator
+2026-06-10 17:59:52,627 - INFO - Output directory: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork
+2026-06-10 17:59:52,627 - INFO - Components directory: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork/components
+2026-06-10 17:59:52,628 - INFO - Analyzing audio fingerprint...
+2026-06-10 17:59:52,636 - INFO - Audio hash: 70f57b1f...381fa288
+2026-06-10 17:59:52,636 - INFO - Generating identicon...
+2026-06-10 17:59:52,636 - INFO - Trying jdenticon approach 1: /Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain/node_modules/.bin/jdenticon 70f57b1f81a696d3902a5f3ddf42fb7dce89162ef82a3da01605447e381fa288
+2026-06-10 17:59:52,638 - WARNING - jdenticon approach 1 - command not found
+2026-06-10 17:59:52,638 - INFO - Trying jdenticon approach 2: npx --prefix
+2026-06-10 17:59:52,837 - WARNING - jdenticon approach 2 failed: Command '['npx', '--prefix', '/Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain', 'jdenticon', '70f57b1f81a696d3902a5f3ddf42fb7dce89162ef82a3da01605447e381fa288', '--size', '5000', '--output', '/Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork/components/identicon.png']' returned non-zero exit status 254.
+2026-06-10 17:59:52,837 - INFO - Trying jdenticon approach 3: npx jdenticon
+2026-06-10 17:59:53,348 - INFO - Identicon created successfully.
+2026-06-10 17:59:53,369 - INFO - Generating ultra-high-resolution spectrogram...
+2026-06-10 17:59:54,159 - INFO - Using figure dimensions: 50.0x12.5 inches at 400 DPI
+2026-06-10 17:59:54,160 - INFO - Target pixel dimensions: 20000x5000
+/Users/danielramirez/repos/lufs-workchain/.venv/lib/python3.12/site-packages/PIL/Image.py:3574: DecompressionBombWarning: Image size (100000000 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+2026-06-10 17:59:56,276 - INFO - Raw spectrogram dimensions: 20000x5000 pixels
+2026-06-10 17:59:56,276 - INFO - Initial dimensions: 20000x5000 pixels
+2026-06-10 17:59:56,276 - INFO - Adjusting saturation to 0.5...
+2026-06-10 17:59:58,216 - INFO - Saved full rectangular spectrogram to: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork/components/rectangle_spectrogram.png
+2026-06-10 17:59:58,224 - INFO - Square crop dimensions: 5000x5000
+2026-06-10 17:59:58,756 - INFO - Saved 5000x5000 square spectrogram to: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork/components/spectrogram.png
+2026-06-10 17:59:58,756 - INFO - Spectrogram segment covers audio from 32.30s to 53.84s
+2026-06-10 17:59:58,774 - INFO - Working with spectrogram: 5000x5000, identicon: 5000x5000
+2026-06-10 17:59:58,774 - INFO - Enhancing spectrogram contrast...
+2026-06-10 17:59:58,892 - INFO - Resizing identicon for overlay...
+2026-06-10 17:59:59,024 - INFO - Creating final composite image...
+2026-06-10 17:59:59,616 - INFO - Album artwork generated successfully: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork/face_normalized_artwork.png
+2026-06-10 17:59:59,621 - INFO - Ultra-high resolution (5000x5000) artwork generation finished successfully.
+2026-06-10 17:59:59,622 - INFO - Final artwork saved at: /Volumes/project/continuo/catalogs/hogtagon/face_astro-catalog/artwork/face_normalized_artwork.png

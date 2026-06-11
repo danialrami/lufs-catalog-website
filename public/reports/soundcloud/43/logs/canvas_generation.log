@@ -1,0 +1,19 @@
+2026-06-10 18:25:57,758 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:25:57,758 - INFO - ---------------------------------------------
+2026-06-10 18:25:57,758 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Wacko Prophet_astro-catalog/artwork/Wacko Prophet_normalized_artwork.png
+2026-06-10 18:25:57,774 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Wacko Prophet_astro-catalog/canvas
+2026-06-10 18:25:57,774 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:25:57,774 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:25:57,774 - INFO - Opening and processing image...
+2026-06-10 18:25:57,998 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:25:57,998 - INFO - Generating glitch effects...
+2026-06-10 18:25:58,468 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:25:59,505 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:25:59,505 - INFO - Saving output files...
+2026-06-10 18:25:59,543 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Wacko Prophet_astro-catalog/canvas/Wacko Prophet_normalized_canvas_static.png
+2026-06-10 18:26:09,222 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Wacko Prophet_astro-catalog/canvas/Wacko Prophet_normalized_canvas.gif
+2026-06-10 18:26:09,222 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:26:09,247 - INFO - FFmpeg found.
+2026-06-10 18:26:10,087 - INFO - MP4 conversion successful.
+2026-06-10 18:26:10,087 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Wacko Prophet_astro-catalog/canvas/Wacko Prophet_normalized_canvas.mp4
+2026-06-10 18:26:10,093 - INFO - Canvas generation finished.

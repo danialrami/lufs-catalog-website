@@ -1,0 +1,37 @@
+2026-06-10 18:32:36,495 - INFO - Ultra-High Resolution Album Artwork Generator v7 (5000x5000 Edition)
+2026-06-10 18:32:36,495 - INFO - -------------------------------------------------
+2026-06-10 18:32:36,495 - INFO - Using saturation level: 0.5
+2026-06-10 18:32:36,495 - INFO - Processing audio file: /Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/Here's the Song Piano Sketch Master_normalized.wav
+2026-06-10 18:32:36,495 - INFO - Output will be saved as: /Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/artwork/Here's the Song Piano Sketch Master_normalized_artwork.png
+2026-06-10 18:32:36,495 - INFO - Component files will be saved in: /Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/artwork/components
+2026-06-10 18:32:36,495 - INFO - Starting the v7 Ultra-High Resolution Album Artwork Generator
+2026-06-10 18:32:36,497 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/artwork
+2026-06-10 18:32:36,497 - INFO - Components directory: /Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/artwork/components
+2026-06-10 18:32:36,497 - INFO - Analyzing audio fingerprint...
+2026-06-10 18:32:36,506 - INFO - Audio hash: f7488b29...b3bb9d66
+2026-06-10 18:32:36,507 - INFO - Generating identicon...
+2026-06-10 18:32:36,507 - INFO - Trying jdenticon approach 1: /Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain/node_modules/.bin/jdenticon f7488b2944a4fc56273e8ef813b55b94a6b2965a078c4d273e902a98b3bb9d66
+2026-06-10 18:32:36,510 - WARNING - jdenticon approach 1 - command not found
+2026-06-10 18:32:36,510 - INFO - Trying jdenticon approach 2: npx --prefix
+2026-06-10 18:32:36,710 - WARNING - jdenticon approach 2 failed: Command '['npx', '--prefix', '/Users/danielramirez/Nextcloud/ore/Notes/Project/utilities/studio/lufs-workchain', 'jdenticon', 'f7488b2944a4fc56273e8ef813b55b94a6b2965a078c4d273e902a98b3bb9d66', '--size', '5000', '--output', "/Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/artwork/components/identicon.png"]' returned non-zero exit status 254.
+2026-06-10 18:32:36,710 - INFO - Trying jdenticon approach 3: npx jdenticon
+2026-06-10 18:32:37,158 - INFO - Identicon created successfully.
+2026-06-10 18:32:37,186 - INFO - Generating ultra-high-resolution spectrogram...
+2026-06-10 18:32:37,997 - INFO - Using figure dimensions: 50.0x12.5 inches at 400 DPI
+2026-06-10 18:32:37,997 - INFO - Target pixel dimensions: 20000x5000
+/Users/danielramirez/repos/lufs-workchain/.venv/lib/python3.12/site-packages/PIL/Image.py:3574: DecompressionBombWarning: Image size (100000000 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+2026-06-10 18:32:40,475 - INFO - Raw spectrogram dimensions: 20000x5000 pixels
+2026-06-10 18:32:40,475 - INFO - Initial dimensions: 20000x5000 pixels
+2026-06-10 18:32:40,475 - INFO - Adjusting saturation to 0.5...
+2026-06-10 18:32:42,396 - INFO - Saved full rectangular spectrogram to: /Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/artwork/components/rectangle_spectrogram.png
+2026-06-10 18:32:42,405 - INFO - Square crop dimensions: 5000x5000
+2026-06-10 18:32:42,908 - INFO - Saved 5000x5000 square spectrogram to: /Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/artwork/components/spectrogram.png
+2026-06-10 18:32:42,908 - INFO - Spectrogram segment covers audio from 46.46s to 77.44s
+2026-06-10 18:32:42,929 - INFO - Working with spectrogram: 5000x5000, identicon: 5000x5000
+2026-06-10 18:32:42,929 - INFO - Enhancing spectrogram contrast...
+2026-06-10 18:32:43,038 - INFO - Resizing identicon for overlay...
+2026-06-10 18:32:43,174 - INFO - Creating final composite image...
+2026-06-10 18:32:43,737 - INFO - Album artwork generated successfully: /Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/artwork/Here's the Song Piano Sketch Master_normalized_artwork.png
+2026-06-10 18:32:43,741 - INFO - Ultra-high resolution (5000x5000) artwork generation finished successfully.
+2026-06-10 18:32:43,741 - INFO - Final artwork saved at: /Volumes/project/continuo/catalogs/soundcloud/Here's the Song Piano Sketch Master_astro-catalog/artwork/Here's the Song Piano Sketch Master_normalized_artwork.png

@@ -1,0 +1,41 @@
+# Normalization Log - Wed Jun 10 18:24:41 CDT 2026
+Target LUFS: -14
+Two-pass: true
+LRA: 7
+True Peak: -1.5 dB
+
+ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.101 / 60. 26.101
+  libavcodec     62. 28.101 / 62. 28.101
+  libavformat    62. 12.101 / 62. 12.101
+  libavdevice    62.  3.101 / 62.  3.101
+  libavfilter    11. 14.101 / 11. 14.101
+  libswscale      9.  5.101 /  9.  5.101
+  libswresample   6.  3.101 /  6.  3.101
+[aist#0:0/pcm_s16le @ 0xc82c0c180] Guessed Channel Layout: stereo
+Input #0, wav, from '/Volumes/project/continuo/catalogs/soundcloud/05- Hole in My Head.wav':
+  Metadata:
+    encoded_by      : Pro Tools
+    originator_reference: aaOoJBrHQqRk
+    date            : 2018-02-21
+    creation_time   : 11:53:26
+    time_reference  : 53694732
+  Duration: 00:05:00.12, bitrate: 1548 kb/s
+  Stream #0:0: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s16le (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, wav, to '/Volumes/project/continuo/catalogs/soundcloud/05- Hole in My Head_astro-catalog/05- Hole in My Head_normalized.wav':
+  Metadata:
+    ITCH            : Pro Tools
+    originator_reference: aaOoJBrHQqRk
+    ICRD            : 2018-02-21
+    time_reference  : 53694732
+    ISFT            : Lavf62.12.101
+  Stream #0:0: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
+    Metadata:
+      encoder         : Lavc62.28.101 pcm_s16le
+size=    2560KiB time=00:00:13.99 bitrate=1498.0kbits/s speed=27.9x elapsed=0:00:00.50    size=    5120KiB time=00:00:28.49 bitrate=1471.7kbits/s speed=28.3x elapsed=0:00:01.00    size=    7936KiB time=00:00:43.29 bitrate=1501.4kbits/s speed=28.7x elapsed=0:00:01.50    size=   11776KiB time=00:01:03.49 bitrate=1519.2kbits/s speed=31.6x elapsed=0:00:02.01    size=   15616KiB time=00:01:23.89 bitrate=1524.8kbits/s speed=33.3x elapsed=0:00:02.51    size=   19456KiB time=00:01:44.09 bitrate=1531.1kbits/s speed=34.5x elapsed=0:00:03.01    size=   23296KiB time=00:02:04.39 bitrate=1534.1kbits/s speed=35.3x elapsed=0:00:03.52    size=   26880KiB time=00:02:24.69 bitrate=1521.8kbits/s speed=  36x elapsed=0:00:04.02    size=   30720KiB time=00:02:44.89 bitrate=1526.1kbits/s speed=36.4x elapsed=0:00:04.52    size=   34560KiB time=00:03:05.09 bitrate=1529.5kbits/s speed=36.8x elapsed=0:00:05.03    size=   38400KiB time=00:03:25.39 bitrate=1531.5kbits/s speed=37.1x elapsed=0:00:05.53    size=   42240KiB time=00:03:45.69 bitrate=1533.1kbits/s speed=37.4x elapsed=0:00:06.03    size=   46080KiB time=00:04:06.09 bitrate=1533.9kbits/s speed=37.6x elapsed=0:00:06.54    size=   49664KiB time=00:04:26.29 bitrate=1527.8kbits/s speed=37.8x elapsed=0:00:07.04    size=   53504KiB time=00:04:46.69 bitrate=1528.8kbits/s speed=  38x elapsed=0:00:07.54    [out#0/wav @ 0xc8301c240] video:0KiB audio:56272KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000201%
+size=   56272KiB time=00:05:00.20 bitrate=1535.6kbits/s speed=  38x elapsed=0:00:07.90    

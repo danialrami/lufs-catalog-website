@@ -1,0 +1,19 @@
+2026-06-10 18:21:09,073 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:21:09,073 - INFO - ---------------------------------------------
+2026-06-10 18:21:09,073 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/REC004L_astro-catalog/artwork/REC004L_normalized_artwork.png
+2026-06-10 18:21:09,075 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/REC004L_astro-catalog/canvas
+2026-06-10 18:21:09,075 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:21:09,075 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:21:09,075 - INFO - Opening and processing image...
+2026-06-10 18:21:09,363 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:21:09,363 - INFO - Generating glitch effects...
+2026-06-10 18:21:09,859 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:21:10,869 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:21:10,869 - INFO - Saving output files...
+2026-06-10 18:21:10,908 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/REC004L_astro-catalog/canvas/REC004L_normalized_canvas_static.png
+2026-06-10 18:21:21,041 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/REC004L_astro-catalog/canvas/REC004L_normalized_canvas.gif
+2026-06-10 18:21:21,041 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:21:21,066 - INFO - FFmpeg found.
+2026-06-10 18:21:22,016 - INFO - MP4 conversion successful.
+2026-06-10 18:21:22,016 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/REC004L_astro-catalog/canvas/REC004L_normalized_canvas.mp4
+2026-06-10 18:21:22,022 - INFO - Canvas generation finished.

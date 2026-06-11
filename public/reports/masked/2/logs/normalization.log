@@ -1,0 +1,41 @@
+# Normalization Log - Wed Jun 10 18:01:58 CDT 2026
+Target LUFS: -14
+Two-pass: true
+LRA: 7
+True Peak: -1.5 dB
+
+ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.101 / 60. 26.101
+  libavcodec     62. 28.101 / 62. 28.101
+  libavformat    62. 12.101 / 62. 12.101
+  libavdevice    62.  3.101 / 62.  3.101
+  libavfilter    11. 14.101 / 11. 14.101
+  libswscale      9.  5.101 /  9.  5.101
+  libswresample   6.  3.101 /  6.  3.101
+[aist#0:0/pcm_s24le @ 0x716c0c180] Guessed Channel Layout: mono
+Input #0, wav, from '/Volumes/project/continuo/catalogs/masked/MX 3_01.L.wav':
+  Metadata:
+    encoded_by      : Pro Tools
+    originator_reference: EUnU2faOnOmaaaGk
+    date            : 2014-12-15
+    creation_time   : 01:47:01
+    time_reference  : 190169798
+  Duration: 00:02:14.08, bitrate: 1159 kb/s
+  Stream #0:0: Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, mono, s32 (24 bit), 1152 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s24le (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, wav, to '/Volumes/project/continuo/catalogs/masked/MX 3_01.L_astro-catalog/MX 3_01.L_normalized.wav':
+  Metadata:
+    ITCH            : Pro Tools
+    originator_reference: EUnU2faOnOmaaaGk
+    ICRD            : 2014-12-15
+    time_reference  : 190169798
+    ISFT            : Lavf62.12.101
+  Stream #0:0: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, mono, s16, 768 kb/s
+    Metadata:
+      encoder         : Lavc62.28.101 pcm_s16le
+size=    2560KiB time=00:00:29.09 bitrate= 720.7kbits/s speed=  58x elapsed=0:00:00.50    size=    6400KiB time=00:01:08.79 bitrate= 762.1kbits/s speed=68.6x elapsed=0:00:01.00    size=    9984KiB time=00:01:48.59 bitrate= 753.1kbits/s speed=72.1x elapsed=0:00:01.50    [out#0/wav @ 0x7170086c0] video:0KiB audio:12570KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000901%
+size=   12570KiB time=00:02:14.10 bitrate= 767.9kbits/s speed=73.1x elapsed=0:00:01.83    

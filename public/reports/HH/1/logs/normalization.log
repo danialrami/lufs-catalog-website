@@ -1,0 +1,63 @@
+# Normalization Log - Wed Jun 10 17:57:52 CDT 2026
+Target LUFS: -14
+Two-pass: true
+LRA: 7
+True Peak: -1.5 dB
+
+ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.101 / 60. 26.101
+  libavcodec     62. 28.101 / 62. 28.101
+  libavformat    62. 12.101 / 62. 12.101
+  libavdevice    62.  3.101 / 62.  3.101
+  libavfilter    11. 14.101 / 11. 14.101
+  libswscale      9.  5.101 /  9.  5.101
+  libswresample   6.  3.101 /  6.  3.101
+[aist#0:0/pcm_s24le @ 0x7ec804180] Guessed Channel Layout: stereo
+Input #0, wav, from '/Volumes/project/continuo/catalogs/HH/moodBoard1.wav':
+  Metadata:
+    encoded_by      : Logic Pro X
+    date            : 2023-04-2
+    creation_time   : 17:20:2
+    time_reference  : 172799987
+    umid            : 0x0000000060799FBBF77F0000000000000000000050799FBBF77F000047E02F070100000000000000000000000000000000000000507A9FBBF77F00004BF03207
+    coding_history  : 
+  Duration: 00:01:07.50, bitrate: 2307 kb/s
+  Chapters:
+    Chapter #0:0: start 0.000000, end 67.500000
+      Metadata:
+        title           : count-in CC reset
+    Chapter #0:1: start 0.000000, end 61.875000
+      Metadata:
+        title           : intro
+    Chapter #0:2: start 61.875000, end 67.500000
+      Metadata:
+        title           : out
+  Stream #0:0: Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s24le (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, wav, to '/Volumes/project/continuo/catalogs/HH/moodBoard1_astro-catalog/moodBoard1_normalized.wav':
+  Metadata:
+    ITCH            : Logic Pro X
+    ICRD            : 2023-04-2
+    coding_history  : 
+    time_reference  : 172799987
+    umid            : 0x0000000060799FBBF77F0000000000000000000050799FBBF77F000047E02F070100000000000000000000000000000000000000507A9FBBF77F00004BF03207
+    ISFT            : Lavf62.12.101
+  Chapters:
+    Chapter #0:0: start 0.000000, end 67.500000
+      Metadata:
+        title           : count-in CC reset
+    Chapter #0:1: start 0.000000, end 61.875000
+      Metadata:
+        title           : intro
+    Chapter #0:2: start 61.875000, end 67.500000
+      Metadata:
+        title           : out
+  Stream #0:0: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
+    Metadata:
+      encoder         : Lavc62.28.101 pcm_s16le
+[out#0/wav @ 0x7ed0086c0] video:0KiB audio:12656KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000895%
+size=   12656KiB time=00:01:07.50 bitrate=1536.0kbits/s speed= 369x elapsed=0:00:00.18    

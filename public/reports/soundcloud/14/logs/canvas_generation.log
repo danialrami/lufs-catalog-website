@@ -1,0 +1,19 @@
+2026-06-10 18:29:11,661 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:29:11,661 - INFO - ---------------------------------------------
+2026-06-10 18:29:11,661 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Here's The Song_astro-catalog/artwork/Here's The Song_normalized_artwork.png
+2026-06-10 18:29:11,663 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Here's The Song_astro-catalog/canvas
+2026-06-10 18:29:11,663 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:29:11,663 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:29:11,663 - INFO - Opening and processing image...
+2026-06-10 18:29:11,919 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:29:11,919 - INFO - Generating glitch effects...
+2026-06-10 18:29:12,404 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:29:13,436 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:29:13,436 - INFO - Saving output files...
+2026-06-10 18:29:13,475 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Here's The Song_astro-catalog/canvas/Here's The Song_normalized_canvas_static.png
+2026-06-10 18:29:23,778 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Here's The Song_astro-catalog/canvas/Here's The Song_normalized_canvas.gif
+2026-06-10 18:29:23,778 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:29:23,804 - INFO - FFmpeg found.
+2026-06-10 18:29:24,690 - INFO - MP4 conversion successful.
+2026-06-10 18:29:24,690 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Here's The Song_astro-catalog/canvas/Here's The Song_normalized_canvas.mp4
+2026-06-10 18:29:24,696 - INFO - Canvas generation finished.

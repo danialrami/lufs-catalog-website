@@ -1,0 +1,19 @@
+2026-06-10 18:26:26,484 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:26:26,485 - INFO - ---------------------------------------------
+2026-06-10 18:26:26,485 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Learn To Ride, Learn to Fly_astro-catalog/artwork/Learn To Ride, Learn to Fly_normalized_artwork.png
+2026-06-10 18:26:26,486 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Learn To Ride, Learn to Fly_astro-catalog/canvas
+2026-06-10 18:26:26,486 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:26:26,486 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:26:26,486 - INFO - Opening and processing image...
+2026-06-10 18:26:26,703 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:26:26,703 - INFO - Generating glitch effects...
+2026-06-10 18:26:27,228 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:26:28,250 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:26:28,250 - INFO - Saving output files...
+2026-06-10 18:26:28,293 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Learn To Ride, Learn to Fly_astro-catalog/canvas/Learn To Ride, Learn to Fly_normalized_canvas_static.png
+2026-06-10 18:26:38,838 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Learn To Ride, Learn to Fly_astro-catalog/canvas/Learn To Ride, Learn to Fly_normalized_canvas.gif
+2026-06-10 18:26:38,838 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:26:38,863 - INFO - FFmpeg found.
+2026-06-10 18:26:39,742 - INFO - MP4 conversion successful.
+2026-06-10 18:26:39,742 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Learn To Ride, Learn to Fly_astro-catalog/canvas/Learn To Ride, Learn to Fly_normalized_canvas.mp4
+2026-06-10 18:26:39,748 - INFO - Canvas generation finished.

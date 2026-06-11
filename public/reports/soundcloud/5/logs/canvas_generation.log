@@ -1,0 +1,19 @@
+2026-06-10 18:13:49,306 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:13:49,306 - INFO - ---------------------------------------------
+2026-06-10 18:13:49,306 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Abisselfa Suite_astro-catalog/artwork/Abisselfa Suite_normalized_artwork.png
+2026-06-10 18:13:49,308 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Abisselfa Suite_astro-catalog/canvas
+2026-06-10 18:13:49,308 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:13:49,308 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:13:49,308 - INFO - Opening and processing image...
+2026-06-10 18:13:49,546 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:13:49,547 - INFO - Generating glitch effects...
+2026-06-10 18:13:50,143 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:13:51,592 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:13:51,592 - INFO - Saving output files...
+2026-06-10 18:13:51,635 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Abisselfa Suite_astro-catalog/canvas/Abisselfa Suite_normalized_canvas_static.png
+2026-06-10 18:14:02,677 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Abisselfa Suite_astro-catalog/canvas/Abisselfa Suite_normalized_canvas.gif
+2026-06-10 18:14:02,677 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:14:02,707 - INFO - FFmpeg found.
+2026-06-10 18:14:04,504 - INFO - MP4 conversion successful.
+2026-06-10 18:14:04,504 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Abisselfa Suite_astro-catalog/canvas/Abisselfa Suite_normalized_canvas.mp4
+2026-06-10 18:14:04,512 - INFO - Canvas generation finished.

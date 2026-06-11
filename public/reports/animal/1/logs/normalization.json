@@ -1,0 +1,12 @@
+{
+  "target_lufs": -14,
+  "final_lufs": "-12.92",
+  "lra": 7,
+  "true_peak": -1.5,
+  "input_i": "-11.73",
+  "input_tp": "0.10",
+  "input_lra": "8.90",
+  "input_thresh": "-21.99",
+  "sample_rate": 48000,
+  "channels": 2
+}

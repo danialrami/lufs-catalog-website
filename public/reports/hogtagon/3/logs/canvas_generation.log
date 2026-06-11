@@ -1,0 +1,19 @@
+2026-06-10 17:58:37,566 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 17:58:37,566 - INFO - ---------------------------------------------
+2026-06-10 17:58:37,566 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/hogtagon/level-music_astro-catalog/artwork/level-music_normalized_artwork.png
+2026-06-10 17:58:37,567 - INFO - Output directory: /Volumes/project/continuo/catalogs/hogtagon/level-music_astro-catalog/canvas
+2026-06-10 17:58:37,567 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 17:58:37,567 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 17:58:37,567 - INFO - Opening and processing image...
+2026-06-10 17:58:37,793 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 17:58:37,794 - INFO - Generating glitch effects...
+2026-06-10 17:58:38,272 - INFO - Applying crossfade and smearing effects...
+2026-06-10 17:58:39,273 - INFO - Generated 96 frames after crossfade.
+2026-06-10 17:58:39,273 - INFO - Saving output files...
+2026-06-10 17:58:39,311 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/hogtagon/level-music_astro-catalog/canvas/level-music_normalized_canvas_static.png
+2026-06-10 17:58:49,585 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/hogtagon/level-music_astro-catalog/canvas/level-music_normalized_canvas.gif
+2026-06-10 17:58:49,585 - INFO - Converting GIF to MP4 format...
+2026-06-10 17:58:49,612 - INFO - FFmpeg found.
+2026-06-10 17:58:50,441 - INFO - MP4 conversion successful.
+2026-06-10 17:58:50,441 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/hogtagon/level-music_astro-catalog/canvas/level-music_normalized_canvas.mp4
+2026-06-10 17:58:50,447 - INFO - Canvas generation finished.

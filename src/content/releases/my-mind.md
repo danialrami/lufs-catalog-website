@@ -4,7 +4,7 @@ collectionId: "my-mind"
 project: "my-mind"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
-status: "draft"
+status: "released"
 coverArt: "/covers/my-mind/cover.png"
 streamingLinks:
   spotify: ""
@@ -20,7 +20,7 @@ tracks:
     sha256: "0aff63cc5fa7e5b06f2e875e0cc78a4d4307f8164ca616b87d312386fc8a2aee"
     processedDate: "2026-06-10T23:03:34Z"
     saturation: 0.5
-    audioPath: "/audio/my-mind/1/if-you-only-knew.mp3"
+    audioPath: "releases/my-mind/1/if-you-only-knew.mp3"
     finalReport: "/reports/my-mind/1/final_report.html"
     duration: 164
     loudness:
@@ -42,7 +42,7 @@ tracks:
     sha256: "23a251cc3f02cf97b0410bce2181334e6f29206ac3b5e458441b1b55f99b762f"
     processedDate: "2026-06-10T23:03:01Z"
     saturation: 0.5
-    audioPath: "/audio/my-mind/2/my-mind.mp3"
+    audioPath: "releases/my-mind/2/my-mind.mp3"
     finalReport: "/reports/my-mind/2/final_report.html"
     duration: 214
     loudness:

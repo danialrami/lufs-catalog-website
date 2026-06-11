@@ -1,0 +1,19 @@
+2026-06-10 17:52:59,244 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 17:52:59,244 - INFO - ---------------------------------------------
+2026-06-10 17:52:59,244 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/ambulance/ambulance_astro-catalog/artwork/ambulance_normalized_artwork.png
+2026-06-10 17:52:59,245 - INFO - Output directory: /Volumes/project/continuo/catalogs/ambulance/ambulance_astro-catalog/canvas
+2026-06-10 17:52:59,245 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 17:52:59,245 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 17:52:59,245 - INFO - Opening and processing image...
+2026-06-10 17:52:59,500 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 17:52:59,501 - INFO - Generating glitch effects...
+2026-06-10 17:53:00,019 - INFO - Applying crossfade and smearing effects...
+2026-06-10 17:53:01,073 - INFO - Generated 96 frames after crossfade.
+2026-06-10 17:53:01,073 - INFO - Saving output files...
+2026-06-10 17:53:01,115 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/ambulance/ambulance_astro-catalog/canvas/ambulance_normalized_canvas_static.png
+2026-06-10 17:53:11,241 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/ambulance/ambulance_astro-catalog/canvas/ambulance_normalized_canvas.gif
+2026-06-10 17:53:11,241 - INFO - Converting GIF to MP4 format...
+2026-06-10 17:53:11,268 - INFO - FFmpeg found.
+2026-06-10 17:53:12,208 - INFO - MP4 conversion successful.
+2026-06-10 17:53:12,208 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/ambulance/ambulance_astro-catalog/canvas/ambulance_normalized_canvas.mp4
+2026-06-10 17:53:12,214 - INFO - Canvas generation finished.

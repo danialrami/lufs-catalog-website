@@ -1,0 +1,19 @@
+2026-06-10 18:29:49,946 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:29:49,946 - INFO - ---------------------------------------------
+2026-06-10 18:29:49,946 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Supposed to Be v2 B2 LANDR High_astro-catalog/artwork/Supposed to Be v2 B2 LANDR High_normalized_artwork.png
+2026-06-10 18:29:49,947 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Supposed to Be v2 B2 LANDR High_astro-catalog/canvas
+2026-06-10 18:29:49,947 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:29:49,947 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:29:49,947 - INFO - Opening and processing image...
+2026-06-10 18:29:50,194 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:29:50,194 - INFO - Generating glitch effects...
+2026-06-10 18:29:50,706 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:29:51,725 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:29:51,725 - INFO - Saving output files...
+2026-06-10 18:29:51,768 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Supposed to Be v2 B2 LANDR High_astro-catalog/canvas/Supposed to Be v2 B2 LANDR High_normalized_canvas_static.png
+2026-06-10 18:30:02,168 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Supposed to Be v2 B2 LANDR High_astro-catalog/canvas/Supposed to Be v2 B2 LANDR High_normalized_canvas.gif
+2026-06-10 18:30:02,168 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:30:02,195 - INFO - FFmpeg found.
+2026-06-10 18:30:03,139 - INFO - MP4 conversion successful.
+2026-06-10 18:30:03,139 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Supposed to Be v2 B2 LANDR High_astro-catalog/canvas/Supposed to Be v2 B2 LANDR High_normalized_canvas.mp4
+2026-06-10 18:30:03,145 - INFO - Canvas generation finished.

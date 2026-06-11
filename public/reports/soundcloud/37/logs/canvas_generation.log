@@ -1,0 +1,19 @@
+2026-06-10 18:07:35,217 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:07:35,217 - INFO - ---------------------------------------------
+2026-06-10 18:07:35,217 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/The Story of Our Lives_astro-catalog/artwork/The Story of Our Lives_normalized_artwork.png
+2026-06-10 18:07:35,218 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/The Story of Our Lives_astro-catalog/canvas
+2026-06-10 18:07:35,218 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:07:35,218 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:07:35,218 - INFO - Opening and processing image...
+2026-06-10 18:07:35,485 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:07:35,485 - INFO - Generating glitch effects...
+2026-06-10 18:07:36,010 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:07:37,071 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:07:37,071 - INFO - Saving output files...
+2026-06-10 18:07:37,111 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/The Story of Our Lives_astro-catalog/canvas/The Story of Our Lives_normalized_canvas_static.png
+2026-06-10 18:07:47,608 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/The Story of Our Lives_astro-catalog/canvas/The Story of Our Lives_normalized_canvas.gif
+2026-06-10 18:07:47,608 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:07:47,635 - INFO - FFmpeg found.
+2026-06-10 18:07:49,722 - INFO - MP4 conversion successful.
+2026-06-10 18:07:49,722 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/The Story of Our Lives_astro-catalog/canvas/The Story of Our Lives_normalized_canvas.mp4
+2026-06-10 18:07:49,731 - INFO - Canvas generation finished.

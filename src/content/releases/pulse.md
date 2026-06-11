@@ -4,7 +4,7 @@ collectionId: "pulse"
 project: "pulse"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
-status: "draft"
+status: "released"
 coverArt: "/covers/pulse/cover.png"
 streamingLinks:
   spotify: ""
@@ -20,7 +20,7 @@ tracks:
     sha256: "0da9297b397343926b41c6006dd9e0fb5a388d0800a8bb503bf10909ff6f5dbf"
     processedDate: "2026-06-10T23:04:01Z"
     saturation: 0.5
-    audioPath: "/audio/pulse/1/traffic.mp3"
+    audioPath: "releases/pulse/1/traffic.mp3"
     finalReport: "/reports/pulse/1/final_report.html"
     duration: 96
     loudness:
@@ -42,7 +42,7 @@ tracks:
     sha256: "d88173aa3dfc449837a293c4337f23e1410d6cc42a85d38bb3029135192e453f"
     processedDate: "2026-06-10T23:04:33Z"
     saturation: 0.5
-    audioPath: "/audio/pulse/2/wheels-theme-in-variations.mp3"
+    audioPath: "releases/pulse/2/wheels-theme-in-variations.mp3"
     finalReport: "/reports/pulse/2/final_report.html"
     duration: 159
     loudness:

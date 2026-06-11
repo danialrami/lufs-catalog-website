@@ -1,0 +1,19 @@
+2026-06-10 18:25:15,487 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:25:15,487 - INFO - ---------------------------------------------
+2026-06-10 18:25:15,487 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/05- Hole in My Head_astro-catalog/artwork/05- Hole in My Head_normalized_artwork.png
+2026-06-10 18:25:15,489 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/05- Hole in My Head_astro-catalog/canvas
+2026-06-10 18:25:15,489 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:25:15,489 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:25:15,489 - INFO - Opening and processing image...
+2026-06-10 18:25:15,731 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:25:15,731 - INFO - Generating glitch effects...
+2026-06-10 18:25:16,230 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:25:17,240 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:25:17,240 - INFO - Saving output files...
+2026-06-10 18:25:17,280 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/05- Hole in My Head_astro-catalog/canvas/05- Hole in My Head_normalized_canvas_static.png
+2026-06-10 18:25:27,171 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/05- Hole in My Head_astro-catalog/canvas/05- Hole in My Head_normalized_canvas.gif
+2026-06-10 18:25:27,171 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:25:27,196 - INFO - FFmpeg found.
+2026-06-10 18:25:28,135 - INFO - MP4 conversion successful.
+2026-06-10 18:25:28,135 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/05- Hole in My Head_astro-catalog/canvas/05- Hole in My Head_normalized_canvas.mp4
+2026-06-10 18:25:28,142 - INFO - Canvas generation finished.

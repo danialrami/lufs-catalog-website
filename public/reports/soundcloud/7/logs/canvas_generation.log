@@ -1,0 +1,19 @@
+2026-06-10 18:18:39,457 - INFO - Spotify Canvas Generator (Integrated Workflow)
+2026-06-10 18:18:39,457 - INFO - ---------------------------------------------
+2026-06-10 18:18:39,457 - INFO - Starting Spotify Canvas generation for: /Volumes/project/continuo/catalogs/soundcloud/Buchla Piece_astro-catalog/artwork/Buchla Piece_normalized_artwork.png
+2026-06-10 18:18:39,459 - INFO - Output directory: /Volumes/project/continuo/catalogs/soundcloud/Buchla Piece_astro-catalog/canvas
+2026-06-10 18:18:39,460 - INFO - Generating 24 base glitch frames with 3 transition frames each.
+2026-06-10 18:18:39,460 - INFO - Targeting 83ms per frame for GIF.
+2026-06-10 18:18:39,460 - INFO - Opening and processing image...
+2026-06-10 18:18:39,695 - INFO - Image is wider than 9:16. Resizing and cropping sides to 720x1280.
+2026-06-10 18:18:39,696 - INFO - Generating glitch effects...
+2026-06-10 18:18:40,211 - INFO - Applying crossfade and smearing effects...
+2026-06-10 18:18:41,240 - INFO - Generated 96 frames after crossfade.
+2026-06-10 18:18:41,241 - INFO - Saving output files...
+2026-06-10 18:18:41,282 - INFO - Static canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Buchla Piece_astro-catalog/canvas/Buchla Piece_normalized_canvas_static.png
+2026-06-10 18:18:52,157 - INFO - GIF canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Buchla Piece_astro-catalog/canvas/Buchla Piece_normalized_canvas.gif
+2026-06-10 18:18:52,157 - INFO - Converting GIF to MP4 format...
+2026-06-10 18:18:52,182 - INFO - FFmpeg found.
+2026-06-10 18:18:53,026 - INFO - MP4 conversion successful.
+2026-06-10 18:18:53,026 - INFO - MP4 canvas saved: /Volumes/project/continuo/catalogs/soundcloud/Buchla Piece_astro-catalog/canvas/Buchla Piece_normalized_canvas.mp4
+2026-06-10 18:18:53,032 - INFO - Canvas generation finished.
