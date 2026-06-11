@@ -112,15 +112,16 @@ function copy(src, dest) {
   copyFileSync(src, dest);
   return true;
 }
-function copyTree(srcDir, destDir, { skipWav = true, skipGif = false } = {}) {
+function copyTree(srcDir, destDir, { skipWav = true, skipGif = false, skipMp4 = false } = {}) {
   if (!existsSync(srcDir)) return;
   for (const name of readdirSync(srcDir)) {
     if (isIgnored(name)) continue;
     const s = join(srcDir, name);
     const d = join(destDir, name);
-    if (statSync(s).isDirectory()) copyTree(s, d, { skipWav, skipGif });
+    if (statSync(s).isDirectory()) copyTree(s, d, { skipWav, skipGif, skipMp4 });
     else if (skipWav && /\.wav$/i.test(name)) continue;
-    else if (skipGif && /\.gif$/i.test(name)) continue; // 45MB Spotify-canvas GIF — never ship
+    else if (skipGif && /\.gif$/i.test(name)) continue;  // 45MB Spotify-canvas GIF — never ship
+    else if (skipMp4 && /\.mp4$/i.test(name)) continue;   // canvas video — heavy, not used by the site
     else copy(s, d);
   }
 }
@@ -144,7 +145,7 @@ function transcodeMp3(wav, mp3) {
 function sanitizeReport(html) {
   if (parseHTML) {
     const root = parseHTML(html);
-    root.querySelectorAll('audio, source').forEach((el) => el.remove());
+    root.querySelectorAll('audio, video, source').forEach((el) => el.remove());
     root.querySelectorAll('img').forEach((el) => {
       if ((el.getAttribute('src') || '').toLowerCase().endsWith('.gif')) el.remove(); // canvas GIF not shipped
     });
@@ -159,6 +160,7 @@ function sanitizeReport(html) {
   }
   return html
     .replace(/<audio[\s\S]*?<\/audio>/gi, '')
+    .replace(/<video[\s\S]*?<\/video>/gi, '')
     .replace(/<source\b[^>]*>/gi, '')
     .replace(/<img\b[^>]*src="[^"]*\.gif"[^>]*>/gi, '')
     .replace(/<a\b[^>]*href="[^"]*\.(wav|mp3)"[^>]*>[\s\S]*?<\/a>/gi, '');
@@ -302,7 +304,7 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
   if (hasReport) {
     ensureDir(reportDir);
     writeFileSync(join(reportDir, 'final_report.html'), sanitizeReport(readFileSync(m.reportHtml, 'utf8')));
-    for (const sub of ['artwork', 'canvas', 'logs']) copyTree(join(m.acDir, sub), join(reportDir, sub), { skipWav: true, skipGif: true });
+    for (const sub of ['artwork', 'canvas', 'logs']) copyTree(join(m.acDir, sub), join(reportDir, sub), { skipWav: true, skipGif: true, skipMp4: true });
   } else { warn(`report not found (re-run the chain with --report to include it): ${m.reportHtml}`); }
 
   // 3) covers for the site UI
@@ -455,6 +457,13 @@ async function main() {
       warn(`no *_astro-catalog/ output in ${dirName} — skipping (run it through the lufs-workchain first).`);
       skipped.push(`${dirName} (unprocessed)`);
       continue;
+    }
+
+    // Clean this collection's published assets first, so stale files from older runs
+    // (e.g. a legacy WAV, a 45MB canvas GIF, or render_stats.html) don't linger + ship.
+    // Audio in remote mode lives on R2, not public/; in local mode it's re-transcoded.
+    if (collectionId) {
+      for (const sub of ['reports', 'covers']) rmSync(join(PUBLIC_DIR, sub, collectionId), { recursive: true, force: true });
     }
 
     const tracks = [];

@@ -97,10 +97,12 @@ describe('catalog-ingest: sanitizeReport', () => {
   it('strips audio, download links and the canvas gif but keeps body content', () => {
     const html =
       '<div><audio controls><source src="x.wav"></audio>' +
+      '<video src="canvas/x_canvas.mp4"></video>' +
       '<a href="x.wav" download>Download WAV</a>' +
       '<img src="canvas/x_canvas.gif"><p>keep this</p></div>';
     const out = sanitizeReport(html);
     expect(out).not.toMatch(/<audio/i);
+    expect(out).not.toMatch(/<video/i);
     expect(out).not.toMatch(/\.gif/i);
     expect(out).not.toMatch(/download/i);
     expect(out).toContain('keep this');
