@@ -5,7 +5,7 @@ project: "soundcloud"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/soundcloud/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/soundcloud/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T23:16:39Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/1/01-don-t-let-me-fall-asleep.mp3"
-    finalReport: "/reports/soundcloud/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/1/final_report.html"
     duration: 313
     loudness:
       targetLufs: -14
@@ -31,10 +31,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/1/artwork.png"
-      identicon: "/covers/soundcloud/1/identicon.png"
-      spectrogram: "/covers/soundcloud/1/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/1/canvas_static.png"
   - trackNumber: 2
     displayTitle: "01 Opposite Over High 2"
     filename: "01-opposite-over-high-2"
@@ -43,7 +43,7 @@ tracks:
     processedDate: "2026-06-10T23:22:03Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/2/01-opposite-over-high-2.mp3"
-    finalReport: "/reports/soundcloud/2/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/2/final_report.html"
     duration: 222
     loudness:
       targetLufs: -14
@@ -53,10 +53,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/2/artwork.png"
-      identicon: "/covers/soundcloud/2/identicon.png"
-      spectrogram: "/covers/soundcloud/2/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/2/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/2/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/2/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/2/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/2/canvas_static.png"
   - trackNumber: 3
     displayTitle: "05- Hole in My Head"
     filename: "05-hole-in-my-head"
@@ -65,7 +65,7 @@ tracks:
     processedDate: "2026-06-10T23:25:28Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/3/05-hole-in-my-head.mp3"
-    finalReport: "/reports/soundcloud/3/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/3/final_report.html"
     duration: 300
     loudness:
       targetLufs: -14
@@ -75,10 +75,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/3/artwork.png"
-      identicon: "/covers/soundcloud/3/identicon.png"
-      spectrogram: "/covers/soundcloud/3/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/3/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/3/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/3/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/3/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/3/canvas_static.png"
   - trackNumber: 4
     displayTitle: "A Trip To London Suite For DGHS"
     filename: "a-trip-to-london-suite-for-dghs"
@@ -87,7 +87,7 @@ tracks:
     processedDate: "2026-06-10T23:31:24Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/4/a-trip-to-london-suite-for-dghs.mp3"
-    finalReport: "/reports/soundcloud/4/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/4/final_report.html"
     duration: 201
     loudness:
       targetLufs: -14
@@ -97,10 +97,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/4/artwork.png"
-      identicon: "/covers/soundcloud/4/identicon.png"
-      spectrogram: "/covers/soundcloud/4/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/4/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/4/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/4/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/4/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/4/canvas_static.png"
   - trackNumber: 5
     displayTitle: "Abisselfa Suite"
     filename: "abisselfa-suite"
@@ -109,7 +109,7 @@ tracks:
     processedDate: "2026-06-10T23:14:05Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/5/abisselfa-suite.mp3"
-    finalReport: "/reports/soundcloud/5/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/5/final_report.html"
     duration: 146
     loudness:
       targetLufs: -14
@@ -119,10 +119,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/5/artwork.png"
-      identicon: "/covers/soundcloud/5/identicon.png"
-      spectrogram: "/covers/soundcloud/5/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/5/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/5/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/5/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/5/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/5/canvas_static.png"
   - trackNumber: 6
     displayTitle: "Abstractions"
     filename: "abstractions"
@@ -131,7 +131,7 @@ tracks:
     processedDate: "2026-06-10T23:11:53Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/6/abstractions.mp3"
-    finalReport: "/reports/soundcloud/6/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/6/final_report.html"
     duration: 71
     loudness:
       targetLufs: -14
@@ -141,10 +141,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/6/artwork.png"
-      identicon: "/covers/soundcloud/6/identicon.png"
-      spectrogram: "/covers/soundcloud/6/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/6/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/6/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/6/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/6/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/6/canvas_static.png"
   - trackNumber: 7
     displayTitle: "Buchla Piece"
     filename: "buchla-piece"
@@ -153,7 +153,7 @@ tracks:
     processedDate: "2026-06-10T23:18:53Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/7/buchla-piece.mp3"
-    finalReport: "/reports/soundcloud/7/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/7/final_report.html"
     duration: 211
     loudness:
       targetLufs: -14
@@ -163,10 +163,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/7/artwork.png"
-      identicon: "/covers/soundcloud/7/identicon.png"
-      spectrogram: "/covers/soundcloud/7/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/7/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/7/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/7/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/7/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/7/canvas_static.png"
   - trackNumber: 8
     displayTitle: "Chorale 1"
     filename: "chorale-1"
@@ -175,7 +175,7 @@ tracks:
     processedDate: "2026-06-10T23:33:46Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/8/chorale-1.mp3"
-    finalReport: "/reports/soundcloud/8/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/8/final_report.html"
     duration: 56
     loudness:
       targetLufs: -14
@@ -185,10 +185,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/8/artwork.png"
-      identicon: "/covers/soundcloud/8/identicon.png"
-      spectrogram: "/covers/soundcloud/8/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/8/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/8/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/8/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/8/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/8/canvas_static.png"
   - trackNumber: 9
     displayTitle: "Crater Lake (Live from Frederick Lowe Theatre)"
     filename: "crater-lake-live-from-frederick-lowe-theatre"
@@ -197,7 +197,7 @@ tracks:
     processedDate: "2026-06-10T23:09:45Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/9/crater-lake-live-from-frederick-lowe-theatre.mp3"
-    finalReport: "/reports/soundcloud/9/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/9/final_report.html"
     duration: 158
     loudness:
       targetLufs: -14
@@ -207,10 +207,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/9/artwork.png"
-      identicon: "/covers/soundcloud/9/identicon.png"
-      spectrogram: "/covers/soundcloud/9/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/9/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/9/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/9/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/9/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/9/canvas_static.png"
   - trackNumber: 10
     displayTitle: "E.O.I.O.M."
     filename: "e-o-i-o-m"
@@ -219,7 +219,7 @@ tracks:
     processedDate: "2026-06-10T23:28:39Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/10/e-o-i-o-m.mp3"
-    finalReport: "/reports/soundcloud/10/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/10/final_report.html"
     duration: 277
     loudness:
       targetLufs: -14
@@ -229,10 +229,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/10/artwork.png"
-      identicon: "/covers/soundcloud/10/identicon.png"
-      spectrogram: "/covers/soundcloud/10/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/10/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/10/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/10/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/10/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/10/canvas_static.png"
   - trackNumber: 11
     displayTitle: "Everywhere Undone"
     filename: "everywhere-undone"
@@ -241,7 +241,7 @@ tracks:
     processedDate: "2026-06-10T23:24:41Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/11/everywhere-undone.mp3"
-    finalReport: "/reports/soundcloud/11/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/11/final_report.html"
     duration: 299
     loudness:
       targetLufs: -14
@@ -251,10 +251,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/11/artwork.png"
-      identicon: "/covers/soundcloud/11/identicon.png"
-      spectrogram: "/covers/soundcloud/11/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/11/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/11/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/11/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/11/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/11/canvas_static.png"
   - trackNumber: 12
     displayTitle: "Exodus"
     filename: "exodus"
@@ -263,7 +263,7 @@ tracks:
     processedDate: "2026-06-10T23:34:13Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/12/exodus.mp3"
-    finalReport: "/reports/soundcloud/12/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/12/final_report.html"
     duration: 85
     loudness:
       targetLufs: -14
@@ -273,10 +273,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/12/artwork.png"
-      identicon: "/covers/soundcloud/12/identicon.png"
-      spectrogram: "/covers/soundcloud/12/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/12/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/12/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/12/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/12/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/12/canvas_static.png"
   - trackNumber: 13
     displayTitle: "Here's the Song Piano Sketch Master"
     filename: "here-s-the-song-piano-sketch-master"
@@ -285,7 +285,7 @@ tracks:
     processedDate: "2026-06-10T23:32:57Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/13/here-s-the-song-piano-sketch-master.mp3"
-    finalReport: "/reports/soundcloud/13/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/13/final_report.html"
     duration: 124
     loudness:
       targetLufs: -14
@@ -295,10 +295,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/13/artwork.png"
-      identicon: "/covers/soundcloud/13/identicon.png"
-      spectrogram: "/covers/soundcloud/13/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/13/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/13/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/13/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/13/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/13/canvas_static.png"
   - trackNumber: 14
     displayTitle: "Here's The Song"
     filename: "here-s-the-song"
@@ -307,7 +307,7 @@ tracks:
     processedDate: "2026-06-10T23:29:25Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/14/here-s-the-song.mp3"
-    finalReport: "/reports/soundcloud/14/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/14/final_report.html"
     duration: 265
     loudness:
       targetLufs: -14
@@ -317,10 +317,10 @@ tracks:
       sampleRate: 96000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/14/artwork.png"
-      identicon: "/covers/soundcloud/14/identicon.png"
-      spectrogram: "/covers/soundcloud/14/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/14/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/14/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/14/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/14/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/14/canvas_static.png"
   - trackNumber: 15
     displayTitle: "Hm."
     filename: "hm"
@@ -329,7 +329,7 @@ tracks:
     processedDate: "2026-06-10T23:17:08Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/15/hm.mp3"
-    finalReport: "/reports/soundcloud/15/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/15/final_report.html"
     duration: 94
     loudness:
       targetLufs: -14
@@ -339,10 +339,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/15/artwork.png"
-      identicon: "/covers/soundcloud/15/identicon.png"
-      spectrogram: "/covers/soundcloud/15/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/15/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/15/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/15/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/15/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/15/canvas_static.png"
   - trackNumber: 16
     displayTitle: "Honk Mock-Up.1"
     filename: "honk-mock-up-1"
@@ -351,7 +351,7 @@ tracks:
     processedDate: "2026-06-10T23:33:22Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/16/honk-mock-up-1.mp3"
-    finalReport: "/reports/soundcloud/16/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/16/final_report.html"
     duration: 64
     loudness:
       targetLufs: -14
@@ -361,10 +361,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/16/artwork.png"
-      identicon: "/covers/soundcloud/16/identicon.png"
-      spectrogram: "/covers/soundcloud/16/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/16/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/16/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/16/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/16/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/16/canvas_static.png"
   - trackNumber: 17
     displayTitle: "Kudos"
     filename: "kudos"
@@ -373,7 +373,7 @@ tracks:
     processedDate: "2026-06-10T23:30:45Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/17/kudos.mp3"
-    finalReport: "/reports/soundcloud/17/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/17/final_report.html"
     duration: 219
     loudness:
       targetLufs: -14
@@ -383,10 +383,10 @@ tracks:
       sampleRate: 96000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/17/artwork.png"
-      identicon: "/covers/soundcloud/17/identicon.png"
-      spectrogram: "/covers/soundcloud/17/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/17/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/17/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/17/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/17/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/17/canvas_static.png"
   - trackNumber: 18
     displayTitle: "Learn To Ride, Learn to Fly"
     filename: "learn-to-ride-learn-to-fly"
@@ -395,7 +395,7 @@ tracks:
     processedDate: "2026-06-10T23:26:40Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/18/learn-to-ride-learn-to-fly.mp3"
-    finalReport: "/reports/soundcloud/18/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/18/final_report.html"
     duration: 93
     loudness:
       targetLufs: -14
@@ -405,10 +405,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/18/artwork.png"
-      identicon: "/covers/soundcloud/18/identicon.png"
-      spectrogram: "/covers/soundcloud/18/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/18/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/18/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/18/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/18/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/18/canvas_static.png"
   - trackNumber: 19
     displayTitle: "Leyna 1st Draft"
     filename: "leyna-1st-draft"
@@ -417,7 +417,7 @@ tracks:
     processedDate: "2026-06-10T23:19:21Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/19/leyna-1st-draft.mp3"
-    finalReport: "/reports/soundcloud/19/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/19/final_report.html"
     duration: 101
     loudness:
       targetLufs: -14
@@ -427,10 +427,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/19/artwork.png"
-      identicon: "/covers/soundcloud/19/identicon.png"
-      spectrogram: "/covers/soundcloud/19/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/19/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/19/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/19/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/19/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/19/canvas_static.png"
   - trackNumber: 20
     displayTitle: "Lion"
     filename: "lion"
@@ -439,7 +439,7 @@ tracks:
     processedDate: "2026-06-10T23:27:53Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/20/lion.mp3"
-    finalReport: "/reports/soundcloud/20/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/20/final_report.html"
     duration: 147
     loudness:
       targetLufs: -14
@@ -449,10 +449,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/20/artwork.png"
-      identicon: "/covers/soundcloud/20/identicon.png"
-      spectrogram: "/covers/soundcloud/20/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/20/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/20/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/20/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/20/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/20/canvas_static.png"
   - trackNumber: 21
     displayTitle: "Mux Remount"
     filename: "mux-remount"
@@ -461,7 +461,7 @@ tracks:
     processedDate: "2026-06-10T23:20:32Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/21/mux-remount.mp3"
-    finalReport: "/reports/soundcloud/21/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/21/final_report.html"
     duration: 185
     loudness:
       targetLufs: -14
@@ -471,10 +471,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/21/artwork.png"
-      identicon: "/covers/soundcloud/21/identicon.png"
-      spectrogram: "/covers/soundcloud/21/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/21/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/21/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/21/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/21/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/21/canvas_static.png"
   - trackNumber: 22
     displayTitle: "Mux"
     filename: "mux"
@@ -483,7 +483,7 @@ tracks:
     processedDate: "2026-06-10T23:23:21Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/22/mux.mp3"
-    finalReport: "/reports/soundcloud/22/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/22/final_report.html"
     duration: 186
     loudness:
       targetLufs: -14
@@ -493,10 +493,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/22/artwork.png"
-      identicon: "/covers/soundcloud/22/identicon.png"
-      spectrogram: "/covers/soundcloud/22/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/22/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/22/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/22/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/22/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/22/canvas_static.png"
   - trackNumber: 23
     displayTitle: "Prelude No. 1 in Bb Major"
     filename: "prelude-no-1-in-bb-major"
@@ -505,7 +505,7 @@ tracks:
     processedDate: "2026-06-10T23:35:39Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/23/prelude-no-1-in-bb-major.mp3"
-    finalReport: "/reports/soundcloud/23/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/23/final_report.html"
     duration: 72
     loudness:
       targetLufs: -14
@@ -515,10 +515,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/23/artwork.png"
-      identicon: "/covers/soundcloud/23/identicon.png"
-      spectrogram: "/covers/soundcloud/23/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/23/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/23/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/23/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/23/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/23/canvas_static.png"
   - trackNumber: 24
     displayTitle: "Prelude to Cold Sweats"
     filename: "prelude-to-cold-sweats"
@@ -527,7 +527,7 @@ tracks:
     processedDate: "2026-06-10T23:35:13Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/24/prelude-to-cold-sweats.mp3"
-    finalReport: "/reports/soundcloud/24/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/24/final_report.html"
     duration: 117
     loudness:
       targetLufs: -14
@@ -537,10 +537,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/24/artwork.png"
-      identicon: "/covers/soundcloud/24/identicon.png"
-      spectrogram: "/covers/soundcloud/24/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/24/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/24/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/24/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/24/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/24/canvas_static.png"
   - trackNumber: 25
     displayTitle: "Ramirez_Daniel_Assig05_101317"
     filename: "ramirez-daniel-assig05-101317"
@@ -549,7 +549,7 @@ tracks:
     processedDate: "2026-06-10T23:32:28Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/25/ramirez-daniel-assig05-101317.mp3"
-    finalReport: "/reports/soundcloud/25/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/25/final_report.html"
     duration: 148
     loudness:
       targetLufs: -14
@@ -559,10 +559,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/25/artwork.png"
-      identicon: "/covers/soundcloud/25/identicon.png"
-      spectrogram: "/covers/soundcloud/25/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/25/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/25/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/25/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/25/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/25/canvas_static.png"
   - trackNumber: 26
     displayTitle: "Ramirez_Daniel_Assign4_v1_022018"
     filename: "ramirez-daniel-assign4-v1-022018"
@@ -571,7 +571,7 @@ tracks:
     processedDate: "2026-06-10T23:13:26Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/26/ramirez-daniel-assign4-v1-022018.mp3"
-    finalReport: "/reports/soundcloud/26/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/26/final_report.html"
     duration: 126
     loudness:
       targetLufs: -14
@@ -581,10 +581,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/26/artwork.png"
-      identicon: "/covers/soundcloud/26/identicon.png"
-      spectrogram: "/covers/soundcloud/26/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/26/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/26/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/26/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/26/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/26/canvas_static.png"
   - trackNumber: 27
     displayTitle: "Ramirez_Daniel_Assign09_v1_040318"
     filename: "ramirez-daniel-assign09-v1-040318"
@@ -593,7 +593,7 @@ tracks:
     processedDate: "2026-06-10T23:23:52Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/27/ramirez-daniel-assign09-v1-040318.mp3"
-    finalReport: "/reports/soundcloud/27/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/27/final_report.html"
     duration: 94
     loudness:
       targetLufs: -14
@@ -603,10 +603,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/27/artwork.png"
-      identicon: "/covers/soundcloud/27/identicon.png"
-      spectrogram: "/covers/soundcloud/27/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/27/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/27/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/27/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/27/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/27/canvas_static.png"
   - trackNumber: 28
     displayTitle: "Ramirez_Daniel_Assignment1_v3_092518"
     filename: "ramirez-daniel-assignment1-v3-092518"
@@ -615,7 +615,7 @@ tracks:
     processedDate: "2026-06-10T23:31:54Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/28/ramirez-daniel-assignment1-v3-092518.mp3"
-    finalReport: "/reports/soundcloud/28/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/28/final_report.html"
     duration: 86
     loudness:
       targetLufs: -14
@@ -625,10 +625,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/28/artwork.png"
-      identicon: "/covers/soundcloud/28/identicon.png"
-      spectrogram: "/covers/soundcloud/28/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/28/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/28/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/28/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/28/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/28/canvas_static.png"
   - trackNumber: 29
     displayTitle: "REC004L"
     filename: "rec004l"
@@ -637,7 +637,7 @@ tracks:
     processedDate: "2026-06-10T23:21:22Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/29/rec004l.mp3"
-    finalReport: "/reports/soundcloud/29/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/29/final_report.html"
     duration: 315
     loudness:
       targetLufs: -14
@@ -647,10 +647,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/29/artwork.png"
-      identicon: "/covers/soundcloud/29/identicon.png"
-      spectrogram: "/covers/soundcloud/29/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/29/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/29/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/29/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/29/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/29/canvas_static.png"
   - trackNumber: 30
     displayTitle: "sampleMedley"
     filename: "samplemedley"
@@ -659,7 +659,7 @@ tracks:
     processedDate: "2026-06-10T23:19:54Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/30/samplemedley.mp3"
-    finalReport: "/reports/soundcloud/30/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/30/final_report.html"
     duration: 126
     loudness:
       targetLufs: -14
@@ -669,10 +669,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/30/artwork.png"
-      identicon: "/covers/soundcloud/30/identicon.png"
-      spectrogram: "/covers/soundcloud/30/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/30/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/30/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/30/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/30/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/30/canvas_static.png"
   - trackNumber: 31
     displayTitle: "Soapboxers Recital"
     filename: "soapboxers-recital"
@@ -681,7 +681,7 @@ tracks:
     processedDate: "2026-06-10T23:11:21Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/31/soapboxers-recital.mp3"
-    finalReport: "/reports/soundcloud/31/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/31/final_report.html"
     duration: 326
     loudness:
       targetLufs: -14
@@ -691,10 +691,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/31/artwork.png"
-      identicon: "/covers/soundcloud/31/identicon.png"
-      spectrogram: "/covers/soundcloud/31/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/31/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/31/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/31/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/31/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/31/canvas_static.png"
   - trackNumber: 32
     displayTitle: "String Practicum Final Solo Piece- _Thermostat_"
     filename: "string-practicum-final-solo-piece-thermostat"
@@ -703,7 +703,7 @@ tracks:
     processedDate: "2026-06-10T23:22:44Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/32/string-practicum-final-solo-piece-thermostat.mp3"
-    finalReport: "/reports/soundcloud/32/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/32/final_report.html"
     duration: 211
     loudness:
       targetLufs: -14
@@ -713,10 +713,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/32/artwork.png"
-      identicon: "/covers/soundcloud/32/identicon.png"
-      spectrogram: "/covers/soundcloud/32/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/32/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/32/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/32/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/32/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/32/canvas_static.png"
   - trackNumber: 33
     displayTitle: "Superman v2"
     filename: "superman-v2"
@@ -725,7 +725,7 @@ tracks:
     processedDate: "2026-06-10T23:14:57Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/33/superman-v2.mp3"
-    finalReport: "/reports/soundcloud/33/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/33/final_report.html"
     duration: 243
     loudness:
       targetLufs: -14
@@ -735,10 +735,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/33/artwork.png"
-      identicon: "/covers/soundcloud/33/identicon.png"
-      spectrogram: "/covers/soundcloud/33/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/33/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/33/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/33/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/33/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/33/canvas_static.png"
   - trackNumber: 34
     displayTitle: "Supposed to Be v2 B2 LANDR High"
     filename: "supposed-to-be-v2-b2-landr-high"
@@ -747,7 +747,7 @@ tracks:
     processedDate: "2026-06-10T23:30:03Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/34/supposed-to-be-v2-b2-landr-high.mp3"
-    finalReport: "/reports/soundcloud/34/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/34/final_report.html"
     duration: 235
     loudness:
       targetLufs: -14
@@ -757,10 +757,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/34/artwork.png"
-      identicon: "/covers/soundcloud/34/identicon.png"
-      spectrogram: "/covers/soundcloud/34/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/34/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/34/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/34/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/34/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/34/canvas_static.png"
   - trackNumber: 35
     displayTitle: "Syncopia"
     filename: "syncopia"
@@ -769,7 +769,7 @@ tracks:
     processedDate: "2026-06-10T23:10:20Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/35/syncopia.mp3"
-    finalReport: "/reports/soundcloud/35/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/35/final_report.html"
     duration: 92
     loudness:
       targetLufs: -14
@@ -779,10 +779,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/35/artwork.png"
-      identicon: "/covers/soundcloud/35/identicon.png"
-      spectrogram: "/covers/soundcloud/35/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/35/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/35/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/35/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/35/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/35/canvas_static.png"
   - trackNumber: 36
     displayTitle: "The Middle"
     filename: "the-middle"
@@ -791,7 +791,7 @@ tracks:
     processedDate: "2026-06-10T23:17:39Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/36/the-middle.mp3"
-    finalReport: "/reports/soundcloud/36/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/36/final_report.html"
     duration: 173
     loudness:
       targetLufs: -14
@@ -801,10 +801,10 @@ tracks:
       sampleRate: 44100
       channels: 1
     artwork:
-      main: "/covers/soundcloud/36/artwork.png"
-      identicon: "/covers/soundcloud/36/identicon.png"
-      spectrogram: "/covers/soundcloud/36/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/36/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/36/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/36/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/36/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/36/canvas_static.png"
   - trackNumber: 37
     displayTitle: "The Story of Our Lives"
     filename: "the-story-of-our-lives"
@@ -813,7 +813,7 @@ tracks:
     processedDate: "2026-06-10T23:07:50Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/37/the-story-of-our-lives.mp3"
-    finalReport: "/reports/soundcloud/37/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/37/final_report.html"
     duration: 376
     loudness:
       targetLufs: -14
@@ -823,10 +823,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/37/artwork.png"
-      identicon: "/covers/soundcloud/37/identicon.png"
-      spectrogram: "/covers/soundcloud/37/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/37/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/37/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/37/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/37/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/37/canvas_static.png"
   - trackNumber: 38
     displayTitle: "The Worm (ft. Morgan Lennon) Master"
     filename: "the-worm-ft-morgan-lennon-master"
@@ -835,7 +835,7 @@ tracks:
     processedDate: "2026-06-10T23:12:48Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/38/the-worm-ft-morgan-lennon-master.mp3"
-    finalReport: "/reports/soundcloud/38/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/38/final_report.html"
     duration: 283
     loudness:
       targetLufs: -14
@@ -845,10 +845,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/38/artwork.png"
-      identicon: "/covers/soundcloud/38/identicon.png"
-      spectrogram: "/covers/soundcloud/38/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/38/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/38/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/38/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/38/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/38/canvas_static.png"
   - trackNumber: 39
     displayTitle: "These City Lights"
     filename: "these-city-lights"
@@ -857,7 +857,7 @@ tracks:
     processedDate: "2026-06-10T23:15:40Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/39/these-city-lights.mp3"
-    finalReport: "/reports/soundcloud/39/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/39/final_report.html"
     duration: 122
     loudness:
       targetLufs: -14
@@ -867,10 +867,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/39/artwork.png"
-      identicon: "/covers/soundcloud/39/identicon.png"
-      spectrogram: "/covers/soundcloud/39/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/39/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/39/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/39/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/39/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/39/canvas_static.png"
   - trackNumber: 40
     displayTitle: "Tidal Disruption (Live from NYU Education Building Penthouse)"
     filename: "tidal-disruption-live-from-nyu-education-building-penthouse"
@@ -879,7 +879,7 @@ tracks:
     processedDate: "2026-06-10T23:27:18Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/40/tidal-disruption-live-from-nyu-education-building-penthouse.mp3"
-    finalReport: "/reports/soundcloud/40/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/40/final_report.html"
     duration: 185
     loudness:
       targetLufs: -14
@@ -889,10 +889,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/40/artwork.png"
-      identicon: "/covers/soundcloud/40/identicon.png"
-      spectrogram: "/covers/soundcloud/40/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/40/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/40/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/40/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/40/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/40/canvas_static.png"
   - trackNumber: 41
     displayTitle: "Untitled 1Ramirez_Daniel_Assig06_102017.101"
     filename: "untitled-1ramirez-daniel-assig06-102017-101"
@@ -901,7 +901,7 @@ tracks:
     processedDate: "2026-06-10T23:34:42Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/41/untitled-1ramirez-daniel-assig06-102017-101.mp3"
-    finalReport: "/reports/soundcloud/41/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/41/final_report.html"
     duration: 121
     loudness:
       targetLufs: -14
@@ -911,10 +911,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/41/artwork.png"
-      identicon: "/covers/soundcloud/41/identicon.png"
-      spectrogram: "/covers/soundcloud/41/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/41/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/41/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/41/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/41/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/41/canvas_static.png"
   - trackNumber: 42
     displayTitle: "Variations on_"
     filename: "variations-on"
@@ -923,7 +923,7 @@ tracks:
     processedDate: "2026-06-10T23:18:16Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/42/variations-on.mp3"
-    finalReport: "/reports/soundcloud/42/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/42/final_report.html"
     duration: 181
     loudness:
       targetLufs: -14
@@ -933,10 +933,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/42/artwork.png"
-      identicon: "/covers/soundcloud/42/identicon.png"
-      spectrogram: "/covers/soundcloud/42/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/42/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/42/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/42/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/42/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/42/canvas_static.png"
   - trackNumber: 43
     displayTitle: "Wacko Prophet"
     filename: "wacko-prophet"
@@ -945,7 +945,7 @@ tracks:
     processedDate: "2026-06-10T23:26:10Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/43/wacko-prophet.mp3"
-    finalReport: "/reports/soundcloud/43/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/43/final_report.html"
     duration: 235
     loudness:
       targetLufs: -14
@@ -955,10 +955,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/soundcloud/43/artwork.png"
-      identicon: "/covers/soundcloud/43/identicon.png"
-      spectrogram: "/covers/soundcloud/43/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/43/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/43/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/43/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/43/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/43/canvas_static.png"
   - trackNumber: 44
     displayTitle: "Wasteland"
     filename: "wasteland"
@@ -967,7 +967,7 @@ tracks:
     processedDate: "2026-06-10T23:06:52Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/44/wasteland.mp3"
-    finalReport: "/reports/soundcloud/44/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/44/final_report.html"
     duration: 255
     loudness:
       targetLufs: -14
@@ -977,10 +977,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/44/artwork.png"
-      identicon: "/covers/soundcloud/44/identicon.png"
-      spectrogram: "/covers/soundcloud/44/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/44/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/44/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/44/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/44/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/44/canvas_static.png"
   - trackNumber: 45
     displayTitle: "Welcome To FAME"
     filename: "welcome-to-fame"
@@ -989,7 +989,7 @@ tracks:
     processedDate: "2026-06-10T23:09:00Z"
     saturation: 0.5
     audioPath: "releases/soundcloud/45/welcome-to-fame.mp3"
-    finalReport: "/reports/soundcloud/45/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/soundcloud/45/final_report.html"
     duration: 460
     loudness:
       targetLufs: -14
@@ -999,8 +999,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/soundcloud/45/artwork.png"
-      identicon: "/covers/soundcloud/45/identicon.png"
-      spectrogram: "/covers/soundcloud/45/spectrogram.png"
-      canvasStatic: "/covers/soundcloud/45/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/soundcloud/45/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/soundcloud/45/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/soundcloud/45/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/soundcloud/45/canvas_static.png"
 ---

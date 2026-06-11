@@ -5,7 +5,7 @@ project: "masked"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/masked/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/masked/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T23:01:57Z"
     saturation: 0.5
     audioPath: "releases/masked/1/mx-2-01-r.mp3"
-    finalReport: "/reports/masked/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/masked/1/final_report.html"
     duration: 78
     loudness:
       targetLufs: -14
@@ -31,10 +31,10 @@ tracks:
       sampleRate: 48000
       channels: 1
     artwork:
-      main: "/covers/masked/1/artwork.png"
-      identicon: "/covers/masked/1/identicon.png"
-      spectrogram: "/covers/masked/1/spectrogram.png"
-      canvasStatic: "/covers/masked/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/masked/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/masked/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/masked/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/masked/1/canvas_static.png"
   - trackNumber: 2
     displayTitle: "MX 3_01.L"
     filename: "mx-3-01-l"
@@ -43,7 +43,7 @@ tracks:
     processedDate: "2026-06-10T23:02:25Z"
     saturation: 0.5
     audioPath: "releases/masked/2/mx-3-01-l.mp3"
-    finalReport: "/reports/masked/2/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/masked/2/final_report.html"
     duration: 134
     loudness:
       targetLufs: -14
@@ -53,10 +53,10 @@ tracks:
       sampleRate: 48000
       channels: 1
     artwork:
-      main: "/covers/masked/2/artwork.png"
-      identicon: "/covers/masked/2/identicon.png"
-      spectrogram: "/covers/masked/2/spectrogram.png"
-      canvasStatic: "/covers/masked/2/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/masked/2/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/masked/2/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/masked/2/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/masked/2/canvas_static.png"
   - trackNumber: 3
     displayTitle: "Score 1- All.L"
     filename: "score-1-all-l"
@@ -65,7 +65,7 @@ tracks:
     processedDate: "2026-06-10T23:01:32Z"
     saturation: 0.5
     audioPath: "releases/masked/3/score-1-all-l.mp3"
-    finalReport: "/reports/masked/3/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/masked/3/final_report.html"
     duration: 45
     loudness:
       targetLufs: -14
@@ -75,8 +75,8 @@ tracks:
       sampleRate: 48000
       channels: 1
     artwork:
-      main: "/covers/masked/3/artwork.png"
-      identicon: "/covers/masked/3/identicon.png"
-      spectrogram: "/covers/masked/3/spectrogram.png"
-      canvasStatic: "/covers/masked/3/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/masked/3/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/masked/3/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/masked/3/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/masked/3/canvas_static.png"
 ---

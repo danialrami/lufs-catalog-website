@@ -5,7 +5,7 @@ project: "Singles"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/HH/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/HH/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T22:58:16Z"
     saturation: 0.5
     audioPath: "releases/HH/1/moodboard1.mp3"
-    finalReport: "/reports/HH/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/HH/1/final_report.html"
     duration: 68
     loudness:
       targetLufs: -14
@@ -31,8 +31,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/HH/1/artwork.png"
-      identicon: "/covers/HH/1/identicon.png"
-      spectrogram: "/covers/HH/1/spectrogram.png"
-      canvasStatic: "/covers/HH/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/HH/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/HH/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/HH/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/HH/1/canvas_static.png"
 ---

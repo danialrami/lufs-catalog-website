@@ -5,7 +5,7 @@ project: "pulse"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/pulse/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/pulse/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T23:04:01Z"
     saturation: 0.5
     audioPath: "releases/pulse/1/traffic.mp3"
-    finalReport: "/reports/pulse/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/pulse/1/final_report.html"
     duration: 96
     loudness:
       targetLufs: -14
@@ -31,10 +31,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/pulse/1/artwork.png"
-      identicon: "/covers/pulse/1/identicon.png"
-      spectrogram: "/covers/pulse/1/spectrogram.png"
-      canvasStatic: "/covers/pulse/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/pulse/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/pulse/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/pulse/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/pulse/1/canvas_static.png"
   - trackNumber: 2
     displayTitle: "wheels (theme in variations)"
     filename: "wheels-theme-in-variations"
@@ -43,7 +43,7 @@ tracks:
     processedDate: "2026-06-10T23:04:33Z"
     saturation: 0.5
     audioPath: "releases/pulse/2/wheels-theme-in-variations.mp3"
-    finalReport: "/reports/pulse/2/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/pulse/2/final_report.html"
     duration: 159
     loudness:
       targetLufs: -14
@@ -53,8 +53,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/pulse/2/artwork.png"
-      identicon: "/covers/pulse/2/identicon.png"
-      spectrogram: "/covers/pulse/2/spectrogram.png"
-      canvasStatic: "/covers/pulse/2/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/pulse/2/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/pulse/2/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/pulse/2/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/pulse/2/canvas_static.png"
 ---

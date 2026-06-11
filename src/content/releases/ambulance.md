@@ -5,7 +5,7 @@ project: "Singles"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/ambulance/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/ambulance/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T22:53:12Z"
     saturation: 0.5
     audioPath: "releases/ambulance/1/ambulance.mp3"
-    finalReport: "/reports/ambulance/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/ambulance/1/final_report.html"
     duration: 295
     loudness:
       targetLufs: -14
@@ -31,8 +31,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/ambulance/1/artwork.png"
-      identicon: "/covers/ambulance/1/identicon.png"
-      spectrogram: "/covers/ambulance/1/spectrogram.png"
-      canvasStatic: "/covers/ambulance/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/ambulance/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/ambulance/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/ambulance/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/ambulance/1/canvas_static.png"
 ---

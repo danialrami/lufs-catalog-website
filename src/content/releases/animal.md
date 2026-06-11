@@ -5,7 +5,7 @@ project: "Singles"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/animal/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/animal/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T22:53:42Z"
     saturation: 0.5
     audioPath: "releases/animal/1/animal.mp3"
-    finalReport: "/reports/animal/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/animal/1/final_report.html"
     duration: 87
     loudness:
       targetLufs: -14
@@ -31,8 +31,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/animal/1/artwork.png"
-      identicon: "/covers/animal/1/identicon.png"
-      spectrogram: "/covers/animal/1/spectrogram.png"
-      canvasStatic: "/covers/animal/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/animal/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/animal/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/animal/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/animal/1/canvas_static.png"
 ---

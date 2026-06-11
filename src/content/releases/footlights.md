@@ -5,7 +5,7 @@ project: "footlights"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/footlights/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/footlights/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T22:55:30Z"
     saturation: 0.5
     audioPath: "releases/footlights/1/footlight-when-i-fall.mp3"
-    finalReport: "/reports/footlights/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/footlights/1/final_report.html"
     duration: 95
     loudness:
       targetLufs: -14
@@ -31,10 +31,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/footlights/1/artwork.png"
-      identicon: "/covers/footlights/1/identicon.png"
-      spectrogram: "/covers/footlights/1/spectrogram.png"
-      canvasStatic: "/covers/footlights/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/footlights/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/footlights/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/footlights/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/footlights/1/canvas_static.png"
   - trackNumber: 2
     displayTitle: "Footlights - _Collapse_ Full"
     filename: "footlights-collapse-full"
@@ -43,7 +43,7 @@ tracks:
     processedDate: "2026-06-10T22:55:58Z"
     saturation: 0.5
     audioPath: "releases/footlights/2/footlights-collapse-full.mp3"
-    finalReport: "/reports/footlights/2/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/footlights/2/final_report.html"
     duration: 105
     loudness:
       targetLufs: -14
@@ -53,10 +53,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/footlights/2/artwork.png"
-      identicon: "/covers/footlights/2/identicon.png"
-      spectrogram: "/covers/footlights/2/spectrogram.png"
-      canvasStatic: "/covers/footlights/2/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/footlights/2/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/footlights/2/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/footlights/2/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/footlights/2/canvas_static.png"
   - trackNumber: 3
     displayTitle: "Footlights Agree to Disagree"
     filename: "footlights-agree-to-disagree"
@@ -65,7 +65,7 @@ tracks:
     processedDate: "2026-06-10T22:57:51Z"
     saturation: 0.5
     audioPath: "releases/footlights/3/footlights-agree-to-disagree.mp3"
-    finalReport: "/reports/footlights/3/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/footlights/3/final_report.html"
     duration: 42
     loudness:
       targetLufs: -14
@@ -75,10 +75,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/footlights/3/artwork.png"
-      identicon: "/covers/footlights/3/identicon.png"
-      spectrogram: "/covers/footlights/3/spectrogram.png"
-      canvasStatic: "/covers/footlights/3/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/footlights/3/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/footlights/3/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/footlights/3/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/footlights/3/canvas_static.png"
   - trackNumber: 4
     displayTitle: "Footlights Arabesque"
     filename: "footlights-arabesque"
@@ -87,7 +87,7 @@ tracks:
     processedDate: "2026-06-10T22:56:48Z"
     saturation: 0.5
     audioPath: "releases/footlights/4/footlights-arabesque.mp3"
-    finalReport: "/reports/footlights/4/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/footlights/4/final_report.html"
     duration: 45
     loudness:
       targetLufs: -14
@@ -97,10 +97,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/footlights/4/artwork.png"
-      identicon: "/covers/footlights/4/identicon.png"
-      spectrogram: "/covers/footlights/4/spectrogram.png"
-      canvasStatic: "/covers/footlights/4/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/footlights/4/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/footlights/4/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/footlights/4/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/footlights/4/canvas_static.png"
   - trackNumber: 5
     displayTitle: "Footlights Danza Footlights"
     filename: "footlights-danza-footlights"
@@ -109,7 +109,7 @@ tracks:
     processedDate: "2026-06-10T22:55:01Z"
     saturation: 0.5
     audioPath: "releases/footlights/5/footlights-danza-footlights.mp3"
-    finalReport: "/reports/footlights/5/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/footlights/5/final_report.html"
     duration: 44
     loudness:
       targetLufs: -14
@@ -119,10 +119,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/footlights/5/artwork.png"
-      identicon: "/covers/footlights/5/identicon.png"
-      spectrogram: "/covers/footlights/5/spectrogram.png"
-      canvasStatic: "/covers/footlights/5/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/footlights/5/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/footlights/5/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/footlights/5/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/footlights/5/canvas_static.png"
   - trackNumber: 6
     displayTitle: "Footlights Lost Cause"
     filename: "footlights-lost-cause"
@@ -131,7 +131,7 @@ tracks:
     processedDate: "2026-06-10T22:57:26Z"
     saturation: 0.5
     audioPath: "releases/footlights/6/footlights-lost-cause.mp3"
-    finalReport: "/reports/footlights/6/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/footlights/6/final_report.html"
     duration: 186
     loudness:
       targetLufs: -14
@@ -141,10 +141,10 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/footlights/6/artwork.png"
-      identicon: "/covers/footlights/6/identicon.png"
-      spectrogram: "/covers/footlights/6/spectrogram.png"
-      canvasStatic: "/covers/footlights/6/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/footlights/6/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/footlights/6/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/footlights/6/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/footlights/6/canvas_static.png"
   - trackNumber: 7
     displayTitle: "Footlights Releve"
     filename: "footlights-releve"
@@ -153,7 +153,7 @@ tracks:
     processedDate: "2026-06-10T22:56:23Z"
     saturation: 0.5
     audioPath: "releases/footlights/7/footlights-releve.mp3"
-    finalReport: "/reports/footlights/7/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/footlights/7/final_report.html"
     duration: 49
     loudness:
       targetLufs: -14
@@ -163,8 +163,8 @@ tracks:
       sampleRate: 44100
       channels: 2
     artwork:
-      main: "/covers/footlights/7/artwork.png"
-      identicon: "/covers/footlights/7/identicon.png"
-      spectrogram: "/covers/footlights/7/spectrogram.png"
-      canvasStatic: "/covers/footlights/7/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/footlights/7/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/footlights/7/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/footlights/7/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/footlights/7/canvas_static.png"
 ---

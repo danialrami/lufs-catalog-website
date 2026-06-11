@@ -5,7 +5,7 @@ project: "hogtagon"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/hogtagon/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/hogtagon/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T23:00:14Z"
     saturation: 0.5
     audioPath: "releases/hogtagon/1/face.mp3"
-    finalReport: "/reports/hogtagon/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/1/final_report.html"
     duration: 86
     loudness:
       targetLufs: -14
@@ -31,10 +31,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/hogtagon/1/artwork.png"
-      identicon: "/covers/hogtagon/1/identicon.png"
-      spectrogram: "/covers/hogtagon/1/spectrogram.png"
-      canvasStatic: "/covers/hogtagon/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/1/canvas_static.png"
   - trackNumber: 2
     displayTitle: "jungle"
     filename: "jungle"
@@ -43,7 +43,7 @@ tracks:
     processedDate: "2026-06-10T22:59:18Z"
     saturation: 0.5
     audioPath: "releases/hogtagon/2/jungle.mp3"
-    finalReport: "/reports/hogtagon/2/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/2/final_report.html"
     duration: 99
     loudness:
       targetLufs: -14
@@ -53,10 +53,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/hogtagon/2/artwork.png"
-      identicon: "/covers/hogtagon/2/identicon.png"
-      spectrogram: "/covers/hogtagon/2/spectrogram.png"
-      canvasStatic: "/covers/hogtagon/2/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/2/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/2/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/2/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/2/canvas_static.png"
   - trackNumber: 3
     displayTitle: "level-music"
     filename: "level-music"
@@ -65,7 +65,7 @@ tracks:
     processedDate: "2026-06-10T22:58:50Z"
     saturation: 0.5
     audioPath: "releases/hogtagon/3/level-music.mp3"
-    finalReport: "/reports/hogtagon/3/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/3/final_report.html"
     duration: 149
     loudness:
       targetLufs: -14
@@ -75,10 +75,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/hogtagon/3/artwork.png"
-      identicon: "/covers/hogtagon/3/identicon.png"
-      spectrogram: "/covers/hogtagon/3/spectrogram.png"
-      canvasStatic: "/covers/hogtagon/3/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/3/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/3/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/3/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/3/canvas_static.png"
   - trackNumber: 4
     displayTitle: "lobby"
     filename: "lobby"
@@ -87,7 +87,7 @@ tracks:
     processedDate: "2026-06-10T23:00:42Z"
     saturation: 0.5
     audioPath: "releases/hogtagon/4/lobby.mp3"
-    finalReport: "/reports/hogtagon/4/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/4/final_report.html"
     duration: 107
     loudness:
       targetLufs: -14
@@ -97,10 +97,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/hogtagon/4/artwork.png"
-      identicon: "/covers/hogtagon/4/identicon.png"
-      spectrogram: "/covers/hogtagon/4/spectrogram.png"
-      canvasStatic: "/covers/hogtagon/4/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/4/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/4/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/4/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/4/canvas_static.png"
   - trackNumber: 5
     displayTitle: "main"
     filename: "main"
@@ -109,7 +109,7 @@ tracks:
     processedDate: "2026-06-10T22:59:46Z"
     saturation: 0.5
     audioPath: "releases/hogtagon/5/main.mp3"
-    finalReport: "/reports/hogtagon/5/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/5/final_report.html"
     duration: 115
     loudness:
       targetLufs: -14
@@ -119,10 +119,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/hogtagon/5/artwork.png"
-      identicon: "/covers/hogtagon/5/identicon.png"
-      spectrogram: "/covers/hogtagon/5/spectrogram.png"
-      canvasStatic: "/covers/hogtagon/5/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/5/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/5/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/5/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/5/canvas_static.png"
   - trackNumber: 6
     displayTitle: "wanna-go-fast"
     filename: "wanna-go-fast"
@@ -131,7 +131,7 @@ tracks:
     processedDate: "2026-06-10T23:01:09Z"
     saturation: 0.5
     audioPath: "releases/hogtagon/6/wanna-go-fast.mp3"
-    finalReport: "/reports/hogtagon/6/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/6/final_report.html"
     duration: 95
     loudness:
       targetLufs: -14
@@ -141,8 +141,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/hogtagon/6/artwork.png"
-      identicon: "/covers/hogtagon/6/identicon.png"
-      spectrogram: "/covers/hogtagon/6/spectrogram.png"
-      canvasStatic: "/covers/hogtagon/6/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/6/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/6/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/6/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/6/canvas_static.png"
 ---

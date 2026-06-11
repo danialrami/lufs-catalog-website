@@ -5,7 +5,7 @@ project: "my-mind"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/my-mind/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/my-mind/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T23:03:34Z"
     saturation: 0.5
     audioPath: "releases/my-mind/1/if-you-only-knew.mp3"
-    finalReport: "/reports/my-mind/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/my-mind/1/final_report.html"
     duration: 164
     loudness:
       targetLufs: -14
@@ -31,10 +31,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/my-mind/1/artwork.png"
-      identicon: "/covers/my-mind/1/identicon.png"
-      spectrogram: "/covers/my-mind/1/spectrogram.png"
-      canvasStatic: "/covers/my-mind/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/my-mind/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/my-mind/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/my-mind/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/my-mind/1/canvas_static.png"
   - trackNumber: 2
     displayTitle: "my-mind"
     filename: "my-mind"
@@ -43,7 +43,7 @@ tracks:
     processedDate: "2026-06-10T23:03:01Z"
     saturation: 0.5
     audioPath: "releases/my-mind/2/my-mind.mp3"
-    finalReport: "/reports/my-mind/2/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/my-mind/2/final_report.html"
     duration: 214
     loudness:
       targetLufs: -14
@@ -53,8 +53,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/my-mind/2/artwork.png"
-      identicon: "/covers/my-mind/2/identicon.png"
-      spectrogram: "/covers/my-mind/2/spectrogram.png"
-      canvasStatic: "/covers/my-mind/2/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/my-mind/2/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/my-mind/2/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/my-mind/2/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/my-mind/2/canvas_static.png"
 ---

@@ -5,7 +5,7 @@ project: "a98ff_praise-legend-road"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/a98ff_praise-legend-road/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T22:47:39Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/1/10-00-0002-15-422.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/1/final_report.html"
     duration: 135
     loudness:
       targetLufs: -14
@@ -31,10 +31,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/1/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/1/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/1/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/1/canvas_static.png"
   - trackNumber: 2
     displayTitle: "11-01-22.2181-03-42.773"
     filename: "11-01-22-2181-03-42-773"
@@ -43,7 +43,7 @@ tracks:
     processedDate: "2026-06-10T22:48:13Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/2/11-01-22-2181-03-42-773.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/2/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/2/final_report.html"
     duration: 135
     loudness:
       targetLufs: -14
@@ -53,10 +53,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/2/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/2/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/2/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/2/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/2/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/2/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/2/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/2/canvas_static.png"
   - trackNumber: 3
     displayTitle: "11-03-42.7731-06-03.328"
     filename: "11-03-42-7731-06-03-328"
@@ -65,7 +65,7 @@ tracks:
     processedDate: "2026-06-10T22:51:25Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/3/11-03-42-7731-06-03-328.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/3/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/3/final_report.html"
     duration: 134
     loudness:
       targetLufs: -14
@@ -75,10 +75,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/3/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/3/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/3/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/3/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/3/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/3/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/3/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/3/canvas_static.png"
   - trackNumber: 4
     displayTitle: "11-06-03.3281-08-23.882"
     filename: "11-06-03-3281-08-23-882"
@@ -87,7 +87,7 @@ tracks:
     processedDate: "2026-06-10T22:38:02Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/4/11-06-03-3281-08-23-882.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/4/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/4/final_report.html"
     duration: 134
     loudness:
       targetLufs: -14
@@ -97,10 +97,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/4/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/4/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/4/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/4/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/4/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/4/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/4/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/4/canvas_static.png"
   - trackNumber: 5
     displayTitle: "11-08-23.8821-10-44.437"
     filename: "11-08-23-8821-10-44-437"
@@ -109,7 +109,7 @@ tracks:
     processedDate: "2026-06-10T22:42:19Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/5/11-08-23-8821-10-44-437.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/5/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/5/final_report.html"
     duration: 134
     loudness:
       targetLufs: -14
@@ -119,10 +119,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/5/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/5/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/5/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/5/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/5/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/5/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/5/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/5/canvas_static.png"
   - trackNumber: 6
     displayTitle: "11-10-44.4371-13-03.957"
     filename: "11-10-44-4371-13-03-957"
@@ -131,7 +131,7 @@ tracks:
     processedDate: "2026-06-10T22:43:54Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/6/11-10-44-4371-13-03-957.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/6/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/6/final_report.html"
     duration: 133
     loudness:
       targetLufs: -14
@@ -141,10 +141,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/6/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/6/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/6/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/6/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/6/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/6/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/6/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/6/canvas_static.png"
   - trackNumber: 7
     displayTitle: "11-13-04.0001-15-23.520"
     filename: "11-13-04-0001-15-23-520"
@@ -153,7 +153,7 @@ tracks:
     processedDate: "2026-06-10T22:38:35Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/7/11-13-04-0001-15-23-520.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/7/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/7/final_report.html"
     duration: 133
     loudness:
       targetLufs: -14
@@ -163,10 +163,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/7/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/7/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/7/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/7/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/7/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/7/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/7/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/7/canvas_static.png"
   - trackNumber: 8
     displayTitle: "11-15-23.5201-17-45.130"
     filename: "11-15-23-5201-17-45-130"
@@ -175,7 +175,7 @@ tracks:
     processedDate: "2026-06-10T22:49:54Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/8/11-15-23-5201-17-45-130.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/8/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/8/final_report.html"
     duration: 136
     loudness:
       targetLufs: -14
@@ -185,10 +185,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/8/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/8/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/8/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/8/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/8/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/8/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/8/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/8/canvas_static.png"
   - trackNumber: 9
     displayTitle: "12-15.4224-38.110"
     filename: "12-15-4224-38-110"
@@ -197,7 +197,7 @@ tracks:
     processedDate: "2026-06-10T22:41:19Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/9/12-15-4224-38-110.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/9/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/9/final_report.html"
     duration: 136
     loudness:
       targetLufs: -14
@@ -207,10 +207,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/9/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/9/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/9/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/9/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/9/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/9/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/9/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/9/canvas_static.png"
   - trackNumber: 10
     displayTitle: "14-38.1107-00.798"
     filename: "14-38-1107-00-798"
@@ -219,7 +219,7 @@ tracks:
     processedDate: "2026-06-10T22:45:59Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/10/14-38-1107-00-798.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/10/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/10/final_report.html"
     duration: 136
     loudness:
       targetLufs: -14
@@ -229,10 +229,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/10/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/10/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/10/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/10/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/10/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/10/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/10/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/10/canvas_static.png"
   - trackNumber: 11
     displayTitle: "17-00.7989-23.486"
     filename: "17-00-7989-23-486"
@@ -241,7 +241,7 @@ tracks:
     processedDate: "2026-06-10T22:39:43Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/11/17-00-7989-23-486.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/11/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/11/final_report.html"
     duration: 137
     loudness:
       targetLufs: -14
@@ -251,10 +251,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/11/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/11/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/11/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/11/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/11/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/11/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/11/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/11/canvas_static.png"
   - trackNumber: 12
     displayTitle: "19-23.48611-46.174"
     filename: "19-23-48611-46-174"
@@ -263,7 +263,7 @@ tracks:
     processedDate: "2026-06-10T22:35:52Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/12/19-23-48611-46-174.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/12/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/12/final_report.html"
     duration: 138
     loudness:
       targetLufs: -14
@@ -273,10 +273,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/12/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/12/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/12/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/12/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/12/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/12/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/12/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/12/canvas_static.png"
   - trackNumber: 13
     displayTitle: "111-46.17414-08.862"
     filename: "111-46-17414-08-862"
@@ -285,7 +285,7 @@ tracks:
     processedDate: "2026-06-10T22:49:20Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/13/111-46-17414-08-862.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/13/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/13/final_report.html"
     duration: 143
     loudness:
       targetLufs: -14
@@ -295,10 +295,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/13/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/13/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/13/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/13/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/13/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/13/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/13/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/13/canvas_static.png"
   - trackNumber: 14
     displayTitle: "114-08.00016-30.688"
     filename: "114-08-00016-30-688"
@@ -307,7 +307,7 @@ tracks:
     processedDate: "2026-06-10T22:36:25Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/14/114-08-00016-30-688.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/14/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/14/final_report.html"
     duration: 137
     loudness:
       targetLufs: -14
@@ -317,10 +317,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/14/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/14/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/14/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/14/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/14/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/14/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/14/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/14/canvas_static.png"
   - trackNumber: 15
     displayTitle: "116-30.68818-53.376"
     filename: "116-30-68818-53-376"
@@ -329,7 +329,7 @@ tracks:
     processedDate: "2026-06-10T22:50:23Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/15/116-30-68818-53-376.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/15/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/15/final_report.html"
     duration: 136
     loudness:
       targetLufs: -14
@@ -339,10 +339,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/15/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/15/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/15/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/15/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/15/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/15/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/15/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/15/canvas_static.png"
   - trackNumber: 16
     displayTitle: "118-53.37621-12.896"
     filename: "118-53-37621-12-896"
@@ -351,7 +351,7 @@ tracks:
     processedDate: "2026-06-10T22:52:31Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/16/118-53-37621-12-896.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/16/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/16/final_report.html"
     duration: 134
     loudness:
       targetLufs: -14
@@ -361,10 +361,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/16/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/16/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/16/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/16/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/16/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/16/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/16/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/16/canvas_static.png"
   - trackNumber: 17
     displayTitle: "121-12.89623-32.416"
     filename: "121-12-89623-32-416"
@@ -373,7 +373,7 @@ tracks:
     processedDate: "2026-06-10T22:51:58Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/17/121-12-89623-32-416.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/17/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/17/final_report.html"
     duration: 135
     loudness:
       targetLufs: -14
@@ -383,10 +383,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/17/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/17/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/17/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/17/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/17/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/17/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/17/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/17/canvas_static.png"
   - trackNumber: 18
     displayTitle: "123-32.41625-51.936"
     filename: "123-32-41625-51-936"
@@ -395,7 +395,7 @@ tracks:
     processedDate: "2026-06-10T22:41:50Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/18/123-32-41625-51-936.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/18/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/18/final_report.html"
     duration: 134
     loudness:
       targetLufs: -14
@@ -405,10 +405,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/18/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/18/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/18/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/18/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/18/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/18/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/18/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/18/canvas_static.png"
   - trackNumber: 19
     displayTitle: "126-01.44028-24.128"
     filename: "126-01-44028-24-128"
@@ -417,7 +417,7 @@ tracks:
     processedDate: "2026-06-10T22:37:33Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/19/126-01-44028-24-128.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/19/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/19/final_report.html"
     duration: 139
     loudness:
       targetLufs: -14
@@ -427,10 +427,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/19/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/19/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/19/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/19/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/19/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/19/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/19/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/19/canvas_static.png"
   - trackNumber: 20
     displayTitle: "128-24.12830-46.816"
     filename: "128-24-12830-46-816"
@@ -439,7 +439,7 @@ tracks:
     processedDate: "2026-06-10T22:48:46Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/20/128-24-12830-46-816.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/20/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/20/final_report.html"
     duration: 137
     loudness:
       targetLufs: -14
@@ -449,10 +449,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/20/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/20/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/20/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/20/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/20/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/20/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/20/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/20/canvas_static.png"
   - trackNumber: 21
     displayTitle: "130-46.81633-09.504"
     filename: "130-46-81633-09-504"
@@ -461,7 +461,7 @@ tracks:
     processedDate: "2026-06-10T22:47:06Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/21/130-46-81633-09-504.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/21/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/21/final_report.html"
     duration: 136
     loudness:
       targetLufs: -14
@@ -471,10 +471,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/21/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/21/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/21/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/21/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/21/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/21/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/21/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/21/canvas_static.png"
   - trackNumber: 22
     displayTitle: "133-09.50435-31.114"
     filename: "133-09-50435-31-114"
@@ -483,7 +483,7 @@ tracks:
     processedDate: "2026-06-10T22:36:59Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/22/133-09-50435-31-114.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/22/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/22/final_report.html"
     duration: 135
     loudness:
       targetLufs: -14
@@ -493,10 +493,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/22/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/22/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/22/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/22/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/22/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/22/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/22/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/22/canvas_static.png"
   - trackNumber: 23
     displayTitle: "135-31.11437-52.725"
     filename: "135-31-11437-52-725"
@@ -505,7 +505,7 @@ tracks:
     processedDate: "2026-06-10T22:40:49Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/23/135-31-11437-52-725.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/23/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/23/final_report.html"
     duration: 136
     loudness:
       targetLufs: -14
@@ -515,10 +515,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/23/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/23/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/23/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/23/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/23/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/23/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/23/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/23/canvas_static.png"
   - trackNumber: 24
     displayTitle: "137-52.72540-14.336"
     filename: "137-52-72540-14-336"
@@ -527,7 +527,7 @@ tracks:
     processedDate: "2026-06-10T22:40:17Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/24/137-52-72540-14-336.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/24/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/24/final_report.html"
     duration: 141
     loudness:
       targetLufs: -14
@@ -537,10 +537,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/24/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/24/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/24/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/24/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/24/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/24/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/24/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/24/canvas_static.png"
   - trackNumber: 25
     displayTitle: "140-14.00042-35.610"
     filename: "140-14-00042-35-610"
@@ -549,7 +549,7 @@ tracks:
     processedDate: "2026-06-10T22:43:24Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/25/140-14-00042-35-610.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/25/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/25/final_report.html"
     duration: 137
     loudness:
       targetLufs: -14
@@ -559,10 +559,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/25/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/25/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/25/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/25/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/25/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/25/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/25/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/25/canvas_static.png"
   - trackNumber: 26
     displayTitle: "142-35.61044-57.221"
     filename: "142-35-61044-57-221"
@@ -571,7 +571,7 @@ tracks:
     processedDate: "2026-06-10T22:39:09Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/26/142-35-61044-57-221.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/26/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/26/final_report.html"
     duration: 136
     loudness:
       targetLufs: -14
@@ -581,10 +581,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/26/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/26/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/26/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/26/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/26/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/26/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/26/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/26/canvas_static.png"
   - trackNumber: 27
     displayTitle: "144-57.22147-18.832"
     filename: "144-57-22147-18-832"
@@ -593,7 +593,7 @@ tracks:
     processedDate: "2026-06-10T22:35:18Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/27/144-57-22147-18-832.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/27/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/27/final_report.html"
     duration: 135
     loudness:
       targetLufs: -14
@@ -603,10 +603,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/27/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/27/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/27/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/27/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/27/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/27/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/27/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/27/canvas_static.png"
   - trackNumber: 28
     displayTitle: "147-18.83249-39.386"
     filename: "147-18-83249-39-386"
@@ -615,7 +615,7 @@ tracks:
     processedDate: "2026-06-10T22:44:54Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/28/147-18-83249-39-386.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/28/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/28/final_report.html"
     duration: 134
     loudness:
       targetLufs: -14
@@ -625,10 +625,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/28/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/28/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/28/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/28/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/28/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/28/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/28/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/28/canvas_static.png"
   - trackNumber: 29
     displayTitle: "149-39.38651-59.941"
     filename: "149-39-38651-59-941"
@@ -637,7 +637,7 @@ tracks:
     processedDate: "2026-06-10T22:46:33Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/29/149-39-38651-59-941.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/29/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/29/final_report.html"
     duration: 135
     loudness:
       targetLufs: -14
@@ -647,10 +647,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/29/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/29/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/29/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/29/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/29/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/29/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/29/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/29/canvas_static.png"
   - trackNumber: 30
     displayTitle: "152-00.00054-20.554"
     filename: "152-00-00054-20-554"
@@ -659,7 +659,7 @@ tracks:
     processedDate: "2026-06-10T22:45:28Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/30/152-00-00054-20-554.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/30/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/30/final_report.html"
     duration: 135
     loudness:
       targetLufs: -14
@@ -669,10 +669,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/30/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/30/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/30/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/30/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/30/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/30/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/30/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/30/canvas_static.png"
   - trackNumber: 31
     displayTitle: "154-20.55456-41.109"
     filename: "154-20-55456-41-109"
@@ -681,7 +681,7 @@ tracks:
     processedDate: "2026-06-10T22:44:24Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/31/154-20-55456-41-109.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/31/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/31/final_report.html"
     duration: 134
     loudness:
       targetLufs: -14
@@ -691,10 +691,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/31/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/31/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/31/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/31/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/31/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/31/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/31/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/31/canvas_static.png"
   - trackNumber: 32
     displayTitle: "156-41.10959-01.664"
     filename: "156-41-10959-01-664"
@@ -703,7 +703,7 @@ tracks:
     processedDate: "2026-06-10T22:50:53Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/32/156-41-10959-01-664.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/32/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/32/final_report.html"
     duration: 135
     loudness:
       targetLufs: -14
@@ -713,10 +713,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/32/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/32/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/32/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/32/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/32/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/32/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/32/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/32/canvas_static.png"
   - trackNumber: 33
     displayTitle: "159-01.6641-01-22.218"
     filename: "159-01-6641-01-22-218"
@@ -725,7 +725,7 @@ tracks:
     processedDate: "2026-06-10T22:42:52Z"
     saturation: 0.5
     audioPath: "releases/a98ff_praise-legend-road/33/159-01-6641-01-22-218.mp3"
-    finalReport: "/reports/a98ff_praise-legend-road/33/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/a98ff_praise-legend-road/33/final_report.html"
     duration: 136
     loudness:
       targetLufs: -14
@@ -735,8 +735,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/a98ff_praise-legend-road/33/artwork.png"
-      identicon: "/covers/a98ff_praise-legend-road/33/identicon.png"
-      spectrogram: "/covers/a98ff_praise-legend-road/33/spectrogram.png"
-      canvasStatic: "/covers/a98ff_praise-legend-road/33/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/33/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/33/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/33/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/a98ff_praise-legend-road/33/canvas_static.png"
 ---

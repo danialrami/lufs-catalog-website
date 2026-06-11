@@ -5,7 +5,7 @@ project: "Singles"
 artist: "Daniel Ramirez"
 releaseDate: 2026-06-10
 status: "released"
-coverArt: "/covers/elegant-picking/cover.png"
+coverArt: "https://cdn.lufsaud.io/covers/elegant-picking/cover.png"
 streamingLinks:
   spotify: ""
   appleMusic: ""
@@ -21,7 +21,7 @@ tracks:
     processedDate: "2026-06-10T22:54:36Z"
     saturation: 0.5
     audioPath: "releases/elegant-picking/1/elegant-picking.mp3"
-    finalReport: "/reports/elegant-picking/1/final_report.html"
+    finalReport: "https://cdn.lufsaud.io/reports/elegant-picking/1/final_report.html"
     duration: 402
     loudness:
       targetLufs: -14
@@ -31,8 +31,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "/covers/elegant-picking/1/artwork.png"
-      identicon: "/covers/elegant-picking/1/identicon.png"
-      spectrogram: "/covers/elegant-picking/1/spectrogram.png"
-      canvasStatic: "/covers/elegant-picking/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/elegant-picking/1/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/elegant-picking/1/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/elegant-picking/1/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/elegant-picking/1/canvas_static.png"
 ---
