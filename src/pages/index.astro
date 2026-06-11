@@ -4,312 +4,198 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const releases = await getCollection('releases');
 
-// Filter for released releases
+// Show only released items in prod; PUBLIC_SHOW_DRAFTS=true reveals drafts locally.
 const envShowDrafts = import.meta.env.PUBLIC_SHOW_DRAFTS === 'true';
-const filteredReleases = envShowDrafts 
-  ? releases 
-  : releases.filter(r => r.data.status === 'released');
+const visible = (envShowDrafts ? releases : releases.filter((r) => r.data.status === 'released'))
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, undefined, { numeric: true, sensitivity: 'base' }));
 
-// Get unique projects for legend
-const allProjects = [...new Set(releases.flatMap(r => r.data.project || []))];
+// Legend is built from what's actually visible, so a filter never points at nothing.
+const projects = [...new Set(visible.flatMap((r) => r.data.project || []))].sort();
+const count = visible.length;
 ---
 
 <BaseLayout title="LUFS Catalog">
-  <header>
-      <div class="container">
-        <a href="/" class="site-title">LUFS Catalog</a>
-        <nav class="legend">
-          <button class="legend-item active" data-filter="all">All</button>
-          {allProjects.map(project => (
-            <button 
-              class="legend-item"
-              data-filter={project}
-            >
-              {project}
-            </button>
-          ))}
-        </nav>
+  <header class="masthead">
+    <div class="container">
+      <div class="topbar reveal">
+        <a href="/" class="wordmark" data-hover>lufs<span>.</span></a>
+        <span class="sec-label">Audio Catalog</span>
       </div>
-    </header>
 
-    <main class="container">
-      <div class="grid" id="releases-grid">
-        {filteredReleases.map((release) => (
-          <a href={`/releases/${release.slug}`} class="card reveal" data-project={release.data.project}>
-            {release.data.coverArt && (
-              <img 
-                src={release.data.coverArt} 
-                alt={`${release.data.title} cover art`}
-                class="card-cover"
-              />
-            )}
-            
-            <div class="card-content">
-              <h2 class="card-title">{release.data.title}</h2>
-              
-              <div class="card-meta">
-                {release.data.tracks[0]?.catalogNumber && (
-                  <span class="badge badge-catalog">{release.data.tracks[0].catalogNumber}</span>
-                )}
-                <span class="badge badge-project">{release.data.project}</span>
-              </div>
-              
-              {release.data.tracks.length > 0 && (
-                <div class="card-tracks">
-                  {release.data.tracks.slice(0, 3).map((track) => (
-                    <div class="track-row">
-                      <span class="track-number">{track.trackNumber}</span>
-                      <button 
-                        class="track-play-btn"
-                        data-audio-path={track.audioPath}
-                        data-track-title={track.displayTitle}
-                        onclick="event.preventDefault(); event.stopPropagation();"
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" fill="#78BEBA"/>
-                        </svg>
-                      </button>
-                      <span class="track-title">{track.displayTitle}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </a>
+      <div class="intro reveal">
+        <h1 class="display">Catalog</h1>
+        <p class="lead">
+          Loudness-normalized masters with embedded proof-of-work.
+          <span class="dim">{count} release{count === 1 ? '' : 's'}.</span>
+        </p>
+      </div>
+
+      <nav class="legend reveal" aria-label="Filter by project">
+        <button class="chip is-active" data-filter="all">All</button>
+        {projects.map((project) => (
+          <button class="chip" data-filter={project}>{project}</button>
         ))}
-      </div>
-    </main>
+      </nav>
+    </div>
+  </header>
 
-    <script>
-      // Client-side filtering by project (cards carry data-project)
-      const buttons = document.querySelectorAll('.legend-item');
-      const cards = document.querySelectorAll('.card');
+  <main class="container">
+    <div class="grid" id="releases-grid">
+      {visible.map((release) => (
+        <a href={`/releases/${release.slug}`} class="card reveal" data-project={release.data.project} data-hover>
+          <div class="card-cover">
+            {release.data.coverArt && (
+              <img src={release.data.coverArt} alt={`${release.data.title} cover art`} loading="lazy" />
+            )}
+            <span class="card-tag">{release.data.project}</span>
+          </div>
 
-      buttons.forEach(btn => {
+          <div class="card-body">
+            <h2 class="card-title">{release.data.title}</h2>
+            <p class="card-meta">
+              {release.data.tracks[0]?.catalogNumber && (
+                <span class="mono cat">{release.data.tracks[0].catalogNumber}</span>
+              )}
+              <span class="mono dim">{release.data.tracks.length} track{release.data.tracks.length === 1 ? '' : 's'}</span>
+            </p>
+
+            {release.data.tracks.length > 0 && (
+              <ul class="card-tracks">
+                {release.data.tracks.slice(0, 3).map((track) => (
+                  <li class="trow">
+                    <span class="tnum mono">{String(track.trackNumber).padStart(2, '0')}</span>
+                    <button
+                      class="track-play-btn"
+                      data-audio-path={track.audioPath}
+                      data-track-title={track.displayTitle}
+                      aria-label={`Play ${track.displayTitle}`}
+                      onclick="event.preventDefault(); event.stopPropagation();"
+                    >
+                      <svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <span class="ttitle">{track.displayTitle}</span>
+                  </li>
+                ))}
+                {release.data.tracks.length > 3 && (
+                  <li class="trow more mono">+{release.data.tracks.length - 3} more</li>
+                )}
+              </ul>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+
+    {count === 0 && (
+      <p class="empty mono">No releases yet.</p>
+    )}
+  </main>
+
+  <script>
+    // Re-attach on every view (ViewTransitions swaps the DOM without re-running
+    // module scripts), so the legend filter + play buttons keep working after nav.
+    function wireCatalog() {
+      const grid = document.getElementById('releases-grid');
+      if (!grid) return;
+
+      const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('.legend .chip'));
+      const cards = Array.from(document.querySelectorAll<HTMLElement>('#releases-grid .card'));
+      buttons.forEach((btn) => {
         btn.addEventListener('click', () => {
-          const filter = (btn as HTMLElement).dataset.filter;
-          buttons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          cards.forEach(card => {
-            const project = (card as HTMLElement).dataset.project;
-            const show = filter === 'all' || project === filter;
-            (card as HTMLElement).style.display = show ? 'block' : 'none';
+          const filter = btn.dataset.filter;
+          buttons.forEach((b) => b.classList.toggle('is-active', b === btn));
+          cards.forEach((card) => {
+            const show = filter === 'all' || card.dataset.project === filter;
+            card.style.display = show ? '' : 'none';
           });
         });
       });
 
-      // Track play buttons - dispatch to player store
-      document.querySelectorAll('.track-play-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const audioPath = (btn as HTMLElement).dataset.audioPath;
-          const trackTitle = (btn as HTMLElement).dataset.trackTitle;
-          
-          // Dispatch custom event for player
+      document.querySelectorAll<HTMLElement>('#releases-grid .track-play-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
           window.dispatchEvent(new CustomEvent('play-track', {
-            detail: { audioPath, trackTitle }
+            detail: { audioPath: btn.dataset.audioPath, trackTitle: btn.dataset.trackTitle },
           }));
         });
       });
-    </script>
+    }
+    document.addEventListener('astro:page-load', wireCatalog);
+  </script>
 
-    <style>
-      :root {
-        --color-bg: #111111;
-        --color-surface: #1a1a1a;
-        --color-surface-2: #242424;
-        --color-text: #fbf9e2;
-        --color-text-muted: #E2E3D8;
-        --color-teal: #78BEBA;
-        --color-red: #D35233;
-        --color-yellow: #E7B225;
-        --color-blue: #2069AF;
-        --color-border: rgba(251, 249, 226, 0.08);
-        --player-height: 72px;
-      }
-      
-      * { box-sizing: border-box; }
-      
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: var(--color-bg);
-        color: var(--color-text);
-        font-family: var(--font-body);
-      }
+  <style>
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 6vw, 64px); }
 
-      .site-title { font-family: var(--font-display); letter-spacing: -0.02em; }
-      .legend-item { font-family: var(--font-mono); letter-spacing: 0.04em; }
-      .badge { letter-spacing: 0.04em; }
-      
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1.5rem;
-      }
-      
-      header {
-        position: sticky;
-        top: 0;
-        background-color: var(--color-bg);
-        border-bottom: 1px solid var(--color-border);
-        padding: 1rem 0;
-        z-index: 900;
-      }
-      
-      .site-title {
-        font-size: 1.5rem;
-        color: var(--color-teal);
-        text-decoration: none;
-        font-weight: 600;
-      }
-      
-      .site-title:hover {
-        color: var(--color-text);
-      }
-      
-      h1 {
-        margin: 0;
-        font-size: 1.5rem;
-        color: var(--color-teal);
-      }
-      
-      .legend {
-        display: flex;
-        gap: 0.75rem;
-        margin-top: 1rem;
-        flex-wrap: wrap;
-      }
-      
-      .legend-item {
-        padding: 0.25rem 0.75rem;
-        background-color: var(--color-surface-2);
-        border-radius: 4px;
-        font-size: 0.875rem;
-        cursor: pointer;
-        border: 1px solid var(--color-border);
-        transition: background-color 0.2s;
-        color: var(--color-text);
-      }
-      
-      .legend-item:hover {
-        background-color: var(--color-surface);
-      }
-      
-      .legend-item.active {
-        background-color: var(--color-teal);
-        color: #111;
-      }
-      
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-        padding: 2rem 0;
-        padding-bottom: calc(var(--player-height) + 2rem);
-      }
-      
-      .card {
-        background-color: var(--color-surface);
-        border: 1px solid var(--color-hairline);
-        border-radius: 4px;
-        overflow: hidden;
-        text-decoration: none;
-        color: inherit;
-        display: block;
-        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-      }
+    /* ---- masthead ---- */
+    .masthead { padding-top: clamp(28px, 6vh, 56px); }
+    .topbar { display: flex; align-items: baseline; gap: var(--space-4); border-bottom: 1px solid var(--color-hairline); padding-bottom: var(--space-4); }
+    .wordmark { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; color: var(--color-text); }
+    .wordmark span { color: var(--color-teal); }
+    .wordmark:hover { text-decoration: none; }
+    .topbar .sec-label { margin-left: auto; }
 
-      .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        border-color: var(--color-teal);
-      }
-      
-      .card-cover {
-        width: 100%;
-        height: 240px;
-        object-fit: cover;
-      }
-      
-      .card-content {
-        padding: 1rem;
-      }
-      
-      .card-title {
-        margin: 0 0 0.5rem 0;
-        font-size: 1.125rem;
-        font-weight: 600;
-      }
-      
-      .card-meta {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        flex-wrap: wrap;
-      }
-      
-      .badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 2px;
-        font-size: 0.75rem;
-        font-family: var(--font-mono, monospace);
-      }
-      
-      .badge-catalog {
-        background-color: var(--color-yellow);
-        color: #111;
-      }
-      
-      .badge-project {
-        background-color: var(--color-blue);
-        color: #fff;
-      }
-      
-      .card-tracks {
-        border-top: 1px solid var(--color-border);
-        padding-top: 0.75rem;
-      }
-      
-      .track-row {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.25rem 0;
-        font-size: 0.875rem;
-      }
-      
-      .track-number {
-        color: var(--color-text-muted);
-        font-family: var(--font-mono, monospace);
-        width: 1.5rem;
-      }
-      
-      .track-play-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0.25rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      
-      .track-play-btn:hover svg {
-        transform: scale(1.1);
-      }
-      
-      .track-title {
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      
-      footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-      }
-    </style>
-  </BaseLayout>
+    .intro { margin-top: clamp(36px, 9vh, 84px); }
+    .display { font-size: clamp(3rem, 11vw, 7rem); font-weight: 800; letter-spacing: -0.03em; line-height: 0.94; }
+    .lead { margin-top: var(--space-4); max-width: 46ch; font-size: clamp(1rem, 1.4vw, 1.15rem); color: var(--color-text-muted); }
+    .lead .dim { color: var(--color-teal); }
+
+    /* ---- legend ---- */
+    .legend { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: clamp(28px, 5vh, 48px) 0 clamp(20px, 4vh, 36px); }
+    .chip {
+      font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--color-text-muted); background: transparent; border: 1px solid var(--color-border);
+      padding: 0.4rem 0.8rem; border-radius: 999px; transition: color .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .chip:hover { color: var(--color-text); border-color: var(--color-text-muted); }
+    .chip.is-active { color: var(--color-bg); background: var(--color-teal); border-color: var(--color-teal); }
+
+    /* ---- grid + cards ---- */
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: clamp(16px, 2vw, 28px);
+      padding-bottom: calc(var(--player-height) + 4rem);
+    }
+    .card {
+      display: flex; flex-direction: column; color: var(--color-text);
+      background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: var(--radius-lg);
+      overflow: hidden; transition: transform .22s ease, border-color .22s ease, background .22s ease;
+    }
+    .card:hover { transform: translateY(-4px); border-color: var(--color-teal); background: var(--color-surface-2); text-decoration: none; }
+    .card-cover { position: relative; aspect-ratio: 1 / 1; background: var(--color-surface-2); overflow: hidden; }
+    .card-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+    .card:hover .card-cover img { transform: scale(1.04); }
+    .card-tag {
+      position: absolute; left: 0.75rem; bottom: 0.75rem;
+      font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--color-text); background: rgba(12,12,12,0.66); backdrop-filter: blur(6px);
+      border: 1px solid var(--color-border); padding: 0.25rem 0.55rem; border-radius: var(--radius-sm);
+    }
+    .card-body { padding: var(--space-4) var(--space-4) var(--space-6); display: flex; flex-direction: column; gap: var(--space-3); }
+    .card-title { font-size: 1.18rem; font-weight: 700; letter-spacing: -0.01em; }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.72rem; align-items: center; }
+    .card-meta .cat { color: var(--color-teal); }
+    .card-meta .dim { color: var(--color-text-muted); }
+
+    .card-tracks { list-style: none; display: flex; flex-direction: column; }
+    .trow { display: flex; align-items: center; gap: 0.65rem; padding: 0.4rem 0; border-top: 1px solid var(--color-hairline); font-size: 0.85rem; }
+    .trow:first-child { border-top: none; }
+    .tnum { color: var(--color-text-muted); font-size: 0.7rem; min-width: 1.4em; }
+    .ttitle { color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .card:hover .ttitle { color: var(--color-text); }
+    .trow.more { color: var(--color-text-muted); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; padding-top: 0.55rem; }
+    .track-play-btn {
+      flex: none; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; background: var(--color-surface-2); border: 1px solid var(--color-border);
+      transition: background .2s ease, border-color .2s ease;
+    }
+    .track-play-btn svg { fill: var(--color-teal); transform: translateX(1px); }
+    .track-play-btn:hover { background: var(--color-teal); border-color: var(--color-teal); }
+    .track-play-btn:hover svg { fill: var(--color-bg); }
+
+    .empty { color: var(--color-text-muted); padding: 4rem 0; }
+
+    @media (max-width: 540px) {
+      .grid { grid-template-columns: 1fr; }
+      .topbar .sec-label { display: none; }
+    }
+  </style>
+</BaseLayout>
