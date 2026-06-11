@@ -42,6 +42,14 @@ let lastKnownPosition = 0;
 let positionInterval: ReturnType<typeof setInterval> | null = null;
 let shouldAutoPlay = false;
 
+// Monotonic token guarding against overlapping async loads. Each loadAudio() call claims
+// the next token; an in-flight signed-URL resolve only builds its Howl if its token is
+// still the latest. Without this, rapid or duplicate play triggers (e.g. 'play-track'
+// listeners that accumulated across ViewTransitions navigations) each kicked off an async
+// resolve while howlInstance was still null, so none unloaded the others — several
+// orphaned Howls ended up playing at once (the ear-piercing overlap / feedback).
+let loadToken = 0;
+
 // Callbacks for UI updates
 let onPlayCallback: (() => void) | null = null;
 let onPauseCallback: (() => void) | null = null;
@@ -73,6 +81,29 @@ export function setOnEnd(cb: () => void) { onEndCallback = cb; }
 export function setOnLoad(cb: (duration: number) => void) { onLoadCallback = cb; }
 export function setOnSeek(cb: (position: number) => void) { onSeekCallback = cb; }
 
+// --- Global event wiring (bound once; survives ViewTransitions) --------------------
+// PlayerBar re-mounts on every Astro ViewTransition navigation. If it attached window
+// listeners per-mount they would accumulate — one 'play-track' click then fires N times
+// and (via the async load path) spawns N overlapping Howls. So we bind each global
+// listener exactly ONCE here (this module persists across client-side navigations) and
+// delegate to whatever handlers the most-recently-mounted PlayerBar registered.
+type EventHandlerMap = {
+  playTrack?: (e: Event) => void;
+  pageLoad?: () => void;
+  keydown?: (e: KeyboardEvent) => void;
+};
+const activeHandlers: EventHandlerMap = {};
+let globalListenersWired = false;
+
+export function setEventHandlers(handlers: EventHandlerMap) {
+  Object.assign(activeHandlers, handlers);
+  if (globalListenersWired || typeof window === 'undefined') return;
+  window.addEventListener('play-track', (e) => activeHandlers.playTrack?.(e));
+  document.addEventListener('astro:page-load', () => activeHandlers.pageLoad?.());
+  window.addEventListener('keydown', (e) => activeHandlers.keydown?.(e as KeyboardEvent));
+  globalListenersWired = true;
+}
+
 export function getLastKnownPosition(): number {
   return lastKnownPosition;
 }
@@ -85,11 +116,11 @@ export function hasStoredState(): boolean {
 export function restoreFromStorage(): { audioPath: string; position: number; volume: number } | null {
   const state = getStoredState();
   if (!state?.audioPath) return null;
-  
+
   currentAudioPath = state.audioPath;
   lastKnownPosition = state.position;
   shouldAutoPlay = state.isPlaying;
-  
+
   return {
     audioPath: state.audioPath,
     position: state.position,
@@ -102,6 +133,11 @@ export function restoreFromStorage(): { audioPath: string; position: number; vol
  * on load so it works for both the synchronous (local) and async (R2) paths.
  */
 function buildHowl(resolvedUrl: string, autoPlay: boolean) {
+  // Never let two Howls coexist: tear down any current instance before creating a new one.
+  if (howlInstance) {
+    try { howlInstance.unload(); } catch { /* ignore */ }
+    howlInstance = null;
+  }
   const volume = getStoredState()?.volume ?? 0.8;
   try {
     howlInstance = new Howl({
@@ -162,6 +198,9 @@ export function loadAudio(ref: string, autoPlay = true): boolean {
     return true;
   }
 
+  // Claim a token; any load already in flight becomes stale and must not build a Howl.
+  const token = ++loadToken;
+
   if (howlInstance && howlInstance.playing()) {
     lastKnownPosition = howlInstance.seek() as number;
     saveState({ position: lastKnownPosition });
@@ -175,10 +214,10 @@ export function loadAudio(ref: string, autoPlay = true): boolean {
   saveState({ audioPath: ref, position: 0, isPlaying: false });
 
   if (isDirectUrl(ref)) {
-    buildHowl(ref, autoPlay); // local / already-public URL — synchronous, as before
+    if (token === loadToken) buildHowl(ref, autoPlay); // local / already-public URL — synchronous
   } else {
     resolveAudioUrl(ref) // private R2 key — sign via the stream Worker
-      .then((url) => buildHowl(url, autoPlay))
+      .then((url) => { if (token === loadToken) buildHowl(url, autoPlay); }) // drop if superseded
       .catch((e) => console.error('Failed to resolve audio URL:', e));
   }
   return true;
