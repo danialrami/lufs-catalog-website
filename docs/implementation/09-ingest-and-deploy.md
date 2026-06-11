@@ -108,56 +108,61 @@ Daniel's Mac has it). Documented here so it isn't a surprise on a fresh machine.
 sanitized to **0** audio/source tags, **0** download links, **0** live `.wav`
 src/href (kept imgs + the canvas video). Re-ingest preserved simulated human edits.
 
-> **Not yet:** R2/rustfs upload (`STORAGE_MODE=remote`) lands in Phase 2 via
-> `uploadR2.mjs`; the script already branches on `STORAGE_MODE` and warns. Legacy
-> album/`_final` shapes are skipped for now (only the Continuo album used them; the
-> path forward is astro-catalog).
+> **Status:** `STORAGE_MODE=remote` (R2) is the production default and is live — audio →
+> the private `lufs-catalog` bucket, covers + reports → the public `lufs-catalog-public`
+> bucket (`cdn.lufsaud.io`). Local mode still works for offline preview. The legacy
+> album/`_final` shapes are gone; astro-catalog is the only ingest path. Object keys are
+> stable per track (`releases|covers|reports/<collectionId>/<lufs-id>/…`) — see §"Stable
+> per-track keys" above.
 
 ---
 
-## 2. Deploy: `catalog-deploy.sh` + Hostinger webhook (no CI)
+## 2. Deploy: `catalog-deploy.sh` → push `main` → CI → Hostinger
 
 ```
-pnpm catalog:ingest         # (local) transcode + assets + content   [needs NAS + ffmpeg]
+pnpm catalog:ingest          # (local) transcode + assets + content   [needs NAS + ffmpeg]
 ./catalog-deploy.sh [--ingest]
-   ├── pnpm build            -> dist/
-   ├── git push origin main  (source)
-   └── publish dist/  ->  `hostinger` branch  (built output, via a throwaway repo)
-                              │
-                              └── Hostinger Git auto-deploy webhook -> public_html -> catalog.lufs.audio
+   ├── (optional) ingest
+   ├── pnpm build             # validate the build only
+   ├── git commit
+   └── git push origin main  ──► GitHub Actions (.github/workflows/deploy.yml)
+                                    ├── pnpm build  -> dist/
+                                    └── publish dist/ -> `hostinger` branch
+                                          │
+                                          └── Hostinger Git auto-deploy -> public_html -> catalog.lufs.audio
 ```
 
-Key point: **Hostinger static hosting doesn't build Astro**, so the branch it watches
-must contain *built* output. `catalog-deploy.sh` builds locally and publishes only
-`dist/` to the `hostinger` branch (using a temporary repo, so `dist/` never has to be
-committed to `main`). The Hostinger side is exactly the "GitHub → webhook →
-auto-deploy" flow Daniel already uses for the Hugo blog — just pointed at the
-`hostinger` branch.
+Key point: **Hostinger static hosting doesn't build Astro**, so the branch it watches must
+contain *built* output — but **CI now owns that build + publish**, not the local script.
+`catalog-deploy.sh` only ingests (optional), validates the build, commits, and pushes `main`;
+the `deploy.yml` workflow then builds and publishes `dist/` to the `hostinger` branch, which
+Hostinger fast-forwards into `public_html`. (The workflow must NOT use `force_orphan` — that
+rewrites `hostinger` as an orphan each run and breaks Hostinger's `git pull` on "divergent
+branches"; linear history lets it auto-deploy. Template: `ci-deploy.yml`.)
 
 ---
 
-## 3. Decision: the GitHub Actions workflow (`deploy.yml`) — **removed**
+## 3. The GitHub Actions workflow (`deploy.yml`) — **now the deploy path**
 
-The existing `.github/workflows/deploy.yml` was a **non-functional placeholder**:
-- every real deploy step was commented out (it only built + uploaded an artifact),
-- it had bugs (`cache: pnpm` ordered before pnpm setup; a bogus `pnpm build --out
-  dist` double-build; deprecated `setup-node@v3` / `upload-artifact@v3`), and
-- it duplicated/contradicted the local-build + webhook model.
+Earlier in the build-out the placeholder `deploy.yml` was removed (it was non-functional —
+every deploy step commented out, `cache: pnpm` mis-ordered before pnpm setup, a bogus
+double-build, deprecated actions) in favor of a purely local `catalog-deploy.sh`. **That
+decision was later reversed: CI now owns build + publish**, so a push to `main` deploys
+without anyone running a local build. The live workflow:
+- triggers on push to `main` (+ manual `workflow_dispatch`);
+- `pnpm install` → `pnpm build`, baking `PUBLIC_R2_STREAM_URL` / `PUBLIC_SITE_URL` (repo
+  Variables with production fallbacks, so audio can't silently break on a missing var);
+- publishes `dist/` to the `hostinger` branch with `peaceiris/actions-gh-pages` (no
+  `force_orphan`, so Hostinger fast-forwards).
 
-Since (a) deployment is handled by `catalog-deploy.sh` + the Hostinger webhook, and
-(b) the build already runs locally right before each deploy (so a CI build-check is
-redundant for a solo workflow), **we removed it** to keep one clear deploy path.
+`catalog-deploy.sh` remains for offline/local deploys (build + commit + push `main`); both
+publish through the same `hostinger` branch. Template + rationale live in `ci-deploy.yml`
+(the bot can't commit under `.github/workflows/` itself, so that file is copied into place
+by hand).
 
-**If we ever want CI back**, the one genuinely useful job would be a *build-health
-check* on PRs (no secrets, no deploy): `pnpm install --frozen-lockfile && pnpm build
-&& pnpm astro check`. That catches a broken content `.md` or dependency before it
-reaches the deploy script. It's easy to add later as `.github/workflows/ci.yml`; it's
-intentionally omitted now per the "keep it simple, deploy via webhook" preference.
-
-> Sandbox note: the build itself can't be verified in the agent sandbox (the npm
-> registry is blocked there), so `pnpm install && pnpm build` runs on Daniel's Mac
-> (or in the optional CI). The ingest logic above *was* verified in-sandbox because
-> it only needs Node + ffmpeg.
+> Sandbox note: the build can't be verified in the agent sandbox (the npm registry is
+> blocked there), so `pnpm build` runs in CI (or on Daniel's Mac). The ingest logic *was*
+> verified in-sandbox because it only needs Node + ffmpeg.
 
 ---
 
@@ -169,16 +174,19 @@ or custom domain exposes the *whole* bucket. So the "`releases/` private, `repor
 public within one bucket" idea in the PRD/TDD isn't how R2 works. The implemented
 model is simpler and cheaper:
 
-- **Private R2 bucket `lufs-catalog`** holds only the **audio MP3s** (`releases/…`),
-  served via short-lived presigned URLs from the Worker. Nothing public points at it.
-- **Small assets** (the ~8 KB sanitized `final_report.html` + cover/identicon/
-  spectrogram/canvas-still PNGs) stay **committed in `public/`** and deploy with the
-  site — cacheable, zero-egress, no second bucket, no signing needed.
-- The **45 MB Spotify-canvas GIF is never shipped** (ingest excludes `*.gif` and the
-  sanitizer drops its `<img>`); the static PNG + the 3 MB MP4 cover the visual.
+- **Private bucket `lufs-catalog`** — the **audio MP3s** (`releases/<id>/<lufs-id>/…`),
+  served only via short-lived presigned URLs from the Worker. Nothing public points at it.
+- **Public bucket `lufs-catalog-public`** — **cover art + the full proof-of-work report**
+  (incl. the canvas video/gif + spectrograms), served read-only from `PUBLIC_R2_BASE_URL`
+  (`cdn.lufsaud.io`). The ingest bakes those absolute CDN URLs into the `.md` and **removes
+  the local `public/` copies after upload**, so neither git nor the `hostinger` deploy
+  carries heavy assets.
+- The **45 MB Spotify-canvas GIF** now ships *only* inside the public-bucket report (kept for
+  full fidelity); it is still never committed to git.
 
-If you ever want reports/artwork on the CDN too, add a *second, public* bucket
-(`lufs-catalog-public` + custom domain) — but at this scale committing them is fine.
+(Both buckets take same-key PUTs, so re-ingest overwrites in place and never grows storage.
+If the public bucket isn't configured, the ingest falls back to committing covers/reports
+under `public/` — the older single-bucket behavior, fine at small scale.)
 
 ### 4.2 Pieces
 - **`worker/`** — `lufs-catalog-stream`, a tiny Cloudflare Worker that presigns GET
@@ -186,9 +194,10 @@ If you ever want reports/artwork on the CDN too, add a *second, public* bucket
   `nodejs_compat`). Origin-locked to `ALLOWED_ORIGIN`; only signs `releases/` keys;
   TTL via `URL_TTL_SECONDS` (default 1h). Deploy: `npm run worker:deploy`. Setup in
   `worker/README.md`.
-- **`src/scripts/ingest/uploadR2.mjs`** — `uploadObject(localPath, key, contentType)`
-  via `@aws-sdk/client-s3` `PutObject` (lazy-loaded; only needed in remote mode).
-  Includes a commented rustfs mirror (doc 07).
+- **`src/scripts/ingest/uploadR2.mjs`** — `uploadObject(localPath, key, contentType, { bucket,
+  metadata })` via `@aws-sdk/client-s3` (lazy-loaded; remote mode only), plus `headObjectMeta`
+  (skip-if-unchanged), `listKeys` / `deleteKeys` (the manifest-aware prune), and `copyObject`
+  (server-side re-key, used by the stable-key migration). Includes a commented rustfs mirror (doc 07).
 - **ingest remote mode** — with `STORAGE_MODE=remote`, the MP3 is transcoded to a
   temp file, uploaded to `releases/<collectionId>/<lufs-id>/<file>.mp3`, and the track's
   `audioPath` is set to that **key** (not a `/audio/…` path). Reports + covers still

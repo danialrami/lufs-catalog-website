@@ -10,43 +10,42 @@ model and the organization scheme.
 The same site runs in two modes; only the **values** in the content files (and a few
 env flags) differ.
 
-### Local-only (today)
+### Local mode (offline preview — `STORAGE_MODE=local`)
 ```
 Mac + NAS (/Volumes/project/continuo/catalogs)
-        │  pnpm catalog:ingest:local
+        │  pnpm catalog:ingest
         ▼
-  catalog-ingest-local.mjs
-        ├─ copies MP3   → public/audio/...
-        ├─ copies report→ public/reports/...
-        ├─ copies art   → public/covers/...
-        └─ writes       → src/content/releases/*.md   (audioPath = /audio/...)
+  catalog-ingest.mjs
+        ├─ transcode WAV→MP3 → public/audio/<id>/<lufs-id>/...
+        ├─ copies report     → public/reports/<id>/<lufs-id>/...
+        ├─ copies art        → public/covers/<id>/<lufs-id>/...
+        └─ writes            → src/content/releases/*.md   (audioPath = /audio/...)
         ▼
   astro dev / build  →  http://localhost:4321  (serves everything from public/)
 ```
 
-### Production (target)
+### Production (live — `STORAGE_MODE=remote`)
 ```
-Mac + NAS                                  Cloudflare
-  pnpm catalog:ingest                       ┌───────────────────────────┐
-    ├─ transcode WAV→MP3 (ffmpeg)           │  R2 bucket: lufs-catalog     │
-    ├─ upload audio   ───────────────────►  │   releases/  (PRIVATE)     │
-    ├─ upload reports ───────────────────►  │   reports/   (public)      │
-    ├─ upload artwork ───────────────────►  │   artwork/   (public)      │
-    ├─ (opt) mirror → NAS rustfs (fallback) └───────────▲───────────────┘
-    └─ write/merge src/content/releases/*.md            │ getSignedUrl (1h)
-  catalog-deploy.sh                          ┌───────────┴───────────────┐
-    ├─ pnpm build → dist/                     │  Worker (stream.lufs.audio)│
-    ├─ git push origin main                   │  signs releases/ GETs      │
-    └─ subtree split dist → hostinger branch  └───────────▲───────────────┘
-        │ webhook                                          │ fetch ?key=
-        ▼                                                  │
-  Hostinger  public_html/ ← dist/            Browser ──────┘
-  catalog.lufs.audio  (static HTML/CSS/JS)   (Howler plays the signed URL)
+Mac + NAS                                  Cloudflare R2
+  pnpm catalog:ingest                       ┌─ lufs-catalog (PRIVATE) ───────────┐
+    ├─ transcode WAV→MP3 (ffmpeg)           │   releases/<id>/<lufs-id>/*.mp3    │ ◄─ signed GETs only
+    ├─ upload audio ──────────────────────► └────────────────────────────────────┘
+    ├─ upload covers + reports ───────────► ┌─ lufs-catalog-public (PUBLIC) ─────┐
+    └─ write/merge src/content/releases/*.md│   covers/…  reports/…  → cdn.lufsaud.io
+  catalog-deploy.sh (or any commit)         └────────────────────────────────────┘
+    └─ git push origin main
+          │
+          ▼
+  GitHub Actions (deploy.yml): build → publish dist/ → `hostinger` branch
+          │  Hostinger Git auto-deploy → public_html
+          ▼
+  catalog.lufs.audio  (static HTML/CSS/JS)        Worker (stream.lufsaud.io) signs releases/ GETs
 ```
 
-Key point: **the HTML is static and dumb about audio** — it holds a *key*, not a URL.
-At play time the player asks the Worker for a fresh signed URL. Public assets
-(reports, artwork) are fetched directly from their public R2 URLs.
+Key point: **the HTML is static and dumb about audio** — it holds a *key*, not a URL. At
+play time the player asks the Worker for a fresh 1-hour signed URL. Covers + the proof-of-work
+report are plain `cdn.lufsaud.io` URLs fetched directly. Nothing for audio is durable or
+downloadable. (The optional NAS rustfs origin/fallback — doc 07 — is wired but commented.)
 
 ---
 
@@ -55,7 +54,7 @@ At play time the player asks the Worker for a fresh signed URL. Public assets
 1. User clicks ▶ on a track. The page has the track's R2 **key**
    (`releases/<collectionId>/<lufs-id>/<file>.mp3` — keyed by the per-track catalog id, not
    the ordinal; see `09-ingest-and-deploy.md`), not a URL.
-2. `useHowler.ts` calls `GET {STREAM_WORKER_URL}?key=<key>`.
+2. The player (`resolveAudio.ts`) calls `GET {PUBLIC_R2_STREAM_URL}?key=<key>`.
 3. The Worker checks the `Origin` (must be `catalog.lufs.audio`), validates the key
    prefix (`releases/`, no `..`), and returns a **1-hour presigned URL**.
 4. Howler streams from that URL (`html5: true`, so it doesn't buffer the whole file).
@@ -83,18 +82,17 @@ isrc: "US-XXX-YY-NNNNN"           # human-edited (post-DSP)
 streamingLinks: { spotify, appleMusic, bandcamp, soundcloud }  # human-edited
 tags: [ambient, piano]
 tracks:
-  - trackNumber: 1
+  - trackNumber: 1                   # display order only (NOT the storage key)
     displayTitle: "..."
     filename: "..."
-    catalogNumber: "lufs-5cfa866d"   # machine-derived
+    catalogNumber: "lufs-5cfa866d"   # machine-derived; also the stable R2 key segment
     sha256: "...64 hex..."           # machine-derived
     processedDate: "2026-02-22T16:50:08"
     saturation: 0.5
-    audioPath: "/audio/.../x.mp3"    # local path OR R2 key/URL
-    renderStatsPath: "/reports/.../render_stats.html"
-    finalReport: "/reports/.../final_report.html"
-    duration: 0                      # seconds (ffprobe; currently 0)
-    artwork: { main, identicon?, spectrogram?, canvasStatic? }
+    audioPath: "releases/<id>/lufs-5cfa866d/x.mp3"   # R2 key (remote) OR /audio/… (local)
+    finalReport: "https://cdn.lufsaud.io/reports/<id>/lufs-5cfa866d/final_report.html"
+    duration: 223                    # seconds (ffprobe)
+    artwork: { main, identicon?, spectrogram?, canvasStatic? }   # cdn.lufsaud.io URLs (remote)
 ```
 
 **Field ownership (for the edit-preserving merge):**
@@ -165,28 +163,26 @@ details: [`07-nas-rustfs-fallback.md`](./07-nas-rustfs-fallback.md).
 
 ---
 
-## 6. Repo layout (target, additions in **bold**)
+## 6. Repo layout (current)
 
 ```
 lufs-catalog-website/
 ├── astro.config.mjs            output: 'static'
 ├── src/
 │   ├── content/{config.ts, releases/*.md}
-│   ├── layouts/  pages/  components/{player/*}  styles/  tests/
+│   ├── layouts/  pages/{index.astro, releases/[slug].astro}  styles/  tests/
+│   ├── components/player/      PlayerBar.svelte, audioManager.ts, resolveAudio.ts
 │   └── scripts/ingest/
-│       ├── catalog-ingest-local.mjs        (existing)
-│       ├── utils.mjs                        (existing)
-│       ├── **classify.mjs**                 (new: source-shape detection)
-│       ├── **parseContext.mjs**             (new: context.json + HTML fallback)
-│       ├── **transcode.mjs**                (new: ffmpeg WAV→MP3 + ffprobe duration)
-│       ├── **uploadR2.mjs**                 (new: S3 PutObject; + commented rustfs mirror)
-│       └── **generateMarkdown.mjs**         (new: edit-preserving merge)
-├── public/{covers/, reports/}              small text + art only (committed)
-├── **worker/**                              standalone signing Worker
-│   ├── src/index.ts   wrangler.toml   package.json
-├── **catalog-deploy.sh**                    build → push → hostinger split
-├── .env.local.example   **.env.production.example**
-└── docs/{PRD.md, TDD.md, **implementation/** (this suite)}
+│       ├── catalog-ingest.mjs   context.json-driven ingest (WAV→MP3, .md merge, prune)
+│       └── uploadR2.mjs         R2 helpers: upload/head/list/delete/copy (+ commented rustfs mirror)
+├── public/{audio,covers,reports}/   local-mode assets (gitignored; live on R2 in remote mode)
+├── worker/                          standalone signing Worker (src/index.ts, wrangler.toml)
+├── catalog-dev.sh  catalog-sync.sh  catalog-deploy.sh
+├── scripts/                         catalog-process.sh, catalog-config.sh, catalog-set-origin.sh
+├── .opencode/agents/catalog-operator.md
+├── .github/workflows/deploy.yml     CI: build → publish dist/ → hostinger branch
+├── .env.local.example   .env.production.example
+└── docs/{PRD.md, TDD.md, implementation/ (this suite)}
 ```
 
 ---

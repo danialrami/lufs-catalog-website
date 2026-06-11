@@ -33,6 +33,7 @@ switch). No extra config needed.
 | "Switch production to rustfs" / "…back to R2" | `./scripts/catalog-set-origin.sh <origin>` | 🛑 confirms first; warns if rustfs isn't stood up |
 | "Process the new audio I dropped in" | `./scripts/catalog-process.sh <file>… \| --album <dir>` | 🛑 runs the lufs-workchain `astro-catalog` chain; leaves `{track-name}_astro-catalog/` ready to ingest |
 | "Update the site with the new audio" | `catalog-process.sh` (if unprocessed) → `pnpm catalog:ingest` or `./catalog-deploy.sh --ingest` | 🛑 confirms before any upload/deploy |
+| "Remove / replace a track or a release" | delete the source dir → `R2_PRUNE=dry` then `R2_PRUNE=apply pnpm catalog:ingest` | 🛑 stable per-track keys → only the changed track's R2 objects move; the prune shows exact keys before deleting |
 | "Run it locally / preview" | `./catalog-dev.sh --ingest` or `pnpm dev` | |
 | "Build" | `pnpm build` | |
 | "Deploy / publish" | `./catalog-deploy.sh` | 🛑 confirms before pushing to production |
@@ -52,7 +53,8 @@ changed**.
   status/diff/log`, local dev sync).
 - **Hard stops** (require explicit approval) on everything that mutates production or
   storage: switching `STORAGE_PRIMARY`, R2/rustfs uploads, `catalog-deploy.sh`, any
-  `git push`. `rm *` is denied outright; `wrangler*` is `ask`.
+  `git push`, and R2 prunes (`R2_PRUNE=apply`). `rm *` is `ask` (it must show the exact
+  path first — used for track/release removals); `wrangler*` is `ask`.
 - **Secrets** are never printed (the config script masks keys); the agent must never
   commit `.env*` or bake R2 keys into the site bundle.
 - **Respects field ownership** — it won't overwrite human-edited frontmatter

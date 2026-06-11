@@ -14,15 +14,30 @@ All of this runs on Daniel's Mac (it needs the NAS + ffmpeg).
    ```bash
    ./catalog-deploy.sh --ingest
    ```
-   This: ingests (transcode → MP3 320k, parse metadata, upload audio to R2 in remote
-   mode / copy to `public/` in local mode, write `src/content/releases/<slug>.md`),
-   builds, pushes `main`, and publishes `dist/` to the `hostinger` branch → Hostinger
-   auto-deploys.
+   This ingests (transcode → MP3 320k, parse metadata; remote mode uploads audio to the
+   private `lufs-catalog` bucket and covers/reports to the public `lufs-catalog-public`
+   bucket; local mode copies into `public/`; writes `src/content/releases/<slug>.md`),
+   validates the build, commits, and pushes `main`. **CI (`deploy.yml`) then builds and
+   publishes `dist/` to the `hostinger` branch → Hostinger auto-deploys.** (Equivalently:
+   `pnpm catalog:ingest`, then commit + push `main`, and let CI do the rest.)
 3. **Fill in the human fields** in `src/content/releases/<slug>.md` (the ingest set
    safe defaults and preserves these on re-runs):
    - `title` (human-readable), `status: released` (new releases default to `draft`),
      `releaseDate`, `isrc`, `streamingLinks.*`, `tags`, `project`.
 4. **Re-deploy** to publish the edits: `./catalog-deploy.sh` (no `--ingest` needed).
+
+## Remove or replace a track / release
+
+Keys are **stable per track** (`…/<collectionId>/<lufs-id>/…`), so a removal only orphans the
+removed track's own objects — pair the source delete with a prune:
+1. 🛑 Delete the track's `<track>_astro-catalog/` dir (or the whole album folder) from the source.
+2. Preview: `R2_PRUNE=dry pnpm catalog:ingest` — regenerates the `.md` without the track and
+   **lists** the orphaned R2 keys it would delete (just that track's `…/<lufs-id>/…`). Review.
+3. Apply + ship: `R2_PRUNE=apply ./catalog-deploy.sh --ingest`. For a whole release, also delete
+   `src/content/releases/<slug>.md` and add `R2_PRUNE_COLLECTIONS=<id>`.
+
+Full add / remove / replace recipes (with the safety stops) live in the catalog-operator agent —
+see [`08-opencode-agent.md`](./08-opencode-agent.md).
 
 ## Just preview locally (no deploy)
 

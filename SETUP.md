@@ -44,8 +44,12 @@ Legend: 🟢 do once · 🔁 per release · ⏳ later/optional
 
 Full walkthrough + the "what is S3/CDN" primer: `docs/implementation/06-cdn-and-s3-guide.md`.
 
-1. **Create the bucket:** Cloudflare → R2 → **Create bucket** → name **`lufs-catalog`**
-   (keep it **private** — do *not* enable a public URL on it; audio is signed).
+1. **Create the buckets:** Cloudflare → R2 → **Create bucket**:
+   - **`lufs-catalog`** — keep it **private** (do *not* enable a public URL; audio is signed).
+   - **`lufs-catalog-public`** — **public**: enable the public URL and map a custom domain
+     **`cdn.lufsaud.io`**. Holds cover art + the proof-of-work report (incl. canvas video);
+     audio never goes here. (Skip this bucket and the ingest falls back to committing
+     covers/reports under `public/` — fine for a quick start.)
 2. **API token:** R2 → *Manage R2 API Tokens* → **Object Read & Write**, scoped to
    `lufs-catalog`. Save the **Access Key ID**, **Secret Access Key**, and your
    **Account ID** / endpoint `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`.
@@ -59,11 +63,13 @@ Full walkthrough + the "what is S3/CDN" primer: `docs/implementation/06-cdn-and-
    npx wrangler secret put R2_SECRET_ACCESS_KEY
    npx wrangler deploy
    ```
-   Then in the dashboard map a route / custom domain → **`stream.lufs.audio`**.
+   Then in the dashboard map a route / custom domain → **`stream.lufsaud.io`**.
    (Confirm `ALLOWED_ORIGIN`/`R2_BUCKET_NAME` in `worker/wrangler.toml`.)
 4. **Production env:** `cp .env.production.example .env.production` and fill
    `R2_ACCOUNT_ID/ACCESS_KEY_ID/SECRET_ACCESS_KEY/ENDPOINT`, set
-   `PUBLIC_R2_STREAM_URL=https://stream.lufs.audio`, and `STORAGE_MODE=remote`.
+   `PUBLIC_R2_STREAM_URL=https://stream.lufsaud.io`, `R2_PUBLIC_BUCKET_NAME=lufs-catalog-public`
+   + `PUBLIC_R2_BASE_URL=https://cdn.lufsaud.io` (both required to serve covers/reports from the
+   CDN; the ingest then drops the local copies), and `STORAGE_MODE=remote`.
    *(CORS: the Worker already sends CORS headers; HTML5 `<audio>` playback of the
    signed URL doesn't need bucket CORS. If you ever switch the player to Web Audio,
    add a GET CORS rule on the bucket for your site origin.)*
@@ -72,23 +78,27 @@ Full walkthrough + the "what is S3/CDN" primer: `docs/implementation/06-cdn-and-
 
 ## Phase C — Hosting + DNS 🟢
 
-1. **DNS:** point `catalog.lufs.audio` → Hostinger; `stream.lufs.audio` → the Worker.
+1. **DNS:** point `catalog.lufs.audio` → Hostinger; `stream.lufsaud.io` → the Worker.
 2. **Hostinger Git auto-deploy:** connect this repo and set the auto-deploy webhook to
    watch the **`hostinger`** branch (same as your Hugo blog). The branch must contain
-   **built output** (Hostinger doesn't run `astro build`). Two ways to publish it:
-   - **CI (recommended, no local build):** a ready-made workflow ships at
-     `docs/implementation/ci-deploy.yml` — copy it into place (the PR bot can't commit
-     workflow files itself):
+   **built output** (Hostinger doesn't run `astro build`) — **CI produces it**:
+   - The workflow lives at `.github/workflows/deploy.yml` (template + rationale:
+     `docs/implementation/ci-deploy.yml`). On every push to `main` it builds and publishes
+     `dist/` to `hostinger`; Hostinger fast-forwards that into `public_html`. It must NOT use
+     `force_orphan` (that rewrites `hostinger` as an orphan and breaks Hostinger's pull on
+     "divergent branches"). Fresh clone? Copy the template into place once — the PR bot can't
+     commit workflow files itself:
      ```bash
      mkdir -p .github/workflows && cp docs/implementation/ci-deploy.yml .github/workflows/deploy.yml
      git add .github/workflows/deploy.yml && git commit -m "ci: deploy to hostinger" && git push
      ```
-     It builds on every push to `main` and publishes `dist/` to `hostinger`. This is how
-     you can get a **blank** site live (zero releases) to confirm DNS + the webhook
-     *before any audio exists*. No secrets needed for a local-mode/blank build.
-   - **Manual:** `./catalog-deploy.sh` builds locally and publishes `dist/` to
-     `hostinger`. Use this for offline/local deploys. (There is no other GitHub Actions
-     CI; see `docs/implementation/09` §3.)
+   - Set repo **Variables** `PUBLIC_R2_STREAM_URL` + `PUBLIC_SITE_URL` (Settings → Secrets and
+     variables → Actions → Variables); the workflow also falls back to the production values, so
+     audio can't silently break on a missing var. A blank/local-mode build needs no secrets —
+     good for confirming DNS + the webhook before any audio exists.
+   - **Local convenience:** `./catalog-deploy.sh [--ingest]` ingests (optional), validates the
+     build, commits, and pushes `main` — CI does the actual publish. (See `docs/implementation/09`
+     §2–§3.)
 
 ---
 
@@ -113,9 +123,10 @@ hardening: `docs/implementation/12-hardening-and-verification.md`.)
    bash <lufs-workchain>/tests/verify_astro_catalog.sh "$CATALOG_SOURCE_PATH"
    #   add --rerun to re-process anything unfinished (also with --report)
    ```
-3. `./catalog-deploy.sh --ingest` → ingests (transcode + upload to R2 + write `.md`),
-   builds, pushes `main`, publishes `dist/` to `hostinger` → auto-deploys. (Or just
-   `pnpm catalog:ingest`, commit to `main`, and let CI deploy.)
+3. `./catalog-deploy.sh --ingest` → ingests (transcode + upload audio to private R2 +
+   covers/reports to the public bucket + write `.md`), validates the build, commits, and
+   pushes `main`; **CI then builds + publishes to `hostinger` → auto-deploys.** (Or just
+   `pnpm catalog:ingest`, commit to `main`, and let CI do the rest.)
 4. Edit `src/content/releases/<slug>.md`: set `title`, `status: released`,
    `releaseDate`, `isrc`, `streamingLinks`, `tags`, `project` (these are preserved on
    re-ingest).

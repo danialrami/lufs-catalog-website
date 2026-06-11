@@ -1,24 +1,28 @@
 # LUFS Audio Catalog Website
 
-A static Astro/Svelte website for browsing and streaming LUFS Audio releases. Features a persistent audio player that persists across page navigation, proof-of-work reports embedded from workchain output, and local development without external cloud services.
+A static Astro/Svelte site for browsing and streaming LUFS Audio releases — with a
+persistent bottom player that survives page navigation and an embedded, sanitized
+**proof-of-work report** for every track (loudness, spectrograms, canvas video). Fed by
+the `lufs-workchain` **astro-catalog** pipeline.
 
-**Target URL:** catalog.lufs.audio
+**Live:** [catalog.lufs.audio](https://catalog.lufs.audio)
 
 ---
 
-## Quick Start
+## Quick Start (local preview)
 
 ```bash
-# Install dependencies
-npm install
+pnpm install
+cp .env.local.example .env.local        # defaults are fine (STORAGE_MODE=local)
+# mount the NAS so CATALOG_SOURCE_PATH (/Volumes/project/continuo/catalogs) exists
 
-# Run local development with asset sync from workchain
-./catalog-sync.sh          # sync assets + start dev server
-./catalog-sync.sh --build  # sync assets + build production
-
-# Or start dev server only (if assets already exist)
-npm run dev
+./catalog-dev.sh --ingest               # ingest from the workchain output + start dev server
+# or, if content already exists:
+pnpm dev                                # dev server only → http://localhost:4321
 ```
+
+Local mode writes MP3s + assets into `public/` and serves everything statically — no
+cloud needed. Production streams from Cloudflare R2 (see **Production** below).
 
 ---
 
@@ -26,38 +30,45 @@ npm run dev
 
 | Command | Action |
 |---------|--------|
-| `./catalog-sync.sh` | Sync assets from workchain + start dev server |
-| `./catalog-sync.sh --build` | Sync assets + build production |
-| `npm run dev` | Start Astro dev server at localhost:4321 |
-| `npm run build` | Build production static site to `dist/` |
-| `npm run preview` | Preview production build locally |
-| `npm run astro` | Run Astro CLI (typecheck, etc.) |
-| `npm run catalog:ingest:local` | Run ingest script only |
-| `npm run test:e2e` | Run Playwright E2E tests |
-| `npm run test:e2e:ui` | Run E2E tests with UI |
+| `pnpm dev` | Astro dev server at `localhost:4321` |
+| `pnpm build` | Build the static site to `dist/` |
+| `pnpm preview` | Preview the production build locally |
+| `pnpm catalog:ingest` | Run the ingest (workchain output → MP3 + assets + content `.md`) |
+| `pnpm worker:deploy` | Deploy the R2 signing Worker (`worker/`) |
+| `pnpm test` / `pnpm test:e2e` | Vitest unit tests / Playwright E2E |
+| `./catalog-dev.sh [--ingest]` | Local: (optionally ingest, then) start the dev server |
+| `./catalog-sync.sh [--build]` | Local: ingest assets into `public/` (and optionally build) |
+| `./catalog-deploy.sh [--ingest]` | Ingest (optional) → validate build → commit → push `main` (CI deploys) |
 
 ---
 
 ## Features
 
-- **Persistent Audio Player** — Playback continues seamlessly as users navigate between pages. Uses Astro ViewTransitions with `transition:persist` + localStorage state synchronization to survive page reloads and maintain playback position/volume
-- **Keyboard Shortcuts** — Space to play/pause, Left/Right arrows to adjust volume in 10% increments
-- **Click & Drag Volume Control** — Click or drag the volume slider to adjust volume (supports 0-100% range)
-- **Mute Toggle** — Click the speaker icon to mute/unmute
-- **Workchain Reports** — View final report and render stats HTML for each track
-- **Project Filtering** — Filter releases by project/series on the home page
-- **Responsive Design** — Works on desktop and mobile
+- **Persistent audio player** — playback continues seamlessly across navigation (Astro
+  ViewTransitions + `transition:persist`). A single window-scoped Howl is guaranteed
+  (no overlap/feedback), with position/volume/state synced to `localStorage`.
+- **Protected streaming** — in production, audio is private on R2 and played via
+  short-lived **signed URLs** minted per play by a Cloudflare Worker; no durable URL or
+  key ever ships in the page, and the report is sanitized to remove any download path.
+- **Embedded proof-of-work** — each track links/embeds its sanitized workchain report
+  (loudness, spectrograms, canvas video) served from the CDN.
+- **Keyboard + mouse controls** — Space to play/pause, ←/→ for volume, click/drag the
+  volume slider, mute toggle.
+- **Project filtering** and **responsive** (incl. a mobile-friendly playbar).
 
 ---
 
 ## Project Overview
 
 - **Framework:** Astro v5 (`output: 'static'`)
-- **UI Components:** Svelte 5 (player bar, state management)
-- **Audio Engine:** Howler.js v2 (HTML5 streaming mode)
-- **State Persistence:** Astro ViewTransitions with `transition:persist`
-- **Content:** Markdown files in `src/content/releases/` with YAML frontmatter
-- **Styling:** CSS custom properties with dark theme (LUFS brand)
+- **UI:** Svelte 5 islands (the player bar)
+- **Audio:** Howler.js v2 (HTML5 streaming)
+- **State:** window-scoped audio singleton (`audioManager.ts`) + `localStorage`, persisted
+  across navigation via Astro ViewTransitions
+- **Content:** one Markdown file per release in `src/content/releases/` (schema in
+  `src/content/config.ts`)
+- **Storage:** local (`public/`) or Cloudflare R2 — private audio + a public CDN bucket for
+  covers/reports (see below)
 
 ---
 
@@ -65,141 +76,106 @@ npm run dev
 
 ```
 /
-├── public/                  # Static assets (generated by ingest)
-│   ├── audio/              # MP3 files: /audio/[collectionId]/[track]/
-│   ├── covers/             # Artwork: /covers/[collectionId]/[track]/
-│   └── reports/            # Workchain HTML reports + artwork components
-│
+├── public/                  # local-mode assets (gitignored; on R2 in remote mode)
+│   ├── audio/   covers/   reports/      # …/<collectionId>/<lufs-id>/…
 ├── src/
-│   ├── content/
-│   │   └── releases/       # One .md file per release
-│   ├── pages/
-│   │   ├── index.astro     # Catalog grid (home)
-│   │   └── releases/
-│   │       └── [slug].astro  # Release detail page
-│   ├── components/
-│   │   └── player/         # Svelte player components
-│   ├── scripts/
-│   │   └── ingest/         # Local ingest script
-│   └── tests/               # Test files
-│
-├── catalog-dev.sh            # Local dev wrapper
-├── catalog-sync.sh          # Asset sync script
-├── playwright.config.ts     # E2E test configuration
-├── vitest.config.ts        # Unit test configuration
-└── package.json
+│   ├── content/{config.ts, releases/*.md}
+│   ├── pages/{index.astro, releases/[slug].astro}
+│   ├── components/player/   # PlayerBar.svelte, audioManager.ts, resolveAudio.ts
+│   ├── layouts/  styles/
+│   └── scripts/ingest/      # catalog-ingest.mjs, uploadR2.mjs
+├── worker/                  # Cloudflare Worker that signs R2 audio GETs
+├── catalog-dev.sh  catalog-sync.sh  catalog-deploy.sh
+├── scripts/                 # catalog-process.sh, catalog-config.sh, catalog-set-origin.sh
+├── .opencode/agents/        # the catalog-operator agent
+└── docs/                    # PRD/TDD (historical) + implementation/ (current reference)
 ```
 
 ---
 
 ## Ingest Workflow
 
-The ingest script reads from a workchain output directory and generates the site content.
+The ingest reads `lufs-workchain` **astro-catalog** output and generates site content.
 
-### Input (CATALOG_SOURCE_PATH)
+**Source shape** (`CATALOG_SOURCE_PATH`, one album per top-level folder):
 
 ```
-[source-dir]/
-└── [collection-id]/           # e.g., a98ff_praise-legend-road
-    ├── artwork/
-    │   └── YYYY-MM-DD_artwork.png
-    ├── [track-number]/
-    │   ├── [filename]_final/
-    │   │   ├── [filename]_final_report.html
-    │   │   └── artwork/
-    │   │       └── components/
-    │   ├── [filename].mp3
-    │   └── [filename].render_stats.html
+{album}/
+  {track-name}.wav                 # source audio (ignored by the ingest)
+  {track-name}_astro-catalog/      # the unit the ingest reads (one per track)
+      context.json                 # status + metadata
+      {track-name}_normalized.wav  # transcoded to MP3
+      {track-name}_report.html     # sanitized → final_report.html
+      artwork/  canvas/  catalog/catalog_info.txt  logs/normalization.json
 ```
 
-### Running Ingest
+`pnpm catalog:ingest` will, per track:
+1. transcode the normalized WAV → **MP3 @320k** (duration via `ffprobe`);
+2. sanitize the report (strip audio/download affordances) + copy its assets;
+3. emit covers (artwork, identicon, spectrograms, canvas still);
+4. write/merge `src/content/releases/<slug>.md`, preserving human-edited fields.
 
-```bash
-# Using the sync script (recommended)
-./catalog-sync.sh
-
-# Or directly
-pnpm catalog:ingest:local
-```
-
-The script will:
-1. Walk the source directory
-2. Parse `_final_report.html` for catalog number, SHA256, saturation
-3. Copy MP3, artwork, and reports to `public/`
-4. Copy artwork components (identicon, spectrograms) for HTML reports
-5. Create/update `.md` file with track metadata
+**Object keys are stable per track:** `releases|covers|reports/<collectionId>/<lufs-id>/…`,
+where `<lufs-id>` is the workchain catalog number (a content hash), **not** the track's
+ordinal — so adding/removing/reordering a track only touches that one track's objects.
+`R2_PRUNE=dry|apply` cleans any orphans.
 
 ---
 
-## Environment Variables
+## Environment
 
-Create `.env.local` for local development:
-
+**Local** (`.env.local`):
 ```bash
-# Source path for workchain catalogs (required for ingest)
-CATALOG_SOURCE_PATH=/Volumes/project/continuo/catalogs
-
-# Optional: show draft/unreleased items
-PUBLIC_SHOW_DRAFTS=false
+CATALOG_SOURCE_PATH=/Volumes/project/continuo/catalogs   # workchain output
+PUBLIC_SHOW_DRAFTS=false                                  # show draft/unreleased locally
 ```
+
+**Production** (`.env.production`, used by `pnpm catalog:ingest` with `STORAGE_MODE=remote`):
+```bash
+STORAGE_MODE=remote
+R2_ACCOUNT_ID=…  R2_ACCESS_KEY_ID=…  R2_SECRET_ACCESS_KEY=…  R2_ENDPOINT=…
+R2_BUCKET_NAME=lufs-catalog                       # PRIVATE — audio (signed)
+R2_PUBLIC_BUCKET_NAME=lufs-catalog-public         # PUBLIC — covers + reports
+PUBLIC_R2_BASE_URL=https://cdn.lufsaud.io         # public CDN domain
+PUBLIC_R2_STREAM_URL=https://stream.lufsaud.io    # signing Worker (baked into the build)
+```
+
+`R2_*` and `CATALOG_SOURCE_PATH` are server/ingest-only; only `PUBLIC_*` reach the browser
+bundle. Never commit `.env*`.
 
 ---
 
-## Testing
+## Production
 
-### Unit Tests (Vitest)
-```bash
-npm run test
-```
-
-### E2E Tests (Playwright)
-```bash
-npm run test:e2e        # Run in terminal
-npm run test:e2e:ui     # Run with browser UI
-```
-
-### Test Coverage
-- Homepage loads correctly
-- Navigation between pages
-- Audio playback
-- Player persists across page navigation
-- Volume control (click and drag)
-- Asset accessibility (audio, images, reports)
-
----
-
-## Production Deployment
-
-For production on Hostinger with Cloudflare R2:
-
-1. **Set up R2** with bucket `lufs-audio`
-2. **Deploy Worker** for signed audio URLs
-3. **Run ingest** with R2 upload (not implemented in local script)
-4. **Build & deploy:**
-   ```bash
-   ./catalog-sync.sh --build
-   # Push dist/ to hostinger branch for auto-deploy
-   ```
-
-See `docs/PRD.md` and `docs/TDD.md` for full production architecture.
+- **Storage:** audio → **private** `lufs-catalog` (streamed via short-lived signed URLs
+  from the Worker at `stream.lufsaud.io`); cover art + the proof-of-work report → **public**
+  `lufs-catalog-public`, served from `cdn.lufsaud.io`. The ingest bakes absolute CDN URLs
+  into the content and drops the local copies, so git/Hostinger stay tiny.
+- **Deploy:** push to `main` → **GitHub Actions** (`.github/workflows/deploy.yml`) builds and
+  publishes `dist/` to the **`hostinger`** branch → Hostinger Git auto-deploy pulls it into
+  `public_html`. `./catalog-deploy.sh [--ingest]` is the local convenience that ingests +
+  validates + pushes `main`.
+- One-time setup, account/DNS/credentials, and the publish loop: **[`SETUP.md`](SETUP.md)**.
 
 ---
 
 ## Tech Stack
 
-- **Astro v5** — Static site generation with islands architecture
-- **Svelte 5** — Reactive UI components (PlayerBar, playerStore)
-- **ViewTransitions** — Persistent player across navigation via `transition:persist`
-- **nanostores + @nanostores/persistent** — Cross-component state management with localStorage for cross-page persistence
-- **Howler.js v2** — Audio playback with HTML5 streaming mode and localStorage state sync
-- **Playwright** — E2E testing (playback, navigation, keyboard shortcuts, volume controls)
-- **Vitest** — Unit testing
-- **node-html-parser** — Parse workchain HTML reports (catalog number, SHA256, saturation)
+- **Astro v5** — static SSG with islands
+- **Svelte 5** — the player island
+- **Howler.js v2** — HTML5 streaming playback
+- **Cloudflare R2 + Worker (`aws4fetch`)** — object storage + signed audio URLs
+- **node-html-parser** — sanitize/parse the workchain report
+- **Vitest / Playwright** — unit + E2E tests
 
 ---
 
 ## Documentation
 
-- `docs/PRD.md` — Product requirements & architecture
-- `docs/TDD.md` — Technical design & implementation details
-- `AGENTS.md` — Development guidelines & scripts
+- **[`SETUP.md`](SETUP.md)** — one-time setup + the publish-a-release loop
+- **[`docs/implementation/`](docs/implementation/)** — the working reference (start with
+  `06` CDN/S3, `09` ingest & deploy, `11` runbook; `13` is the future-work roadmap)
+- **[`.opencode/agents/catalog-operator.md`](.opencode/agents/catalog-operator.md)** — run the
+  whole site in natural language (process, ingest, add/remove, deploy)
+- `docs/PRD.md` / `docs/TDD.md` — the original product/technical design (historical; the
+  implementation docs supersede them where they differ)
