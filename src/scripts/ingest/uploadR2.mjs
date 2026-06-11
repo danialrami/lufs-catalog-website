@@ -18,9 +18,9 @@ import { readFileSync } from 'node:fs';
 const warn = (...a) => console.warn('  ⚠', ...a);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-let S3Client; let PutObjectCommand; let HeadObjectCommand;
+let S3Client; let PutObjectCommand; let HeadObjectCommand; let ListObjectsV2Command; let DeleteObjectsCommand;
 try {
-  ({ S3Client, PutObjectCommand, HeadObjectCommand } = await import('@aws-sdk/client-s3'));
+  ({ S3Client, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } = await import('@aws-sdk/client-s3'));
 } catch {
   // Loaded lazily so local-mode ingest doesn't require the dependency.
 }
@@ -116,6 +116,46 @@ export async function headObjectMeta(key, { bucket } = {}) {
     if (code === 404 || e?.name === 'NotFound' || e?.name === 'NoSuchKey') return null;
     throw e; // real error (auth/network) — let the caller decide
   }
+}
+
+/**
+ * List every object key under a prefix (handles pagination). Pass { bucket } to target a
+ * non-default bucket. Returns [] if the SDK isn't available. Used by the prune step to
+ * find orphaned keys — objects still in R2 that the current ingest no longer produces.
+ */
+export async function listKeys(prefix, { bucket } = {}) {
+  if (!ListObjectsV2Command) return [];
+  _r2 = _r2 || r2Client();
+  const Bucket = bucket || process.env.R2_BUCKET_NAME;
+  const keys = [];
+  let ContinuationToken;
+  do {
+    const r = await _r2.send(new ListObjectsV2Command({ Bucket, Prefix: prefix, ContinuationToken }));
+    for (const o of r.Contents || []) keys.push(o.Key);
+    ContinuationToken = r.IsTruncated ? r.NextContinuationToken : undefined;
+  } while (ContinuationToken);
+  return keys;
+}
+
+/**
+ * Delete the given keys (batched, up to 1000 per request). Pass { bucket } to target a
+ * non-default bucket. Returns the count deleted. No-op for an empty list. Caller is
+ * responsible for ensuring these keys are truly orphaned (never pass live keys).
+ */
+export async function deleteKeys(keys, { bucket } = {}) {
+  if (!DeleteObjectsCommand || !keys.length) return 0;
+  _r2 = _r2 || r2Client();
+  const Bucket = bucket || process.env.R2_BUCKET_NAME;
+  let deleted = 0;
+  for (let i = 0; i < keys.length; i += 1000) {
+    const chunk = keys.slice(i, i + 1000);
+    const r = await _r2.send(new DeleteObjectsCommand({
+      Bucket, Delete: { Objects: chunk.map((Key) => ({ Key })), Quiet: true },
+    }));
+    deleted += chunk.length - ((r.Errors || []).length);
+    for (const e of (r.Errors || [])) warn(`R2 delete failed for ${e.Key}: ${e.Message}`);
+  }
+  return deleted;
 }
 
 export const isAvailable = () => !!S3Client;

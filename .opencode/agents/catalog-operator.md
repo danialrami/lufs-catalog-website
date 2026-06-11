@@ -114,6 +114,10 @@ explicit order). The album **folder name is used verbatim** as the collectionId 
   in CI it must be a **repo Variable** (Settings → Secrets and variables → Actions →
   Variables), though the workflow also falls back to the production value.
 - `R2_FORCE_UPLOAD=1` re-uploads even unchanged objects.
+- `R2_PRUNE=dry|apply` deletes R2 objects a processed collection no longer produces
+  (orphans from removed/renumbered tracks) — `dry` lists what would go, `apply` deletes.
+  `R2_PRUNE_COLLECTIONS=<id,id>` additionally purges whole collections removed from source.
+  Off by default; a normal ingest never lists or deletes.
 - Re-ingest is **idempotent**: audio is skipped when R2 already holds the same source
   (matched by `source_sha256` metadata); public covers/reports are skipped when the
   object exists at the same byte size. Same-key PUTs overwrite, so **R2 never grows on
@@ -150,34 +154,49 @@ rustfs until configured). Inspect everything with `./scripts/catalog-config.sh` 
   -> edit the release's `.md` frontmatter directly (human-owned fields; ingest preserves
   them). Set `status: unreleased` to keep a release off the live site without deleting it.
 
-## Removing or replacing audio (the remove/replace lifecycle)
-The ingest derives the catalog from the SOURCE, writes/overwrites the `.md`, and uploads
-to R2 — but it does **not** delete things that disappeared. So removal is deliberate:
+## Recipes — add / remove catalog entries (the common operations)
+The ingest derives the catalog from the SOURCE, regenerates each release `.md`, and uploads
+to R2; it does NOT delete what disappeared, so removals pair with a prune. Always preview
+(`R2_PRUNE=dry`, `pnpm dev`) before shipping, and confirm every 🛑.
 
-**Remove ONE track from a multi-track release**
-1. Delete that track's source from the album under `CATALOG_SOURCE_PATH`: the
-   `{track}_astro-catalog/` dir (and its `{track}.wav` if present). 🛑 confirm the exact path.
-2. Re-ingest (`./catalog-deploy.sh --ingest`, or `pnpm catalog:ingest` to preview). The
-   release `.md` is regenerated **without** that track. (Track numbers of later tracks
-   shift, so their audio keys change and get re-uploaded; the old keys are left orphaned
-   on R2 — see prune below.)
-3. Deploy (push `main` → CI). Verify the track is gone from the release page + player.
+### Add a release or a track
+1. Put the source under `CATALOG_SOURCE_PATH`: a new **album folder** `<name>/` for a new
+   release, or drop `<track>.wav` into an existing album to add a track. Prefix `01_`,
+   `02_`… to control order. Keep album folder names URL-safe.
+2. 🛑 `./scripts/catalog-process.sh --album <name>` — run the astro-catalog chain (with
+   `--report`). Verify: `./scripts/catalog-process.sh --verify-only`.
+3. (Preview) `pnpm catalog:ingest` then `pnpm dev` to eyeball the release locally.
+4. 🛑 Ship: `./catalog-deploy.sh --ingest` (ingest → commit → push `main` → CI auto-deploys).
+5. If you added a track to a multi-track album, ordering renumbers the others → run the
+   prune (below) to clear old keys. A brand-new album orphans nothing.
+6. (Optional) edit `src/content/releases/<slug>.md` frontmatter for human fields.
 
-**Remove an ENTIRE release**
-- Delete the album folder under `CATALOG_SOURCE_PATH` **and** delete its
-  `src/content/releases/{slug}.md` (the ingest won't remove a stale `.md` on its own, so
-  the release would otherwise still render). Then rebuild/redeploy.
-- Or, to just hide it (keep source + R2): set `status: unreleased` in the `.md` — no
-  reprocessing needed, only a rebuild/redeploy.
+### Remove a track from a multi-track release
+1. 🛑 Delete the track's source: `<album>/<track>_astro-catalog/` (+ `<track>.wav`). Show
+   the exact path first; make sure the master exists elsewhere.
+2. 🛑 Preview: `R2_PRUNE=dry pnpm catalog:ingest` — regenerates the `.md` without the track
+   and LISTS the orphaned R2 keys it would delete. Removing a middle track renumbers the
+   later tracks, so the prune is **manifest-aware**: it keeps exactly what the new `.md`
+   references and only removes the leftovers. Review the list + the new `.md`.
+3. 🛑 Apply + ship: `R2_PRUNE=apply ./catalog-deploy.sh --ingest` (re-ingest → delete the
+   orphans → commit → push `main` → CI auto-deploys).
+4. Verify the track is gone and every remaining track's cover/report still loads.
 
-**Replace a track** = remove its source dir, drop the new audio in the album, run
-`catalog-process.sh` on it, then re-ingest + deploy.
+### Remove an entire release
+- To delete it: 🛑 remove the album folder from `CATALOG_SOURCE_PATH` **and** delete
+  `src/content/releases/<slug>.md` (the ingest won't remove a stale `.md`). Purge its R2:
+  🛑 `R2_PRUNE=dry R2_PRUNE_COLLECTIONS=<id> pnpm catalog:ingest` (preview), then
+  `R2_PRUNE=apply R2_PRUNE_COLLECTIONS=<id> ./catalog-deploy.sh --ingest`.
+- To just hide it (keep source + R2): set `status: unreleased` in the `.md` and redeploy.
 
-**Prune orphaned R2 objects (optional cleanup).** Re-ingest never deletes R2 objects, so
-a removed/renumbered track leaves stale keys (`releases/<id>/<n>/<slug>.mp3` in the
-private bucket; `covers/<id>/…` + `reports/<id>/…` in the public bucket). They're harmless
-(nothing references them) but to tidy up: 🛑 `wrangler r2 object delete <bucket>/<key>`
-(or the Cloudflare dashboard). Never bulk-delete without showing Daniel the exact keys first.
+### Replace a track
+Remove its source dir (as above), drop the new audio in the album, `catalog-process.sh`
+it, then run the remove-track flow (re-ingest with `R2_PRUNE=apply`) + deploy.
+
+> The manifest-aware prune (`R2_PRUNE`) is the safe way to clean R2 — never hand-delete
+> position-keyed `covers/<id>/<n>/` or `reports/<id>/<n>/` objects after a renumber, since
+> those slots get reused by the shifted tracks. `wrangler r2 object delete` is only a last
+> resort for one-offs, and only after showing Daniel the exact keys.
 
 ## Deploy model (how the site actually ships)
 - **CI owns build + publish.** A push to `main` triggers `.github/workflows/deploy.yml`,
