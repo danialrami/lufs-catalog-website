@@ -89,8 +89,9 @@ const REMOTE = STORAGE_MODE !== 'local';
 
 // Lazy-load the R2 uploader only in remote mode (keeps local ingest dependency-free).
 let uploadObject = null;
+let headObjectMeta = null;
 if (REMOTE) {
-  try { ({ uploadObject } = await import('./uploadR2.mjs')); }
+  try { ({ uploadObject, headObjectMeta } = await import('./uploadR2.mjs')); }
   catch (e) { console.warn('  ⚠ could not load uploadR2.mjs:', e.message); }
 }
 
@@ -262,13 +263,29 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
   if (!existsSync(m.normalizedWav)) {
     warn(`normalized WAV not found: ${m.normalizedWav}`);
   } else if (REMOTE) {
-    const tmpMp3 = join(tmpdir(), `lufs-${slugify(collectionId)}-${n}-${base}.mp3`);
-    transcodeMp3(m.normalizedWav, tmpMp3);
-    duration = ffprobeDuration(tmpMp3);
     const key = `releases/${collectionId}/${n}/${base}.mp3`;
-    if (uploadObject) await uploadObject(tmpMp3, key, 'audio/mpeg');
-    else warn('remote mode but uploader unavailable; audio not uploaded');
-    rmSync(tmpMp3, { force: true });
+    const force = /^(1|true)$/i.test(process.env.R2_FORCE_UPLOAD || '');
+    // Skip the transcode + upload when R2 already holds this exact source — matched by
+    // the source SHA-256 we stamp as object metadata. Saves upload bandwidth + CPU on
+    // re-ingests (and re-uploads automatically if the source changed). R2_FORCE_UPLOAD=1
+    // forces a re-upload regardless.
+    let head = null;
+    if (!force && headObjectMeta && m.sha256) {
+      try { head = await headObjectMeta(key); }
+      catch (e) { warn(`HEAD ${key} failed (${e.message}); will upload`); }
+    }
+    if (head && head.metadata?.source_sha256 && head.metadata.source_sha256 === m.sha256) {
+      duration = Number(head.metadata.duration) || 0;
+      log(`    = R2 (unchanged)  ${key}`);
+    } else if (uploadObject) {
+      const tmpMp3 = join(tmpdir(), `lufs-${slugify(collectionId)}-${n}-${base}.mp3`);
+      transcodeMp3(m.normalizedWav, tmpMp3);
+      duration = ffprobeDuration(tmpMp3);
+      await uploadObject(tmpMp3, key, 'audio/mpeg', { source_sha256: m.sha256 || '', duration });
+      rmSync(tmpMp3, { force: true });
+    } else {
+      warn('remote mode but uploader unavailable; audio not uploaded');
+    }
     audioPath = key; // the player exchanges this key for a signed URL via the Worker
   } else {
     const audioDest = join(PUBLIC_DIR, 'audio', collectionId, n, `${base}.mp3`);
@@ -392,6 +409,15 @@ function writeReleaseMarkdown(slug, data) {
   writeFileSync(join(CONTENT_DIR, `${slug}.md`), body);
 }
 
+// Publish policy. Remote (prod): default to `released` so confirmed-on-R2 tracks go
+// live without manual flipping; honor an explicit `unreleased` (deliberate withhold)
+// and an explicit `released`. Local: preserve the human status, default `draft`.
+// To keep a release off the live site, set its frontmatter `status: unreleased`.
+function decideStatus(remote, humanStatus) {
+  if (remote) return humanStatus === 'unreleased' ? 'unreleased' : 'released';
+  return humanStatus || 'draft';
+}
+
 // ---------- orchestrator ----------
 function deriveIds(dirName) {
   // The folder name IS the album name verbatim (e.g. "a98ff_praise-legend-road" is the
@@ -405,6 +431,7 @@ async function main() {
   log(`output : ${OUTPUT_ROOT}  (mode=${STORAGE_MODE}, mp3=${MP3_BITRATE}, html-parser=${parseHTML ? 'node-html-parser' : 'regex-fallback'})`);
   if (!existsSync(SRC)) { console.error(`CATALOG_SOURCE_PATH not found: ${SRC}`); process.exit(1); }
   if (REMOTE) log(`  remote: audio -> R2 bucket "${process.env.R2_BUCKET_NAME || '(R2_BUCKET_NAME unset)'}"; reports + covers committed to public/.`);
+  if (REMOTE) log('  publish: status=released by default; set a release\'s status to "unreleased" to keep it off the site (re-ingest preserves it).');
 
   let albums = listDirs(SRC).map((d) => d.name).sort();
   if (ONLY) albums = albums.filter((n) => n === ONLY);
@@ -459,7 +486,7 @@ async function main() {
       project: human.project || (single ? 'Singles' : (human.title || dirName)),
       artist: 'Daniel Ramirez',
       releaseDate: human.releaseDate || (tracks[0].processedDate || '').slice(0, 10) || new Date().toISOString().slice(0, 10),
-      status: human.status || 'draft',
+      status: decideStatus(REMOTE, human.status),
       coverArt: `/covers/${collectionId}/cover.png`,
       isrc: human.isrc || '',
       streamingLinks: human.streamingLinks,
@@ -482,4 +509,4 @@ if (invokedDirectly) {
   main().catch((e) => { console.error('FATAL', e); process.exit(1); });
 }
 
-export { slugify, deriveIds, sanitizeReport, parseAstroCatalog, findAstroTracks };
+export { slugify, deriveIds, sanitizeReport, parseAstroCatalog, findAstroTracks, decideStatus };

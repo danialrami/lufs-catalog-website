@@ -17,9 +17,9 @@ import { readFileSync } from 'node:fs';
 const warn = (...a) => console.warn('  ⚠', ...a);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-let S3Client; let PutObjectCommand;
+let S3Client; let PutObjectCommand; let HeadObjectCommand;
 try {
-  ({ S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3'));
+  ({ S3Client, PutObjectCommand, HeadObjectCommand } = await import('@aws-sdk/client-s3'));
 } catch {
   // Loaded lazily so local-mode ingest doesn't require the dependency.
 }
@@ -55,11 +55,13 @@ let _r2 = null;
 /**
  * Upload a local file to R2 (and optionally mirror to rustfs). Returns the key.
  */
-export async function uploadObject(localPath, key, contentType = 'application/octet-stream') {
+export async function uploadObject(localPath, key, contentType = 'application/octet-stream', metadata = {}) {
   _r2 = _r2 || r2Client();
   const Body = readFileSync(localPath);
+  // Metadata values must be strings; stored as x-amz-meta-* (keys come back lowercased).
+  const meta = Object.fromEntries(Object.entries(metadata).map(([k, v]) => [k, String(v ?? '')]));
   const cmd = new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME, Key: key, Body, ContentType: contentType,
+    Bucket: process.env.R2_BUCKET_NAME, Key: key, Body, ContentType: contentType, Metadata: meta,
   });
   // Retry transient R2 errors (5xx / rate-limit / an HTML error page the SDK can't
   // deserialize) with backoff, so one blip doesn't drop a track.
@@ -89,6 +91,23 @@ export async function uploadObject(localPath, key, contentType = 'application/oc
   // }
 
   return key;
+}
+
+/**
+ * HEAD an object to support skip-if-unchanged. Returns { metadata, contentLength }
+ * or null if the object doesn't exist. `metadata` keys are lowercased by S3/R2.
+ */
+export async function headObjectMeta(key) {
+  if (!HeadObjectCommand) return null;
+  _r2 = _r2 || r2Client();
+  try {
+    const r = await _r2.send(new HeadObjectCommand({ Bucket: process.env.R2_BUCKET_NAME, Key: key }));
+    return { metadata: r.Metadata || {}, contentLength: r.ContentLength };
+  } catch (e) {
+    const code = e?.$metadata?.httpStatusCode;
+    if (code === 404 || e?.name === 'NotFound' || e?.name === 'NoSuchKey') return null;
+    throw e; // real error (auth/network) — let the caller decide
+  }
 }
 
 export const isAvailable = () => !!S3Client;

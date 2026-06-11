@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 // Pure helpers exported from the ingest. Importing is safe: the module only runs
 // main() when invoked directly (node catalog-ingest.mjs), not when imported.
-import { slugify, deriveIds, sanitizeReport, parseAstroCatalog } from '../scripts/ingest/catalog-ingest.mjs';
+import { slugify, deriveIds, sanitizeReport, parseAstroCatalog, decideStatus } from '../scripts/ingest/catalog-ingest.mjs';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -76,6 +76,20 @@ describe('catalog-ingest: parseAstroCatalog (identity from dir, not clobbered co
     expect(m.name).toBe('Song');
     expect(m.ext).toBe('mp3');
     expect(m.normalizedWav.endsWith('Song_normalized.mp3')).toBe(true);
+  });
+});
+
+describe('catalog-ingest: decideStatus (publish policy)', () => {
+  it('remote (prod) defaults to released, but honors an explicit "unreleased" opt-out', () => {
+    expect(decideStatus(true, undefined)).toBe('released');     // brand-new release → live
+    expect(decideStatus(true, 'draft')).toBe('released');       // prior default draft → promoted
+    expect(decideStatus(true, 'released')).toBe('released');
+    expect(decideStatus(true, 'unreleased')).toBe('unreleased'); // manual hide is preserved
+  });
+  it('local preserves human status, defaulting to draft', () => {
+    expect(decideStatus(false, undefined)).toBe('draft');
+    expect(decideStatus(false, 'released')).toBe('released');
+    expect(decideStatus(false, 'unreleased')).toBe('unreleased');
   });
 });
 
