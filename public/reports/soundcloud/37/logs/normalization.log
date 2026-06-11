@@ -1,44 +1,0 @@
-# Normalization Log - Wed Jun 10 18:06:53 CDT 2026
-Target LUFS: -14
-Two-pass: true
-LRA: 7
-True Peak: -1.5 dB
-
-ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
-  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
-  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
-  libavutil      60. 26.101 / 60. 26.101
-  libavcodec     62. 28.101 / 62. 28.101
-  libavformat    62. 12.101 / 62. 12.101
-  libavdevice    62.  3.101 / 62.  3.101
-  libavfilter    11. 14.101 / 11. 14.101
-  libswscale      9.  5.101 /  9.  5.101
-  libswresample   6.  3.101 /  6.  3.101
-[in#0/mp3 @ 0xb37014000] Estimating duration from bitrate, this may be inaccurate
-Input #0, mp3, from '/Volumes/project/continuo/catalogs/soundcloud/The Story of Our Lives.mp3':
-  Metadata:
-    title           : The Story of Our Lives
-    iTunPGAP        : 0
-    encoded_by      : iTunes 12.0.1.26
-    iTunNORM        :  000000A9 00000035 00000AAB 00000111 00054372 000535E0 00002C3C 00001E48 0004DB78 00055CDB
-    iTunSMPB        :  00000000 00000210 000007F0 0000000000FD3A00 00000000 0089C14F 00000000 00000000 00000000 00000000 00000000 00000000
-    artist          : Daniel Ramirez
-  Duration: 00:06:16.37, start: 0.000000, bitrate: 192 kb/s
-  Stream #0:0: Audio: mp3 (mp3float), 44100 Hz, stereo, fltp, 192 kb/s
-Stream mapping:
-  Stream #0:0 -> #0:0 (mp3 (mp3float) -> mp3 (libmp3lame))
-Press [q] to stop, [?] for help
-Output #0, mp3, to '/Volumes/project/continuo/catalogs/soundcloud/The Story of Our Lives_astro-catalog/The Story of Our Lives_normalized.mp3':
-  Metadata:
-    TIT2            : The Story of Our Lives
-    iTunPGAP        : 0
-    TENC            : iTunes 12.0.1.26
-    iTunNORM        :  000000A9 00000035 00000AAB 00000111 00054372 000535E0 00002C3C 00001E48 0004DB78 00055CDB
-    iTunSMPB        :  00000000 00000210 000007F0 0000000000FD3A00 00000000 0089C14F 00000000 00000000 00000000 00000000 00000000 00000000
-    TPE1            : Daniel Ramirez
-    TSSE            : Lavf62.12.101
-  Stream #0:0: Audio: mp3, 44100 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavc62.28.101 libmp3lame
-size=     256KiB time=00:00:17.47 bitrate= 120.0kbits/s speed=34.6x elapsed=0:00:00.50    size=     512KiB time=00:00:35.03 bitrate= 119.7kbits/s speed=34.9x elapsed=0:00:01.00    size=     768KiB time=00:00:52.58 bitrate= 119.6kbits/s speed=34.9x elapsed=0:00:01.50    size=    1024KiB time=00:01:09.69 bitrate= 120.4kbits/s speed=34.7x elapsed=0:00:02.00    size=    1280KiB time=00:01:27.58 bitrate= 119.7kbits/s speed=34.9x elapsed=0:00:02.51    size=    1536KiB time=00:01:45.48 bitrate= 119.3kbits/s speed=  35x elapsed=0:00:03.01    size=    1792KiB time=00:02:03.37 bitrate= 119.0kbits/s speed=35.1x elapsed=0:00:03.51    size=    2048KiB time=00:02:20.48 bitrate= 119.4kbits/s speed=34.9x elapsed=0:00:04.02    size=    2304KiB time=00:02:38.51 bitrate= 119.1kbits/s speed=  35x elapsed=0:00:04.52    size=    2560KiB time=00:02:56.48 bitrate= 118.8kbits/s speed=35.1x elapsed=0:00:05.02    size=    2816KiB time=00:03:14.27 bitrate= 118.7kbits/s speed=35.1x elapsed=0:00:05.53    size=    3072KiB time=00:03:32.11 bitrate= 118.6kbits/s speed=35.1x elapsed=0:00:06.03    size=    3584KiB time=00:03:50.08 bitrate= 127.6kbits/s speed=35.2x elapsed=0:00:06.54    size=    3840KiB time=00:04:07.87 bitrate= 126.9kbits/s speed=35.2x elapsed=0:00:07.04    size=    4096KiB time=00:04:25.19 bitrate= 126.5kbits/s speed=35.1x elapsed=0:00:07.54    size=    4352KiB time=00:04:42.67 bitrate= 126.1kbits/s speed=35.1x elapsed=0:00:08.04    size=    4608KiB time=00:04:59.67 bitrate= 126.0kbits/s speed=  35x elapsed=0:00:08.55    size=    4864KiB time=00:05:17.38 bitrate= 125.5kbits/s speed=35.1x elapsed=0:00:09.05    size=    5120KiB time=00:05:34.78 bitrate= 125.3kbits/s speed=  35x elapsed=0:00:09.55    size=    5376KiB time=00:05:52.57 bitrate= 124.9kbits/s speed=  35x elapsed=0:00:10.06    size=    5632KiB time=00:06:10.67 bitrate= 124.5kbits/s speed=35.1x elapsed=0:00:10.56    [out#0/mp3 @ 0xb3701c240] video:0KiB audio:5881KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.010146%
-size=    5882KiB time=00:06:16.40 bitrate= 128.0kbits/s speed=35.2x elapsed=0:00:10.69    

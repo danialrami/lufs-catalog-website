@@ -1,36 +1,0 @@
-# Normalization Log - Wed Jun 10 18:18:17 CDT 2026
-Target LUFS: -14
-Two-pass: true
-LRA: 7
-True Peak: -1.5 dB
-
-ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
-  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
-  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
-  libavutil      60. 26.101 / 60. 26.101
-  libavcodec     62. 28.101 / 62. 28.101
-  libavformat    62. 12.101 / 62. 12.101
-  libavdevice    62.  3.101 / 62.  3.101
-  libavfilter    11. 14.101 / 11. 14.101
-  libswscale      9.  5.101 /  9.  5.101
-  libswresample   6.  3.101 /  6.  3.101
-[in#0 @ 0x857408000] Skipping 512 bytes of junk at 0.
-[in#0/mp3 @ 0x857408000] Estimating duration from bitrate, this may be inaccurate
-Input #0, mp3, from '/Volumes/project/continuo/catalogs/soundcloud/Buchla Piece.mp3':
-  Duration: 00:03:31.04, start: 0.000000, bitrate: 128 kb/s
-  Stream #0:0: Audio: mp3 (mp3float), 44100 Hz, stereo, fltp, 128 kb/s
-Stream mapping:
-  Stream #0:0 -> #0:0 (mp3 (mp3float) -> mp3 (libmp3lame))
-Press [q] to stop, [?] for help
-Output #0, mp3, to '/Volumes/project/continuo/catalogs/soundcloud/Buchla Piece_astro-catalog/Buchla Piece_normalized.mp3':
-  Metadata:
-    TSSE            : Lavf62.12.101
-  Stream #0:0: Audio: mp3, 44100 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavc62.28.101 libmp3lame
-[mp3float @ 0x856c2ce00] overread, skip -9 enddists: -5 -5
-[mp3float @ 0x856c2ce00] overread, skip -9 enddists: -8 -8
-size=     768KiB time=00:01:05.07 bitrate=  96.7kbits/s speed= 129x elapsed=0:00:00.50    [mp3float @ 0x856c2ce00] overread, skip -9 enddists: -1 -1
-size=    2048KiB time=00:02:12.36 bitrate= 126.8kbits/s speed= 131x elapsed=0:00:01.00    size=    3072KiB time=00:03:19.36 bitrate= 126.2kbits/s speed= 132x elapsed=0:00:01.51    [mp3float @ 0x856c2ce00] invalid new backstep -1
-[out#0/mp3 @ 0x856c30180] video:0KiB audio:3298KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.007492%
-size=    3298KiB time=00:03:31.04 bitrate= 128.0kbits/s speed= 132x elapsed=0:00:01.60    
