@@ -24,10 +24,6 @@ const count = visible.length;
 
       <div class="intro reveal">
         <h1 class="display">Catalog</h1>
-        <p class="lead">
-          Loudness-normalized masters with embedded proof-of-work.
-          <span class="dim">{count} release{count === 1 ? '' : 's'}.</span>
-        </p>
       </div>
 
       <nav class="legend reveal" aria-label="Filter by project">
@@ -135,8 +131,6 @@ const count = visible.length;
 
     .intro { margin-top: clamp(36px, 9vh, 84px); }
     .display { font-size: clamp(3rem, 11vw, 7rem); font-weight: 800; letter-spacing: -0.03em; line-height: 0.94; }
-    .lead { margin-top: var(--space-4); max-width: 46ch; font-size: clamp(1rem, 1.4vw, 1.15rem); color: var(--color-text-muted); }
-    .lead .dim { color: var(--color-teal); }
 
     /* ---- legend ---- */
     .legend { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: clamp(28px, 5vh, 48px) 0 clamp(20px, 4vh, 36px); }

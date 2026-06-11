@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-# catalog-deploy.sh — build + deploy catalog.lufs.audio to Hostinger.
+# catalog-deploy.sh — ingest + publish source for catalog.lufs.audio.
 #
-# DEPLOY MODEL (no GitHub Actions CI):
-#   build the static site locally -> commit source to main -> publish the BUILT
-#   dist/ to the `hostinger` branch. Hostinger's Git auto-deploy webhook watches
-#   that branch and pulls it into public_html. This mirrors the Hugo blog flow.
+# DEPLOY MODEL (GitHub Actions owns the build + publish):
+#   run the ingest locally (it needs the NAS-mounted source + ffmpeg), commit the
+#   generated content to `main`, and push. The GitHub Actions workflow
+#   (.github/workflows/deploy.yml) then builds the static site and publishes the built
+#   dist/ to the `hostinger` branch, which Hostinger's Git auto-deploy webhook pulls
+#   into public_html.
 #
-#   Why local build: Hostinger static hosting does not run `astro build`, so the
-#   deployed branch must already contain built output. The ingest must run locally
-#   anyway (it needs the NAS-mounted source + ffmpeg), so building locally too keeps
-#   everything in one place. See docs/implementation/09-ingest-and-deploy.md.
+#   This script does NOT build-and-push the hostinger branch itself: doing that here
+#   AND in CI makes two publishers race for the same ref (one push gets rejected with
+#   "cannot lock ref"). CI also builds from the clean repo, so its dist/ never picks up
+#   stray local files. We still run a local build here, but only to VALIDATE that the
+#   site compiles before pushing. See docs/implementation/09-ingest-and-deploy.md.
 #
 # Usage: ./catalog-deploy.sh [--ingest]
 #   --ingest   run `pnpm catalog:ingest` first (transcode + assets + content .md)
@@ -61,8 +64,8 @@ if [[ "${1:-}" == "--ingest" ]]; then
   pnpm catalog:ingest
 fi
 
-# --- 2) Build ---
-echo "==> Building Astro site ..."
+# --- 2) Validate the build (CI rebuilds + publishes; this is just a compile check) ---
+echo "==> Building Astro site (validation only) ..."
 pnpm build
 [ -d dist ] || { echo "Error: build produced no dist/."; exit 1; }
 
@@ -74,20 +77,8 @@ fi
 echo "==> Pushing source to main ..."
 git push origin main
 
-# --- 4) Publish built dist/ to the hostinger branch ---
-# Use a throwaway repo so dist/ never has to be committed to main.
-echo "==> Publishing dist/ to '${HOSTINGER_BRANCH}' (Hostinger webhook auto-deploys it) ..."
-REMOTE_URL="$(git config --get remote.origin.url)"
-DEPLOY_TMP="$(mktemp -d)"
-cp -R dist/. "$DEPLOY_TMP"/
-(
-  cd "$DEPLOY_TMP"
-  git init -q
-  git checkout -q -b "$HOSTINGER_BRANCH"
-  git add -A
-  git commit -qm "deploy $(date +'%Y-%m-%d %H:%M:%S')"
-  git push -f "$REMOTE_URL" "$HOSTINGER_BRANCH"
-)
-rm -rf "$DEPLOY_TMP"
-
-echo "✓ Done. Hostinger auto-deploys '${HOSTINGER_BRANCH}' to catalog.lufs.audio."
+# CI (.github/workflows/deploy.yml) takes it from here: build -> publish the
+# '${HOSTINGER_BRANCH}' branch -> Hostinger auto-deploys it. We deliberately do NOT
+# push the '${HOSTINGER_BRANCH}' branch from here (that would race the CI publisher).
+echo "✓ Pushed main. GitHub Actions builds + publishes the '${HOSTINGER_BRANCH}' branch"
+echo "  (watch the repo's Actions tab); Hostinger then auto-deploys it to catalog.lufs.audio."
