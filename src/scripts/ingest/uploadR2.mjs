@@ -14,6 +14,9 @@
  */
 import { readFileSync } from 'node:fs';
 
+const warn = (...a) => console.warn('  ⚠', ...a);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 let S3Client; let PutObjectCommand;
 try {
   ({ S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3'));
@@ -55,9 +58,21 @@ let _r2 = null;
 export async function uploadObject(localPath, key, contentType = 'application/octet-stream') {
   _r2 = _r2 || r2Client();
   const Body = readFileSync(localPath);
-  await _r2.send(new PutObjectCommand({
+  const cmd = new PutObjectCommand({
     Bucket: process.env.R2_BUCKET_NAME, Key: key, Body, ContentType: contentType,
-  }));
+  });
+  // Retry transient R2 errors (5xx / rate-limit / an HTML error page the SDK can't
+  // deserialize) with backoff, so one blip doesn't drop a track.
+  const attempts = Number(process.env.R2_UPLOAD_ATTEMPTS) || 3;
+  let lastErr;
+  for (let i = 1; i <= attempts; i++) {
+    try { await _r2.send(cmd); lastErr = null; break; }
+    catch (e) {
+      lastErr = e;
+      if (i < attempts) { warn(`R2 upload retry ${i}/${attempts - 1} for ${key}: ${e.message}`); await sleep(400 * i); }
+    }
+  }
+  if (lastErr) throw new Error(`R2 upload failed after ${attempts} attempts for ${key}: ${lastErr.message}`);
   console.log(`    ↑ R2  ${key}`);
 
   // --- rustfs mirror (commented until the NAS endpoint is stood up — see doc 07) ---
