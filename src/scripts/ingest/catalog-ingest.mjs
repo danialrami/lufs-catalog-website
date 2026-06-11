@@ -526,6 +526,19 @@ async function main() {
   log(`source : ${SRC}`);
   log(`output : ${OUTPUT_ROOT}  (mode=${STORAGE_MODE}, mp3=${MP3_BITRATE}, html-parser=${parseHTML ? 'node-html-parser' : 'regex-fallback'})`);
   if (!existsSync(SRC)) { console.error(`CATALOG_SOURCE_PATH not found: ${SRC}`); process.exit(1); }
+
+  // Remote mode streams audio from R2, so a local public/audio/ is never used — but a
+  // stale one from a prior local-mode ingest still gets copied into dist/ by Astro and
+  // bloats the deploy (Astro copies all of public/ regardless of .gitignore). Remove it
+  // up front. In remote-public mode covers/reports also live on R2 (uploaded then removed
+  // per-album), so clear any leftover collection dirs too.
+  if (REMOTE) {
+    rmSync(join(PUBLIC_DIR, 'audio'), { recursive: true, force: true });
+    if (REMOTE_PUBLIC) {
+      for (const sub of ['covers', 'reports']) rmSync(join(PUBLIC_DIR, sub), { recursive: true, force: true });
+    }
+  }
+
   if (REMOTE) log(`  remote: audio → R2 "${process.env.R2_BUCKET_NAME || '(R2_BUCKET_NAME unset)'}" (private, signed at play time).`);
   if (REMOTE_PUBLIC) log(`  remote: covers + reports → R2 "${PUBLIC_BUCKET}" (public), served from ${PUBLIC_BASE} (local copies removed after upload).`);
   else if (REMOTE) log('  remote: covers + reports committed to public/ (set R2_PUBLIC_BUCKET_NAME + PUBLIC_R2_BASE_URL to serve them from a CDN instead).');

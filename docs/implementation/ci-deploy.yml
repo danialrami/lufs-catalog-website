@@ -11,11 +11,13 @@ name: Build & Deploy → hostinger
 # The manual script still works for offline/local deploys; both publish the `hostinger` branch.
 #
 # REMOTE (R2) BUILDS: the player resolves audio keys via PUBLIC_R2_STREAM_URL, which is
-# baked into the bundle at BUILD time. .env.production is gitignored (not in CI), so set
-# these as repo *Variables* (Settings → Secrets and variables → Actions → Variables):
+# baked into the bundle at BUILD time. .env.production is gitignored (not in CI). You can
+# set these as repo *Variables* (Settings → Secrets and variables → Actions → Variables):
 #   - PUBLIC_R2_STREAM_URL   e.g. https://stream.lufsaud.io
 #   - PUBLIC_SITE_URL        e.g. https://catalog.lufs.audio
-# A local-mode / blank build needs no variables.
+# …but the Build step below also falls back to the production values if the Variables are
+# unset, so audio works out of the box. (An empty PUBLIC_R2_STREAM_URL = no audio on the
+# live site — that bit us once; the fallback prevents a recurrence.)
 #
 # Cover art + the proof-of-work report are served from the PUBLIC R2 bucket's CDN domain
 # (PUBLIC_R2_BASE_URL, e.g. https://cdn.lufsaud.io). Those absolute URLs are baked into the
@@ -57,9 +59,13 @@ jobs:
       - name: Build (static)
         run: pnpm build
         env:
-          # Exposed to the browser bundle. Safe to be public; empty is fine for local-mode.
-          PUBLIC_R2_STREAM_URL: ${{ vars.PUBLIC_R2_STREAM_URL }}
-          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+          # Exposed to the browser bundle (safe to be public). These MUST be present at
+          # build time — if PUBLIC_R2_STREAM_URL is empty the player ships with no Worker
+          # URL and audio silently fails to load. Prefer repo Variables (Settings → Secrets
+          # and variables → Actions → Variables); fall back to the known production values
+          # so a missing/forgotten Variable can't break audio.
+          PUBLIC_R2_STREAM_URL: ${{ vars.PUBLIC_R2_STREAM_URL || 'https://stream.lufsaud.io' }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://catalog.lufs.audio' }}
 
       - name: Publish dist/ to the hostinger branch
         uses: peaceiris/actions-gh-pages@v4
