@@ -93,11 +93,12 @@ For this project:
 
 > **Implementation note (corrects this table):** R2 public access is **bucket-level**,
 > not per-prefix — a public bucket exposes *everything* in it. So as built (see
-> `09-ingest-and-deploy.md` §4.1) we keep **only audio in the private `lufs-catalog`
-> bucket** (signed by the Worker) and commit the small `reports/` + `artwork/` assets
-> into the repo's `public/` instead. To truly serve those from the CDN, use a second
-> *public* bucket. Mental model below is unchanged; just the public/private split is
-> "private bucket + committed assets," not "one bucket, mixed prefixes."
+> `09-ingest-and-deploy.md` §4.1) the split is **two buckets**, not mixed prefixes in one:
+> **private `lufs-catalog`** holds the audio (`releases/`, signed by the Worker), and a
+> **public `lufs-catalog-public`** holds covers + the proof-of-work report (`covers/`,
+> `reports/`), served read-only from `cdn.lufsaud.io`. (Earlier the public assets were
+> committed into the repo's `public/` instead; the second bucket replaced that so heavy
+> canvas media stays out of git. The mental model below is unchanged.)
 
 ---
 

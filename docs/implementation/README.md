@@ -29,9 +29,11 @@ fallback design.
 | 6 | [`06-cdn-and-s3-guide.md`](./06-cdn-and-s3-guide.md) | **Start here if you're new to S3/CDN.** Object storage, the S3 API, CDNs, egress, presigned URLs, CORS, and exact R2 setup steps |
 | 7 | [`07-nas-rustfs-fallback.md`](./07-nas-rustfs-fallback.md) | The NAS rustfs origin: the deliberate R2↔rustfs switch + automatic fallback, and how to wire it in (kept commented until the endpoint is live) |
 | 8 | [`08-opencode-agent.md`](./08-opencode-agent.md) | The `catalog-operator` opencode agent (`.opencode/agents/`) that runs the site in natural language, + its helper scripts and the `.env` storage switch |
-| 9 | [`09-ingest-and-deploy.md`](./09-ingest-and-deploy.md) | **Built in Phase 3 + 2.** How `catalog-ingest.mjs` (context.json-driven, WAV→MP3, edit-preserving), `catalog-deploy.sh`, the R2 signing Worker, and the player resolver work; the no-CI deploy decision; the one-private-bucket model |
+| 9 | [`09-ingest-and-deploy.md`](./09-ingest-and-deploy.md) | How `catalog-ingest.mjs` (context.json-driven, WAV→MP3, edit-preserving, **stable per-track keys**), `catalog-deploy.sh`, the R2 signing Worker, and the player resolver work; the **CI-owns-deploy** model; the **two-bucket** layout (private audio + public covers/reports) |
 | 10 | [`10-brand-and-ux.md`](./10-brand-and-ux.md) | **Built in Phase 4.** The LUFS brand pass — tokens/fonts, custom cursor + scroll-reveal, the now-working project filter, and the embedded proof-of-work report |
 | 11 | [`11-runbook.md`](./11-runbook.md) | **Phase 5.** The repeatable publish-a-release loop + troubleshooting. See also the root [`SETUP.md`](../../SETUP.md) for one-time setup |
+| 12 | [`12-hardening-and-verification.md`](./12-hardening-and-verification.md) | The build-out hardening + in-sandbox verification record (point-in-time) |
+| 13 | [`13-future-work.md`](./13-future-work.md) | **Roadmap / backlog** — candidate next steps (rustfs stand-up, build-check CI, parallel uploads, health monitor, …) |
 
 ---
 
@@ -48,28 +50,31 @@ Throughout these docs:
 
 ## TL;DR
 
-- The **site** is in good shape: Astro v5 (static) + Svelte 5 + Howler.js, with a
-  persistent bottom player that survives navigation. ✅
-- The **local ingest** works for the *Continuo* album shape and copies assets into
-  `public/`. 🟡 (one shape only)
-- The **production path** (Cloudflare R2 + a signing Worker + Hostinger
-  auto-deploy) is fully designed but **the cloud upload, the Worker, and the
-  deploy script were never built**. ⛔
-- The **new astro-catalog output** (the `3434` example) is **not yet ingestible**:
-  different folder shape, ships `context.json` instead of the old report, and is
-  **WAV-only (no web MP3)**, so a transcode step is required. ⛔
-- **Decision:** Cloudflare R2 (bucket **`lufs-catalog`**, zero-egress, cheap for
-  mostly-parked audio) as the primary CDN; **Hostinger** for site hosting; a **NAS
-  rustfs S3 endpoint** as both a one-switch alternate origin (`STORAGE_PRIMARY=rustfs`)
-  and an automatic fallback — implemented but commented until it's stood up.
-- A **`catalog-operator` opencode agent** runs the whole thing in natural language.
+- The **site** is **live at catalog.lufs.audio**: Astro v5 (static) + Svelte 5 + Howler.js,
+  with a persistent bottom player that survives navigation and is guaranteed single-voice. ✅
+- The **ingest** (`catalog-ingest.mjs`) is the single astro-catalog pipeline:
+  context.json-driven, WAV→MP3 @320k, edit-preserving, idempotent. ✅
+- The **production path is fully built and live**: audio → **private R2** (`lufs-catalog`)
+  signed by the Worker (`stream.lufsaud.io`); covers + the proof-of-work report → **public R2**
+  (`lufs-catalog-public`, `cdn.lufsaud.io`); a push to `main` → **GitHub Actions** builds and
+  publishes to the `hostinger` branch → Hostinger auto-deploys. ✅
+- **Object keys are stable per track** (`releases|covers|reports/<id>/<lufs-id>/…`), so
+  add/remove/reorder touches only the changed track; a manifest-aware `R2_PRUNE` clears orphans. ✅
+- **Decision:** Cloudflare R2 (private **`lufs-catalog`** + public **`lufs-catalog-public`**,
+  zero-egress) as the CDN; **Hostinger** for hosting; a **NAS rustfs** endpoint as a one-switch
+  alternate origin (`STORAGE_PRIMARY=rustfs`) + automatic fallback — wired but commented until
+  it's stood up. 🟡
+- A **`catalog-operator` opencode agent** runs the whole thing in natural language. ✅
 
 ---
 
 ## Clarifications & corrections (supersede PRD.md / TDD.md where they differ)
 
 - **R2 bucket name is `lufs-catalog`** (not `lufs-audio` as written in PRD/TDD) —
-  scoped to this use case.
+  scoped to this use case. A second **public** bucket **`lufs-catalog-public`** (served from
+  `cdn.lufsaud.io`) holds covers + the proof-of-work report; audio stays private in `lufs-catalog`.
+- **R2 object keys are stable per track** — `releases|covers|reports/<collectionId>/<lufs-id>/…`,
+  keyed by the workchain catalog number, not the track ordinal (so edits don't renumber).
 - **Every top-level folder under `catalogs/` is an album** (`a98ff_praise-legend-road`,
   `footlights`, `3434`, …) — some are workchain-processed, some are raw and awaiting
   processing. See `02-observed-state.md` §4.
@@ -94,4 +99,4 @@ NAS or run REAPER. So the division of labor is:
 - **Daniel runs** the workchain and the real ingest locally, and performs the
   account/DNS/credential steps (or delegates them with scoped credentials).
 
-_Last updated: 2026-06-10._
+_Last updated: 2026-06-11._

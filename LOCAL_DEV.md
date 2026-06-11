@@ -1,158 +1,89 @@
-# Local-Only Development Setup
+# Local Development
 
-This document describes how to set up and use the local-only development environment for the LUFS Audio Catalog.
+How to run the LUFS Audio Catalog locally against `lufs-workchain` output, with no cloud
+services. (One-time setup + production: see [`SETUP.md`](SETUP.md).)
 
 ## Quick Start
 
-1. **Copy environment template**:
+1. **Env:** `cp .env.local.example .env.local` (defaults are fine; `STORAGE_MODE=local`).
+2. **Mount the NAS** so `/Volumes/project/continuo/catalogs` exists (or set
+   `CATALOG_SOURCE_PATH` in `.env.local`).
+3. **Ingest + dev server:**
    ```bash
-   cp .env.local.example .env.local
+   ./catalog-dev.sh --ingest        # or:  pnpm catalog:ingest && pnpm dev
    ```
+4. Open **http://localhost:4321**.
 
-2. **Ensure your workchain catalogs are mounted** at `/Volumes/project/continuo/catalogs` (or set `CATALOG_SOURCE_PATH` in `.env.local`)
-
-3. **Run the dev server with ingest**:
-   ```bash
-   ./catalog-dev.sh --ingest
-   ```
-   
-   Or manually:
-   ```bash
-   pnpm catalog:ingest:local
-   pnpm dev
-   ```
-
-4. **Visit** `http://localhost:4321` in your browser
-
-## Architecture Overview
-
-### Local Development Flow
+## Local flow
 
 ```
-Workchain Output (e.g., /Volumes/project/continuo/catalogs/)
-         │
-         ▼
-  catalog-ingest-local.mjs
-         │
-         ├─ Copies to public/audio/
-         ├─ Copies to public/reports/
-         ├─ Copies to public/covers/
-         └─ Updates src/content/releases/*.md
-         │
-         ▼
-    Astro dev/build (serves from dist/)
+Workchain output (/Volumes/project/continuo/catalogs/{album}/{track}_astro-catalog/)
+        │  pnpm catalog:ingest          (STORAGE_MODE=local)
+        ▼
+  src/scripts/ingest/catalog-ingest.mjs
+        ├─ transcode WAV→MP3 → public/audio/<collectionId>/<lufs-id>/<file>.mp3
+        ├─ sanitized report  → public/reports/<collectionId>/<lufs-id>/final_report.html
+        ├─ covers            → public/covers/<collectionId>/<lufs-id>/*.png
+        └─ write/merge       → src/content/releases/<slug>.md
+        ▼
+  astro dev / build  →  serves everything from public/
 ```
 
-### File Locations
+In local mode `public/` is the asset store (it's gitignored — in production these live on
+R2). Object keys are **stable per track**: the `<lufs-id>` path segment is the workchain
+catalog number, not the track ordinal.
 
-- **Audio files**: `public/audio/[collectionId]/[trackNumber]/[filename].mp3`
-- **Reports**: `public/reports/[collectionId]/[trackNumber]/final_report.html`
-- **Covers**: `public/covers/[collectionId]/[trackNumber]/*.png`
-- **Release metadata**: `src/content/releases/[slug].md`
+## Content model
 
-### Content Model
-
-Tracks have these URL fields:
+Tracks carry storage-agnostic URL/key fields (schema in `src/content/config.ts`):
 
 ```yaml
 tracks:
-  - audioPath: "/audio/[collectionId]/[trackNumber]/[filename].mp3"
-    renderStatsPath: "/reports/[collectionId]/[trackNumber]/render_stats.html"
-    finalReport: "/reports/[collectionId]/[trackNumber]/final_report.html"
+  - trackNumber: 1                                  # display order only
+    audioPath: "/audio/<id>/<lufs-id>/<file>.mp3"   # local path; in remote mode this is an R2 key
+    finalReport: "/reports/<id>/<lufs-id>/final_report.html"
+    artwork: { main, identicon, spectrogram, canvasStatic }
 ```
 
-These are **local paths** that work with Astro's static server.
+Local paths work directly with Astro's static server. In remote mode, `audioPath` becomes a
+private R2 key (resolved to a signed URL at play time) and `finalReport`/`artwork` become
+absolute `cdn.lufsaud.io` URLs — **no component changes needed**, the UI uses whatever the
+field holds.
 
-## Using the Player
+## The player
 
-The persistent bottom player uses Howler.js in HTML5 mode with localStorage state synchronization:
+The persistent bottom player uses Howler.js (HTML5 mode). Runtime state lives on a single
+window-scoped singleton (`src/components/player/audioManager.ts`) so exactly one Howl ever
+plays — even across Astro ViewTransitions — and position/volume/play-state are mirrored to
+`localStorage` (every ~500ms) for seamless resume after a reload.
 
-1. Click any play button to start playback
-2. Player persists across page navigation (via Astro View Transitions + localStorage)
-3. Use the progress bar to seek
-4. Volume controls adjust playback
-5. Position, volume, and play state are saved to localStorage every 500ms, allowing seamless resume even after full page reloads
-6. **Keyboard shortcuts**: Space = play/pause, Left/Right arrows = volume
+- Play button → starts playback; the player persists across navigation.
+- Progress bar to seek; click/drag the volume slider; speaker icon to mute.
+- **Keyboard:** Space = play/pause, ←/→ = volume.
 
-## Development Commands
+Key files in `src/components/player/`: `PlayerBar.svelte` (UI island), `audioManager.ts`
+(the single-Howl engine + state), `resolveAudio.ts` (turns a stored ref into a playable URL —
+a local path as-is, or an R2 key exchanged for a signed URL via `PUBLIC_R2_STREAM_URL`).
 
-### Start Dev Server (no ingest)
+## Commands
+
 ```bash
-pnpm dev
-```
-Serves from `http://localhost:4321`
-
-### Build Production
-```bash
-pnpm build
-```
-Generates static site in `dist/`
-
-### Preview Production Build
-```bash
-pnpm preview
-```
-Serves the static build from `dist/`
-
-### Full Workflow (Ingest + Dev)
-```bash
-./catalog-dev.sh --ingest
+pnpm dev                     # dev server only (no ingest)
+pnpm build                   # static build → dist/
+pnpm preview                 # preview the build
+pnpm catalog:ingest          # ingest only
+./catalog-dev.sh --ingest    # ingest + dev server
+pnpm test                    # unit (Vitest);  pnpm test:e2e for Playwright
 ```
 
-### Ingest Only
-```bash
-pnpm catalog:ingest:local
-```
+## Going to production (remote storage)
 
-## migrating to Remote Storage
-
-To migrate from local files to Cloudflare R2:
-
-1. Update `audioPath`, `renderStatsPath`, and `finalReport` fields to point to R2 URLs:
-   ```yaml
-   audioPath: "https://pub-xxxx.r2.dev/releases/..."
-   ```
-
-2. Or implement a `catalog-ingest.mjs` that uploads to R2
-
-3. No component code changes needed—the player and UI use the URL paths directly
-
-## File Structure
-
-```
-src/
-├── content/
-│   ├── config.ts           # Content schema with audioPath fields
-│   └── releases/
-│       └── continuo.md     # Example release with track URLs
-├── components/
-│   └── player/
-│       ├── PlayerBar.svelte    # Persistent player (Svelte)
-│       ├── playerStore.ts      # State management (nanostores)
-│       └── useHowler.ts        # Howler.js wrapper
-├── scripts/
-│   └── ingest/
-│       ├── catalog-ingest-local.mjs  # Local ingestion script
-│       └── utils.mjs                 # HTML parsing utilities
-└── styles/
-    ├── tokens.css             # CSS design tokens
-    └── global.css            # Global styles
-
-public/
-├── audio/         # MP3 files copied by ingest script
-├── reports/       # HTML reports copied by ingest script
-└── covers/        # Cover art copied by ingest script
-
-docs/
-├── PRD.md              # Product requirements
-├── TDD.md              # Technical definitions (updated with local dev)
-└── v0-local_opencode-prompt.md  # Original instructions
-
-.catalog-dev.sh          # Dev wrapper script
-.env.local.example       # Environment template
-package.json             # Scripts: catalog:ingest:local, dev, build
-astro.config.mjs         # Astro config (output: static)
-```
+Remote mode is built and live — you don't migrate by hand. Set `STORAGE_MODE=remote` plus the
+`R2_*` / `R2_PUBLIC_BUCKET_NAME` / `PUBLIC_R2_BASE_URL` / `PUBLIC_R2_STREAM_URL` vars in
+`.env.production`, then `pnpm catalog:ingest` uploads audio to the private R2 bucket and
+covers/reports to the public CDN bucket and rewrites the `.md` URLs accordingly. Full
+walkthrough (buckets, Worker, DNS, deploy): [`SETUP.md`](SETUP.md) and
+[`docs/implementation/09-ingest-and-deploy.md`](docs/implementation/09-ingest-and-deploy.md).
 
 ## License
 
