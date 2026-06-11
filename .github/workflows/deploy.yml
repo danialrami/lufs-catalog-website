@@ -46,6 +46,9 @@ jobs:
 
       - name: Build (static)
         run: pnpm build
+        env:
+          PUBLIC_R2_STREAM_URL: ${{ vars.PUBLIC_R2_STREAM_URL || 'https://stream.lufsaud.io' }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://catalog.lufs.audio' }}
 
       - name: Publish dist/ to the hostinger branch
         uses: peaceiris/actions-gh-pages@v4
