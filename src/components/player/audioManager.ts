@@ -202,7 +202,13 @@ function buildHowl(resolvedUrl: string, autoPlay: boolean) {
 export function loadAudio(ref: string, autoPlay = true): boolean {
   const r = rt();
   if (r.howl && r.currentAudioPath === ref && r.howl.state() === 'loaded') {
-    if (autoPlay) r.howl.play();
+    // Same track already loaded. If it's already playing, restart in place (seek to 0) —
+    // do NOT call play() again, which would start a SECOND concurrent html5 voice on the
+    // same Howl (the double-click amplitude overload). If paused/ended, resume/restart.
+    if (autoPlay) {
+      if (r.howl.playing()) r.howl.seek(0);
+      else r.howl.play();
+    }
     return true;
   }
 
@@ -232,7 +238,9 @@ export function loadAudio(ref: string, autoPlay = true): boolean {
   return true;
 }
 
-export function play() { const r = rt(); if (r.howl) r.howl.play(); }
+// Guard against starting a second concurrent voice: Howler's play() on an already-playing
+// html5 Howl allocates a NEW sound (overlapping audio). Only play when not already playing.
+export function play() { const r = rt(); if (r.howl && !r.howl.playing()) r.howl.play(); }
 export function pause() { const r = rt(); if (r.howl) r.howl.pause(); }
 export function stop() { const r = rt(); if (r.howl) r.howl.stop(); }
 

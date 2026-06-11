@@ -67,11 +67,18 @@ jobs:
           PUBLIC_R2_STREAM_URL: ${{ vars.PUBLIC_R2_STREAM_URL || 'https://stream.lufsaud.io' }}
           PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://catalog.lufs.audio' }}
 
+      # Do NOT set force_orphan: true. It rewrites `hostinger` as a fresh orphan commit each
+      # deploy (no shared history), which makes Hostinger's Git auto-deploy fail with
+      # "divergent branches / Need to specify how to reconcile" and forces a manual wipe +
+      # re-pull every time. Keeping linear history lets Hostinger fast-forward `git pull`
+      # automatically. dist/ is tiny (HTML/CSS/JS; all media lives on R2), so the branch
+      # history won't bloat. (One-time: after switching away from force_orphan, resync
+      # Hostinger once — fresh pull, or `git reset --hard origin/hostinger` — to bridge the
+      # old orphan history; every push after that auto-deploys.)
       - name: Publish dist/ to the hostinger branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: hostinger
-          force_orphan: true
           commit_message: "deploy ${{ github.sha }}"
