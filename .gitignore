@@ -28,7 +28,12 @@ pnpm-debug.log*
 # VS Code
 .vscode/
 
-# Large web-ready audio: served from R2 in remote mode — never commit.
+# Generated, heavy ingest output — served from Cloudflare R2 in remote mode, never committed.
+# Audio streams from the PRIVATE bucket via the signing Worker; covers + the proof-of-work
+# report (with full-fidelity canvas video/gif/spectrograms) come from the PUBLIC bucket,
+# served from PUBLIC_R2_BASE_URL (cdn.lufsaud.io). Keeping these out of git is what keeps the
+# Hostinger deploy under GitHub's 2GB pack limit. In local mode they're regenerated under
+# public/ on every ingest, so they never need committing either.
 public/audio/
-# NOTE: public/covers/ and public/reports/ ARE committed — they're small, cacheable,
-# zero-egress, and the site needs them at build time (see src/scripts/ingest/uploadR2.mjs).
+public/covers/
+public/reports/
