@@ -53,7 +53,8 @@ At play time the player asks the Worker for a fresh signed URL. Public assets
 ## 2. Request lifecycle (a play click, in production)
 
 1. User clicks ▶ on a track. The page has the track's R2 **key**
-   (`releases/<collection>/<n>/<file>.mp3`), not a URL.
+   (`releases/<collectionId>/<lufs-id>/<file>.mp3` — keyed by the per-track catalog id, not
+   the ordinal; see `09-ingest-and-deploy.md`), not a URL.
 2. `useHowler.ts` calls `GET {STREAM_WORKER_URL}?key=<key>`.
 3. The Worker checks the `Origin` (must be `catalog.lufs.audio`), validates the key
    prefix (`releases/`, no `..`), and returns a **1-hour presigned URL**.
@@ -130,15 +131,15 @@ Defensive defaults: unknown → skip with a warning, never crash the run.
 Configurable via env (e.g. `CATALOG_ORGANIZE=project|year|flat`). This affects:
 
 - the **grouping/legend** on the grid (group header per project, or per year), and
-- optionally the **R2 key prefix** layout, e.g.
-  `releases/<project>/<collection>/<n>/<file>.mp3` or
-  `releases/<year>/<collection>/...`.
+- the **grouping/legend** only — NOT the R2 key layout.
 
-Recommendation: keep **R2 keys stable and flat-ish** (`releases/<collectionId>/<n>/…`)
-and treat project/year purely as **presentation metadata** (frontmatter
-`project`, derived `year` from `releaseDate`). That way re-organizing the *site* never
-requires re-uploading or moving objects in the bucket. Grouping is a view concern;
-keys are an identity concern — don't couple them.
+Realized: R2 keys are **stable and keyed off the per-track id**
+(`releases/<collectionId>/<lufs-id>/…`, where `<lufs-id>` is the workchain catalog number),
+and project/year are purely **presentation metadata** (frontmatter `project`, derived `year`
+from `releaseDate`). Keying off the per-track id (not the ordinal, and not project/year) means
+re-organizing the *site* — or adding/removing/reordering a track — never requires re-uploading
+or moving objects in the bucket. Grouping is a view concern; keys are an identity concern —
+they aren't coupled. (See `09-ingest-and-deploy.md` for the key scheme + the one-time migration.)
 
 ---
 

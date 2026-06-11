@@ -29,10 +29,14 @@ under **keys** (string names), inside a **bucket** (a namespace you own).
 
 ```
 bucket: lufs-catalog
-  key: releases/continuo/1/track.mp3   → [the bytes of that mp3] + metadata
-  key: reports/continuo/1/render.html  → [bytes] + metadata
-  key: artwork/continuo/cover.png      → [bytes] + metadata
+  key: releases/continuo/lufs-5cfa866d/track.mp3   → [the bytes of that mp3] + metadata
+  key: reports/continuo/lufs-5cfa866d/final_report.html → [bytes] + metadata
+  key: covers/continuo/lufs-5cfa866d/artwork.png   → [bytes] + metadata
 ```
+> Keys are keyed by the per-track **`lufs-id`** (the workchain catalog number), not the
+> track's ordinal — see `09-ingest-and-deploy.md`. (Covers + the report now live in the
+> PUBLIC bucket `lufs-catalog-public`, served from `cdn.lufsaud.io`; only audio stays in the
+> private `lufs-catalog`.)
 
 Mental model: **a key→file map in the cloud.** A few things that surprise newcomers:
 
@@ -106,8 +110,8 @@ key — the secret itself never travels to the browser.
 
 Our flow:
 
-1. The static page knows a track's **key** (`releases/continuo/1/track.mp3`) — not a URL.
-2. On play, the browser asks our **Worker**: `GET https://stream.lufs.audio?key=releases/continuo/1/track.mp3`.
+1. The static page knows a track's **key** (`releases/continuo/lufs-5cfa866d/track.mp3`) — not a URL.
+2. On play, the browser asks our **Worker**: `GET https://stream.lufs.audio?key=releases/continuo/lufs-5cfa866d/track.mp3`.
 3. The Worker (holding the secret) returns a **1-hour** presigned URL.
 4. The player streams from it. After an hour the URL is dead.
 

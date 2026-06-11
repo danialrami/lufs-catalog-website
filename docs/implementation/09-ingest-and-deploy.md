@@ -57,17 +57,33 @@ Per the confirmed sample (see also `02-observed-state.md`):
 ### What it produces (local mode)
 - **Audio:** transcodes `<name>_normalized.wav` → **MP3 @ 320 kbps** (`-codec:a
   libmp3lame -b:a 320k -joint_stereo 1 -map_metadata -1`) into
-  `public/audio/<collectionId>/<n>/<name>.mp3`; **duration via `ffprobe`**.
+  `public/audio/<collectionId>/<lufs-id>/<name>.mp3`; **duration via `ffprobe`**.
 - **Report:** sanitizes `<name>_report.html` (strips `<audio>`, `<source>`, and
   `download`/`*.wav`/`*.mp3` anchors so there's no download affordance — text
-  mentions of filenames are harmless) → `public/reports/<collectionId>/<n>/final_report.html`,
+  mentions of filenames are harmless) → `public/reports/<collectionId>/<lufs-id>/final_report.html`,
   copying its `artwork/`, `canvas/`, `logs/` alongside so the embedded relative links
   resolve.
 - **Covers:** `artwork.png` + `identicon/spectrogram/rectangle_spectrogram.png` +
-  `canvas_static.png` → `public/covers/<collectionId>/<n>/`, plus a collection
+  `canvas_static.png` → `public/covers/<collectionId>/<lufs-id>/`, plus a collection
   `cover.png`.
 - **Content:** writes/merges `src/content/releases/<slug>.md` (schema in
   `src/content/config.ts`, now incl. an optional `loudness` block).
+
+### Stable per-track keys (`<lufs-id>`, not the ordinal)
+The `<lufs-id>` segment above is the track's **workchain catalog number** (`lufs-<hash>`
+from `catalog/catalog_info.txt`) — a content-derived, position-INDEPENDENT id, **not** the
+track's `trackNumber`. (Fallback if a catalog number is ever missing: `sha-<first-12-of-sha256>`,
+then the slug.) Keying audio/covers/reports off this id is what makes **add / remove / reorder
+touch only the changed track** — no renumber churn, so a prune after a removal clears just the
+one removed track's `releases|covers|reports/<collectionId>/<lufs-id>/…` objects. Track display
+ORDER still lives in the `.md` `trackNumber`; the collection `cover.png` sits at the collection
+root (`covers/<collectionId>/cover.png`), so its key is position-independent too.
+
+> **Migrating an existing positional catalog (one-time):** older catalogs were keyed
+> `…/<collectionId>/<n>/…`. Re-key them with **no re-encode** via `R2_ADOPT_LEGACY_KEYS=1`
+> (the ingest server-side-COPIES each audio object from its legacy positional key to the new
+> `<lufs-id>` key), then prune the old keys. Full step-by-step in the `catalog-operator` agent
+> ("One-time: migrate to stable per-track keys") and `uploadR2.mjs` / `catalog-ingest.mjs` headers.
 
 ### Edit-preserving merge (idempotent)
 On re-ingest, machine fields (`catalogNumber`, `sha256`, `duration`, `loudness`,
@@ -174,7 +190,7 @@ If you ever want reports/artwork on the CDN too, add a *second, public* bucket
   via `@aws-sdk/client-s3` `PutObject` (lazy-loaded; only needed in remote mode).
   Includes a commented rustfs mirror (doc 07).
 - **ingest remote mode** — with `STORAGE_MODE=remote`, the MP3 is transcoded to a
-  temp file, uploaded to `releases/<collectionId>/<n>/<file>.mp3`, and the track's
+  temp file, uploaded to `releases/<collectionId>/<lufs-id>/<file>.mp3`, and the track's
   `audioPath` is set to that **key** (not a `/audio/…` path). Reports + covers still
   go to `public/`.
 - **player** — `src/components/player/resolveAudio.ts` turns a stored ref into a
