@@ -20,8 +20,8 @@ tracks:
     sha256: "70f57b1f81a696d3902a5f3ddf42fb7dce89162ef82a3da01605447e381fa288"
     processedDate: "2026-06-10T23:00:14Z"
     saturation: 0.5
-    audioPath: "releases/hogtagon/1/face.mp3"
-    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/1/final_report.html"
+    audioPath: "releases/hogtagon/lufs-70f57b1f/face.mp3"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/lufs-70f57b1f/final_report.html"
     duration: 86
     loudness:
       targetLufs: -14
@@ -31,10 +31,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "https://cdn.lufsaud.io/covers/hogtagon/1/artwork.png"
-      identicon: "https://cdn.lufsaud.io/covers/hogtagon/1/identicon.png"
-      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/1/spectrogram.png"
-      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/1/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/lufs-70f57b1f/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/lufs-70f57b1f/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/lufs-70f57b1f/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/lufs-70f57b1f/canvas_static.png"
   - trackNumber: 2
     displayTitle: "jungle"
     filename: "jungle"
@@ -42,8 +42,8 @@ tracks:
     sha256: "405cb479a3f3b39b2708171270bcc8f396a23f3fba4a18098b4e155c3cb87679"
     processedDate: "2026-06-10T22:59:18Z"
     saturation: 0.5
-    audioPath: "releases/hogtagon/2/jungle.mp3"
-    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/2/final_report.html"
+    audioPath: "releases/hogtagon/lufs-405cb479/jungle.mp3"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/lufs-405cb479/final_report.html"
     duration: 99
     loudness:
       targetLufs: -14
@@ -53,10 +53,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "https://cdn.lufsaud.io/covers/hogtagon/2/artwork.png"
-      identicon: "https://cdn.lufsaud.io/covers/hogtagon/2/identicon.png"
-      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/2/spectrogram.png"
-      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/2/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/lufs-405cb479/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/lufs-405cb479/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/lufs-405cb479/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/lufs-405cb479/canvas_static.png"
   - trackNumber: 3
     displayTitle: "level-music"
     filename: "level-music"
@@ -64,8 +64,8 @@ tracks:
     sha256: "3b61cf5280b760dc9302d26f68136e5356a7ee62a99842f3b5c5ec6f9c1c5fcf"
     processedDate: "2026-06-10T22:58:50Z"
     saturation: 0.5
-    audioPath: "releases/hogtagon/3/level-music.mp3"
-    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/3/final_report.html"
+    audioPath: "releases/hogtagon/lufs-3b61cf52/level-music.mp3"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/lufs-3b61cf52/final_report.html"
     duration: 149
     loudness:
       targetLufs: -14
@@ -75,10 +75,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "https://cdn.lufsaud.io/covers/hogtagon/3/artwork.png"
-      identicon: "https://cdn.lufsaud.io/covers/hogtagon/3/identicon.png"
-      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/3/spectrogram.png"
-      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/3/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/lufs-3b61cf52/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/lufs-3b61cf52/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/lufs-3b61cf52/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/lufs-3b61cf52/canvas_static.png"
   - trackNumber: 4
     displayTitle: "lobby"
     filename: "lobby"
@@ -86,8 +86,8 @@ tracks:
     sha256: "310d64beb2b92beb0dde6b82b746a1f72f05cdfece9f6ef71ac843d38edfbe11"
     processedDate: "2026-06-10T23:00:42Z"
     saturation: 0.5
-    audioPath: "releases/hogtagon/4/lobby.mp3"
-    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/4/final_report.html"
+    audioPath: "releases/hogtagon/lufs-310d64be/lobby.mp3"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/lufs-310d64be/final_report.html"
     duration: 107
     loudness:
       targetLufs: -14
@@ -97,10 +97,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "https://cdn.lufsaud.io/covers/hogtagon/4/artwork.png"
-      identicon: "https://cdn.lufsaud.io/covers/hogtagon/4/identicon.png"
-      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/4/spectrogram.png"
-      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/4/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/lufs-310d64be/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/lufs-310d64be/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/lufs-310d64be/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/lufs-310d64be/canvas_static.png"
   - trackNumber: 5
     displayTitle: "main"
     filename: "main"
@@ -108,8 +108,8 @@ tracks:
     sha256: "38776972ed7513f46fe7eb8d72941f7062e8979256322ad9d3dc586486c036c6"
     processedDate: "2026-06-10T22:59:46Z"
     saturation: 0.5
-    audioPath: "releases/hogtagon/5/main.mp3"
-    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/5/final_report.html"
+    audioPath: "releases/hogtagon/lufs-38776972/main.mp3"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/lufs-38776972/final_report.html"
     duration: 115
     loudness:
       targetLufs: -14
@@ -119,10 +119,10 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "https://cdn.lufsaud.io/covers/hogtagon/5/artwork.png"
-      identicon: "https://cdn.lufsaud.io/covers/hogtagon/5/identicon.png"
-      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/5/spectrogram.png"
-      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/5/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/lufs-38776972/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/lufs-38776972/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/lufs-38776972/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/lufs-38776972/canvas_static.png"
   - trackNumber: 6
     displayTitle: "wanna-go-fast"
     filename: "wanna-go-fast"
@@ -130,8 +130,8 @@ tracks:
     sha256: "0e31aa217f9fd3966900d86ff348a62b74692ac416953c564499887939cb2439"
     processedDate: "2026-06-10T23:01:09Z"
     saturation: 0.5
-    audioPath: "releases/hogtagon/6/wanna-go-fast.mp3"
-    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/6/final_report.html"
+    audioPath: "releases/hogtagon/lufs-0e31aa21/wanna-go-fast.mp3"
+    finalReport: "https://cdn.lufsaud.io/reports/hogtagon/lufs-0e31aa21/final_report.html"
     duration: 95
     loudness:
       targetLufs: -14
@@ -141,8 +141,8 @@ tracks:
       sampleRate: 48000
       channels: 2
     artwork:
-      main: "https://cdn.lufsaud.io/covers/hogtagon/6/artwork.png"
-      identicon: "https://cdn.lufsaud.io/covers/hogtagon/6/identicon.png"
-      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/6/spectrogram.png"
-      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/6/canvas_static.png"
+      main: "https://cdn.lufsaud.io/covers/hogtagon/lufs-0e31aa21/artwork.png"
+      identicon: "https://cdn.lufsaud.io/covers/hogtagon/lufs-0e31aa21/identicon.png"
+      spectrogram: "https://cdn.lufsaud.io/covers/hogtagon/lufs-0e31aa21/spectrogram.png"
+      canvasStatic: "https://cdn.lufsaud.io/covers/hogtagon/lufs-0e31aa21/canvas_static.png"
 ---
