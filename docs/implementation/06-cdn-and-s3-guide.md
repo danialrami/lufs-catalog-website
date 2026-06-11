@@ -174,13 +174,33 @@ dollars a month. The thing that makes other clouds expensive for audio (per-GB
 egress) simply doesn't exist on R2. The signing **Worker** also runs on the Workers
 free tier (100k requests/day), so it's free at this scale too.
 
+### Where you are now (verified 2026-06-11)
+
+The two buckets hold **~15.9 GB** total — `lufs-catalog-public` **14.59 GB** (covers + the
+full proof-of-work reports, incl. canvas video/GIF) + `lufs-catalog` **1.35 GB** (the web MP3s).
+R2 bills **storage rounded up to the next GB-month**, first **10 GB-month free**:
+
+```
+billable = ceil(15.94 − 10)  = 6 GB-month
+cost     = 6 × $0.015        ≈ $0.09 / month
+```
+
+So **~$0.09/month** — exactly the "<$0.10" guess. Operations and egress are **$0** at this
+scale (nowhere near 1M writes / 10M reads; R2 never charges egress). Past the free tier, **each
+additional ~10 GB stored adds ~$0.15/month** — storage is the only dial that moves. (GB-month is
+the average daily storage over the month, rounded up to the next whole GB-month, so the brief
+re-ingest window where old + new keys both exist before the prune is negligible. Levers to shrink
+it: §9.8.)
+
 > Because even that storage bill is real (if small), we also build a deliberate
 > **switch to the NAS rustfs origin** — see §11 and `07-nas-rustfs-fallback.md`. If
 > you ever don't want to pay Cloudflare at all, flip `STORAGE_PRIMARY=rustfs` and
 > serve from the NAS.
 >
-> *(Rates as of this writing — verify current Cloudflare R2 pricing; the zero-egress
-> model is the durable point.)*
+> *(Rates verified against developers.cloudflare.com/r2/pricing on 2026-06-11: Standard
+> storage \$0.015/GB-month, Class A \$4.50/M, Class B \$0.36/M, egress \$0; free tier 10
+> GB-month + 1M Class A + 10M Class B, applied account-wide and reset monthly. Re-verify
+> periodically; the zero-egress model is the durable point.)*
 
 ### Rough cost comparison (illustrative — check current pricing)
 
@@ -294,21 +314,33 @@ R2_MODE=true
   `{ url }`; from a random origin → expect `403` (CORS/Origin check working).
 - Load the site → audio plays; **view source / network tab → no R2 key, no secret**.
 
-### 9.8 Cost guardrails (optional, recommended)
-- Cloudflare → **Notifications**: set a billing/usage alert.
-- Remember: storage + operations cost a little; **egress is \$0**. At this scale
-  expect single-digit cents to low dollars per month.
+### 9.8 Cost guardrails + levers (storage is the only dial)
+- Cloudflare → **Notifications**: set a billing/usage alert (e.g. notify above \$1/mo) so
+  growth never surprises you.
+- **Egress is \$0** and operations are effectively free at this scale; the only real bill is
+  **storage past 10 GB-month** (~\$0.015/GB-month). To pull it back down:
+  - **The canvas in the public reports is the biggest item.** Remote-public ingest keeps BOTH
+    the canvas **MP4** and the much larger **GIF** per track — the GIF can be tens of MB each,
+    so across the catalog it dominates `lufs-catalog-public`. Dropping just the GIF (keep the
+    MP4 + static PNG) in the report sanitize/copy step would likely cut the public bucket back
+    toward (or under) the 10 GB free tier. Check a report folder's object sizes first — it's a
+    fidelity tradeoff, so leave it opt-in.
+  - **Prune already keeps storage honest** — `R2_PRUNE` deletes orphaned keys, and stable
+    per-track keys mean edits don't pile up old copies, so you only ever store the live catalog.
+  - **Infrequent Access tier** (\$0.01/GB-month vs \$0.015) is cheaper to store but adds a
+    \$0.01/GB retrieval fee + 2× op rates + a 30-day minimum — not worth it for a ~16 GB catalog
+    (saves cents), but an option if the reports bucket grows large and is rarely read.
+  - **Don't store masters on R2** — only the web MP3 + report derivatives go up (already the case).
 
 ---
 
 ## 10. How our code uses all this (recap)
 
-- **Ingest** (`uploadR2.mjs`) uses the AWS S3 SDK with the R2 endpoint to **PUT**
-  audio (private), reports + artwork (public).
-- **Worker** uses the SDK + `@aws-sdk/s3-request-presigner` to **sign GETs** for
-  `releases/` keys, CORS-locked to the site.
-- **Player** (`useHowler.ts`) fetches a signed URL from the Worker, then streams.
-- **Public assets** are referenced by their public R2 URL directly (no signing).
+- **Ingest** (`uploadR2.mjs`) uses the AWS S3 SDK against the R2 endpoint to **PUT** audio to
+  the private bucket and covers + reports to the public bucket (keys: `…/<id>/<lufs-id>/…`).
+- **Worker** uses **`aws4fetch`** to **sign GETs** for `releases/` keys, CORS-locked to the site.
+- **Player** (`resolveAudio.ts`) fetches a signed URL from the Worker, then streams via Howler.
+- **Public assets** (covers + reports) are referenced by their `cdn.lufsaud.io` URL directly (no signing).
 - **Fallback** (doc 07) swaps the endpoint to the NAS rustfs S3 service when enabled.
 
 That's the whole mental model: *files in a bucket, keys not folders, public vs

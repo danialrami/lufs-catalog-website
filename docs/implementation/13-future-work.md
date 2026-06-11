@@ -25,6 +25,11 @@ Effort: 🟢 small · 🟡 medium · 🔴 large.   Status: 🔜 ready (designed/
   is the bulk of a full re-ingest (the stable-key migration ran ~1h52m, almost all upload I/O).
   A small concurrency limit (e.g. 8–16 in-flight `uploadObject`/`copyObject` calls) would cut
   full re-ingests to minutes. Steady-state incremental ingests are already fast (skip-unchanged).
+- **Trim the public bucket (drop the canvas GIF).** 🟢 💭 The per-track canvas **GIF** (tens of
+  MB) is the bulk of `lufs-catalog-public` (14.59 GB today) and is largely redundant with the
+  canvas **MP4**. Dropping just the GIF from the report (keep MP4 + static PNG) would likely pull
+  storage back under the 10 GB free tier — i.e. ~$0 vs ~$0.09/mo. It's a fidelity tradeoff, so
+  opt-in; see [`06-cdn-and-s3-guide.md`](./06-cdn-and-s3-guide.md) §9.8 for the cost levers.
 - **Refresh the e2e fixtures.** 🟢 🔜 `catalog.spec.ts` still references the old `Continuo`
   fixture; point it at a current release and assert the id-keyed audio/cover/report URLs resolve.
 - **`release-auditor` opencode subagent.** 🟢 🔜 A read-only agent that walks every
