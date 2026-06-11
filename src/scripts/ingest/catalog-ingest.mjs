@@ -146,20 +146,35 @@ function findAstroTracks(albumPath) {
 
 function parseAstroCatalog(acDir) {
   const ctx = JSON.parse(readFileSync(join(acDir, 'context.json'), 'utf8'));
-  const name = ctx.input_name || basename(acDir).replace(/_astro-catalog$/, '');
-  const ext = ctx.input_ext || 'wav';
-  const tmpl = (t) => t.replace('{input_name}', name).replace('{input_ext}', ext);
-  const steps = ctx.steps || {};
-  // Resolve outputs from path_template relative to acDir (NOT the absolute paths
-  // baked into context.json, which point at the machine that produced them).
-  const out = (step, key = 'primary_output') => {
-    const o = steps[step]?.outputs?.[key];
-    return o?.path_template ? join(acDir, tmpl(o.path_template)) : null;
-  };
 
-  const normalizedWav = out('normalization') || join(acDir, `${name}_normalized.${ext}`);
-  const reportHtml = out('reporting') || join(acDir, `${name}_report.html`);
-  const artworkMain = out('artwork_01') || join(acDir, 'artwork', `${name}_artwork.png`);
+  // Track identity comes from the OUTPUT DIR NAME, never ctx.input_name. The workchain
+  // threads each step's output forward, so by the end of the chain ctx.input_name /
+  // input_ext describe the LAST step's output (catalog/catalog_info.txt -> "catalog_info"
+  // / "txt"), NOT the track. catalog-process.sh names the dir `{track}_astro-catalog/`
+  // and the normalized file `{track}_normalized.<ext>`, so the dir is the source of truth.
+  const name = basename(acDir).replace(/_astro-catalog$/i, '');
+
+  // Discover the real artifacts by suffix rather than reconstructing paths from ctx —
+  // robust to a clobbered input_name, to varying audio extensions (wav/mp3/aiff/m4a…),
+  // and to whatever the chain named each file.
+  const AUDIO = /_normalized\.(wav|mp3|aiff|aif|m4a|flac|ogg)$/i;
+  const list = (d) => (existsSync(d) ? readdirSync(d) : []);
+  const here = list(acDir);
+  const norm = here.find((f) => f.startsWith(`${name}_normalized.`) && AUDIO.test(f))
+            || here.find((f) => AUDIO.test(f));
+  const normalizedWav = join(acDir, norm || `${name}_normalized.wav`);
+  const ext = norm ? norm.split('.').pop().toLowerCase() : 'wav';
+
+  const rep = here.find((f) => f === `${name}_report.html`) || here.find((f) => /_report\.html$/i.test(f));
+  const reportHtml = join(acDir, rep || `${name}_report.html`);
+
+  const artList = list(join(acDir, 'artwork'));
+  const art = artList.find((f) => f === `${name}_artwork.png`) || artList.find((f) => /_artwork\.png$/i.test(f));
+  const artworkMain = join(acDir, 'artwork', art || `${name}_artwork.png`);
+
+  const canvasList = list(join(acDir, 'canvas'));
+  const can = canvasList.find((f) => f === `${name}_canvas_static.png`) || canvasList.find((f) => /_canvas_static\.png$/i.test(f));
+  const canvasStatic = join(acDir, 'canvas', can || `${name}_canvas_static.png`);
 
   let catalogNumber = '';
   let sha256 = '';
@@ -184,7 +199,7 @@ function parseAstroCatalog(acDir) {
   }
 
   return {
-    name, ext, acDir, normalizedWav, reportHtml, artworkMain,
+    name, ext, acDir, normalizedWav, reportHtml, artworkMain, canvasStatic,
     catalogNumber, sha256, status: ctx.status,
     processedDate: ctx.end_time || ctx.start_time || new Date().toISOString(),
     saturation: ctx.globals?.saturation,
@@ -248,7 +263,7 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
   copy(m.artworkMain, join(coverDir, 'artwork.png'));
   const comp = join(m.acDir, 'artwork', 'components');
   for (const f of ['identicon.png', 'spectrogram.png', 'rectangle_spectrogram.png']) copy(join(comp, f), join(coverDir, f));
-  copy(join(m.acDir, 'canvas', `${m.name}_canvas_static.png`), join(coverDir, 'canvas_static.png'));
+  copy(m.canvasStatic, join(coverDir, 'canvas_static.png'));
 
   return {
     trackNumber,
