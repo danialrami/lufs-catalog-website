@@ -16,6 +16,13 @@ name: Build & Deploy → hostinger
 #   - PUBLIC_R2_STREAM_URL   e.g. https://stream.lufsaud.io
 #   - PUBLIC_SITE_URL        e.g. https://catalog.lufs.audio
 # A local-mode / blank build needs no variables.
+#
+# Cover art + the proof-of-work report are served from the PUBLIC R2 bucket's CDN domain
+# (PUBLIC_R2_BASE_URL, e.g. https://cdn.lufsaud.io). Those absolute URLs are baked into the
+# CONTENT at *ingest* time (which runs locally with the NAS + ffmpeg), so CI needs NO extra
+# variable for them — they're already in the committed src/content/releases/*.md, and the
+# heavy files live on R2, not in git. PUBLIC_R2_BASE_URL + R2_PUBLIC_BUCKET_NAME only need to
+# be in your LOCAL .env.production for `pnpm catalog:ingest`.
 
 on:
   push:

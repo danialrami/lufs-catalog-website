@@ -1,14 +1,15 @@
 /**
  * uploadR2.mjs — upload helper for catalog-ingest.mjs (STORAGE_MODE=remote).
  *
- * Uploads the web-ready MP3 to the PRIVATE R2 bucket under releases/… ; the site
- * streams it via short-lived presigned URLs from the signing Worker. Small assets
- * (report HTML, cover thumbnails) are NOT uploaded here — they stay committed in
- * public/ and deploy with the site (cacheable, zero-egress, simplest).
+ * Audio (web-ready MP3) goes to the PRIVATE bucket (R2_BUCKET_NAME) under releases/…,
+ * streamed via short-lived presigned URLs from the signing Worker. Public assets (cover
+ * art + the proof-of-work report and its images/video) go to the PUBLIC bucket
+ * (R2_PUBLIC_BUCKET_NAME) and are served directly from PUBLIC_R2_BASE_URL (e.g.
+ * cdn.lufsaud.io) — pass { bucket } to target it. Nothing heavy is committed to git.
  *
  * Env (server/script only — never in the browser bundle):
- *   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_ENDPOINT
- *   STORAGE_MIRROR=rustfs + RUSTFS_* to also mirror to the NAS (see doc 07).
+ *   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME,
+ *   R2_PUBLIC_BUCKET_NAME, R2_ENDPOINT.  (STORAGE_MIRROR=rustfs + RUSTFS_* → doc 07.)
  *
  * Requires `@aws-sdk/client-s3` (root dependency). `pnpm install` after pulling.
  */
@@ -54,14 +55,20 @@ let _r2 = null;
 
 /**
  * Upload a local file to R2 (and optionally mirror to rustfs). Returns the key.
+ *
+ * Targets the PRIVATE audio bucket (R2_BUCKET_NAME) by default; pass { bucket } to
+ * target another bucket — e.g. the PUBLIC bucket (R2_PUBLIC_BUCKET_NAME) for cover art
+ * and the proof-of-work report served from PUBLIC_R2_BASE_URL. `metadata` is stored as
+ * x-amz-meta-* (keys come back lowercased).
  */
-export async function uploadObject(localPath, key, contentType = 'application/octet-stream', metadata = {}) {
+export async function uploadObject(localPath, key, contentType = 'application/octet-stream', { bucket, metadata = {} } = {}) {
   _r2 = _r2 || r2Client();
+  const Bucket = bucket || process.env.R2_BUCKET_NAME;
   const Body = readFileSync(localPath);
   // Metadata values must be strings; stored as x-amz-meta-* (keys come back lowercased).
   const meta = Object.fromEntries(Object.entries(metadata).map(([k, v]) => [k, String(v ?? '')]));
   const cmd = new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME, Key: key, Body, ContentType: contentType, Metadata: meta,
+    Bucket, Key: key, Body, ContentType: contentType, Metadata: meta,
   });
   // Retry transient R2 errors (5xx / rate-limit / an HTML error page the SDK can't
   // deserialize) with backoff, so one blip doesn't drop a track.
@@ -95,13 +102,14 @@ export async function uploadObject(localPath, key, contentType = 'application/oc
 
 /**
  * HEAD an object to support skip-if-unchanged. Returns { metadata, contentLength }
- * or null if the object doesn't exist. `metadata` keys are lowercased by S3/R2.
+ * or null if the object doesn't exist. Pass { bucket } to target a non-default bucket
+ * (e.g. the public covers/reports bucket). `metadata` keys are lowercased by S3/R2.
  */
-export async function headObjectMeta(key) {
+export async function headObjectMeta(key, { bucket } = {}) {
   if (!HeadObjectCommand) return null;
   _r2 = _r2 || r2Client();
   try {
-    const r = await _r2.send(new HeadObjectCommand({ Bucket: process.env.R2_BUCKET_NAME, Key: key }));
+    const r = await _r2.send(new HeadObjectCommand({ Bucket: bucket || process.env.R2_BUCKET_NAME, Key: key }));
     return { metadata: r.Metadata || {}, contentLength: r.ContentLength };
   } catch (e) {
     const code = e?.$metadata?.httpStatusCode;

@@ -27,19 +27,26 @@
  *
  * Storage:
  *   STORAGE_MODE=local (default) -> MP3 + report + covers written into public/.
- *   STORAGE_MODE=remote          -> MP3 uploaded to the PRIVATE R2 bucket
- *                                   (releases/…, signed at play time); report +
- *                                   covers still committed to public/. See doc 09.
+ *   STORAGE_MODE=remote          -> MP3 -> PRIVATE R2 bucket (releases/…, signed at
+ *                                   play time). Covers + the proof-of-work report (and
+ *                                   its full-fidelity canvas video/gif/spectrograms) ->
+ *                                   PUBLIC R2 bucket (R2_PUBLIC_BUCKET_NAME), served from
+ *                                   PUBLIC_R2_BASE_URL (e.g. cdn.lufsaud.io). The local
+ *                                   public/ copies are removed after upload so nothing
+ *                                   heavy is committed to git or shipped in the Hostinger
+ *                                   deploy. If the public bucket isn't configured it falls
+ *                                   back to committing covers/reports under public/. Doc 09.
  *
  * Env: CATALOG_SOURCE_PATH, CATALOG_OUTPUT_ROOT, MP3_BITRATE (320k), STORAGE_MODE,
- *      R2_* (remote), CATALOG_ONLY (process one album, for testing).
+ *      R2_* (private audio), R2_PUBLIC_BUCKET_NAME + PUBLIC_R2_BASE_URL (public covers/
+ *      reports), R2_FORCE_UPLOAD (re-upload even when unchanged), CATALOG_ONLY (one album).
  */
 
 import {
   readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, copyFileSync, rmSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, dirname, basename } from 'node:path';
+import { join, dirname, basename, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
@@ -87,6 +94,18 @@ const STORAGE_MODE = process.env.STORAGE_MODE || 'local';
 const ONLY = process.env.CATALOG_ONLY || '';
 const REMOTE = STORAGE_MODE !== 'local';
 
+// Public-asset serving (remote only): when BOTH a public bucket and its served base URL
+// are set, covers + the proof-of-work report go to the PUBLIC R2 bucket and are served
+// from PUBLIC_R2_BASE_URL (e.g. cdn.lufsaud.io) instead of being committed to public/.
+// Requires both — set just one and we warn + fall back to committing under public/.
+const PUBLIC_BASE = (process.env.PUBLIC_R2_BASE_URL || '').replace(/\/+$/, '');
+const PUBLIC_BUCKET = process.env.R2_PUBLIC_BUCKET_NAME || '';
+const REMOTE_PUBLIC = REMOTE && !!PUBLIC_BASE && !!PUBLIC_BUCKET;
+const FORCE_UPLOAD = /^(1|true)$/i.test(process.env.R2_FORCE_UPLOAD || '');
+if (REMOTE && !REMOTE_PUBLIC && (PUBLIC_BASE || PUBLIC_BUCKET)) {
+  console.warn(`  ⚠ public-asset serving needs BOTH R2_PUBLIC_BUCKET_NAME (${PUBLIC_BUCKET || 'unset'}) and PUBLIC_R2_BASE_URL (${PUBLIC_BASE || 'unset'}); committing covers/reports to public/ for now.`);
+}
+
 // Lazy-load the R2 uploader only in remote mode (keeps local ingest dependency-free).
 let uploadObject = null;
 let headObjectMeta = null;
@@ -104,6 +123,26 @@ const slugify = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').repla
 const listDirs = (p) => existsSync(p)
   ? readdirSync(p, { withFileTypes: true }).filter((d) => d.isDirectory() && !isIgnored(d.name))
   : [];
+
+// Resolve a public/ asset path to the URL the site references. In remote-public mode the
+// asset lives on the public R2 bucket and is served from PUBLIC_R2_BASE_URL (cdn.lufsaud.io);
+// otherwise it's committed under public/ and served from the site root. Accepts a path
+// with or without a leading slash; the bucket key is the same path minus the slash.
+const assetUrl = (rel) => {
+  const clean = String(rel).replace(/^\/+/, '');
+  return REMOTE_PUBLIC ? `${PUBLIC_BASE}/${clean}` : `/${clean}`;
+};
+
+// Best-effort Content-Type for a public-bucket object (R2 has no extension sniffing).
+const CTYPES = {
+  '.html': 'text/html; charset=utf-8', '.htm': 'text/html; charset=utf-8',
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif',
+  '.webp': 'image/webp', '.svg': 'image/svg+xml', '.avif': 'image/avif',
+  '.mp4': 'video/mp4', '.webm': 'video/webm', '.mov': 'video/quicktime',
+  '.json': 'application/json', '.txt': 'text/plain; charset=utf-8',
+  '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
+};
+const ctype = (name) => CTYPES[(name.match(/\.[^.]+$/)?.[0] || '').toLowerCase()] || 'application/octet-stream';
 
 function copy(src, dest) {
   if (!existsSync(src)) { warn(`missing source: ${src}`); return false; }
@@ -126,6 +165,35 @@ function copyTree(srcDir, destDir, { skipWav = true, skipGif = false, skipMp4 = 
   }
 }
 
+// Upload a local directory (under public/) to the PUBLIC R2 bucket, keyed by its path
+// relative to public/ so the served URL (PUBLIC_R2_BASE_URL + key) matches what the
+// markdown references. Skips re-upload when the object already exists at the SAME byte
+// size (covers/reports are deterministic — identical size ⇒ identical content here),
+// unless R2_FORCE_UPLOAD=1. Same-key PUTs overwrite, so R2 storage never grows on
+// re-ingest. Returns { uploaded, skipped }.
+async function uploadPublicDir(absDir) {
+  const stats = { uploaded: 0, skipped: 0 };
+  if (!existsSync(absDir) || !uploadObject) return stats;
+  const walk = async (dir) => {
+    for (const name of readdirSync(dir)) {
+      if (isIgnored(name)) continue;
+      const p = join(dir, name);
+      if (statSync(p).isDirectory()) { await walk(p); continue; }
+      const key = relative(PUBLIC_DIR, p).split(sep).join('/'); // POSIX key regardless of OS
+      if (!FORCE_UPLOAD && headObjectMeta) {
+        try {
+          const head = await headObjectMeta(key, { bucket: PUBLIC_BUCKET });
+          if (head && Number(head.contentLength) === statSync(p).size) { stats.skipped++; continue; }
+        } catch { /* HEAD failed — fall through and upload */ }
+      }
+      await uploadObject(p, key, ctype(name), { bucket: PUBLIC_BUCKET });
+      stats.uploaded++;
+    }
+  };
+  await walk(absDir);
+  return stats;
+}
+
 // ---------- media ----------
 function ffprobeDuration(file) {
   try {
@@ -142,12 +210,26 @@ function transcodeMp3(wav, mp3) {
 }
 
 // ---------- report sanitize ----------
-function sanitizeReport(html) {
+// Always strips original-quality audio and download affordances (the "no-downloads"
+// guarantee). The canvas video + GIF are HEAVY: they're kept only when keepCanvas is set
+// (remote-public mode, where the report's sibling assets are uploaded to the public CDN
+// and the report renders in full); otherwise they're stripped so we never commit them.
+function sanitizeReport(html, { keepCanvas = false } = {}) {
   if (parseHTML) {
     const root = parseHTML(html);
-    root.querySelectorAll('audio, video, source').forEach((el) => el.remove());
-    root.querySelectorAll('img').forEach((el) => {
-      if ((el.getAttribute('src') || '').toLowerCase().endsWith('.gif')) el.remove(); // canvas GIF not shipped
+    // Removing <audio> takes its <source> children with it.
+    root.querySelectorAll('audio').forEach((el) => el.remove());
+    if (!keepCanvas) {
+      root.querySelectorAll('video').forEach((el) => el.remove());
+      root.querySelectorAll('img').forEach((el) => {
+        if ((el.getAttribute('src') || '').toLowerCase().endsWith('.gif')) el.remove(); // canvas GIF
+      });
+    }
+    // Any standalone media <source> pointing at downloadable audio (kept-video <source>s
+    // use .mp4, so the canvas survives keepCanvas mode).
+    root.querySelectorAll('source').forEach((el) => {
+      const src = (el.getAttribute('src') || '').toLowerCase();
+      if (src.endsWith('.wav') || src.endsWith('.mp3')) el.remove();
     });
     root.querySelectorAll('a, button').forEach((el) => {
       const href = (el.getAttribute && (el.getAttribute('href') || '')).toLowerCase();
@@ -158,12 +240,17 @@ function sanitizeReport(html) {
     });
     return root.toString();
   }
-  return html
+  // Regex fallback (node-html-parser unavailable).
+  let out = html
     .replace(/<audio[\s\S]*?<\/audio>/gi, '')
-    .replace(/<video[\s\S]*?<\/video>/gi, '')
-    .replace(/<source\b[^>]*>/gi, '')
-    .replace(/<img\b[^>]*src="[^"]*\.gif"[^>]*>/gi, '')
+    .replace(/<source\b[^>]*(?:\.wav|\.mp3)[^>]*>/gi, '')
     .replace(/<a\b[^>]*href="[^"]*\.(wav|mp3)"[^>]*>[\s\S]*?<\/a>/gi, '');
+  if (!keepCanvas) {
+    out = out
+      .replace(/<video[\s\S]*?<\/video>/gi, '')
+      .replace(/<img\b[^>]*src="[^"]*\.gif"[^>]*>/gi, '');
+  }
+  return out;
 }
 
 // ---------- astro-catalog discovery + metadata ----------
@@ -266,13 +353,12 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
     warn(`normalized WAV not found: ${m.normalizedWav}`);
   } else if (REMOTE) {
     const key = `releases/${collectionId}/${n}/${base}.mp3`;
-    const force = /^(1|true)$/i.test(process.env.R2_FORCE_UPLOAD || '');
     // Skip the transcode + upload when R2 already holds this exact source — matched by
     // the source SHA-256 we stamp as object metadata. Saves upload bandwidth + CPU on
     // re-ingests (and re-uploads automatically if the source changed). R2_FORCE_UPLOAD=1
     // forces a re-upload regardless.
     let head = null;
-    if (!force && headObjectMeta && m.sha256) {
+    if (!FORCE_UPLOAD && headObjectMeta && m.sha256) {
       try { head = await headObjectMeta(key); }
       catch (e) { warn(`HEAD ${key} failed (${e.message}); will upload`); }
     }
@@ -283,7 +369,7 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
       const tmpMp3 = join(tmpdir(), `lufs-${slugify(collectionId)}-${n}-${base}.mp3`);
       transcodeMp3(m.normalizedWav, tmpMp3);
       duration = ffprobeDuration(tmpMp3);
-      await uploadObject(tmpMp3, key, 'audio/mpeg', { source_sha256: m.sha256 || '', duration });
+      await uploadObject(tmpMp3, key, 'audio/mpeg', { metadata: { source_sha256: m.sha256 || '', duration } });
       rmSync(tmpMp3, { force: true });
     } else {
       warn('remote mode but uploader unavailable; audio not uploaded');
@@ -303,8 +389,16 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
   const hasReport = existsSync(m.reportHtml);
   if (hasReport) {
     ensureDir(reportDir);
-    writeFileSync(join(reportDir, 'final_report.html'), sanitizeReport(readFileSync(m.reportHtml, 'utf8')));
-    for (const sub of ['artwork', 'canvas', 'logs']) copyTree(join(m.acDir, sub), join(reportDir, sub), { skipWav: true, skipGif: true, skipMp4: true });
+    // Keep the canvas video + GIF only in remote-public mode, where the report's sibling
+    // assets are uploaded to the public CDN and the report renders in full fidelity;
+    // otherwise strip them (we never commit heavy media to git).
+    writeFileSync(
+      join(reportDir, 'final_report.html'),
+      sanitizeReport(readFileSync(m.reportHtml, 'utf8'), { keepCanvas: REMOTE_PUBLIC }),
+    );
+    for (const sub of ['artwork', 'canvas', 'logs']) {
+      copyTree(join(m.acDir, sub), join(reportDir, sub), { skipWav: true, skipGif: !REMOTE_PUBLIC, skipMp4: !REMOTE_PUBLIC });
+    }
   } else { warn(`report not found (re-run the chain with --report to include it): ${m.reportHtml}`); }
 
   // 3) covers for the site UI
@@ -322,14 +416,14 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
     processedDate: m.processedDate,
     saturation: m.saturation,
     audioPath,
-    finalReport: hasReport ? `/reports/${collectionId}/${n}/final_report.html` : '',
+    finalReport: hasReport ? assetUrl(`/reports/${collectionId}/${n}/final_report.html`) : '',
     duration,
     loudness: m.loudness,
     artwork: {
-      main: `/covers/${collectionId}/${n}/artwork.png`,
-      identicon: `/covers/${collectionId}/${n}/identicon.png`,
-      spectrogram: `/covers/${collectionId}/${n}/spectrogram.png`,
-      canvasStatic: `/covers/${collectionId}/${n}/canvas_static.png`,
+      main: assetUrl(`/covers/${collectionId}/${n}/artwork.png`),
+      identicon: assetUrl(`/covers/${collectionId}/${n}/identicon.png`),
+      spectrogram: assetUrl(`/covers/${collectionId}/${n}/spectrogram.png`),
+      canvasStatic: assetUrl(`/covers/${collectionId}/${n}/canvas_static.png`),
     },
   };
 }
@@ -432,7 +526,9 @@ async function main() {
   log(`source : ${SRC}`);
   log(`output : ${OUTPUT_ROOT}  (mode=${STORAGE_MODE}, mp3=${MP3_BITRATE}, html-parser=${parseHTML ? 'node-html-parser' : 'regex-fallback'})`);
   if (!existsSync(SRC)) { console.error(`CATALOG_SOURCE_PATH not found: ${SRC}`); process.exit(1); }
-  if (REMOTE) log(`  remote: audio -> R2 bucket "${process.env.R2_BUCKET_NAME || '(R2_BUCKET_NAME unset)'}"; reports + covers committed to public/.`);
+  if (REMOTE) log(`  remote: audio → R2 "${process.env.R2_BUCKET_NAME || '(R2_BUCKET_NAME unset)'}" (private, signed at play time).`);
+  if (REMOTE_PUBLIC) log(`  remote: covers + reports → R2 "${PUBLIC_BUCKET}" (public), served from ${PUBLIC_BASE} (local copies removed after upload).`);
+  else if (REMOTE) log('  remote: covers + reports committed to public/ (set R2_PUBLIC_BUCKET_NAME + PUBLIC_R2_BASE_URL to serve them from a CDN instead).');
   if (REMOTE) log('  publish: status=released by default; set a release\'s status to "unreleased" to keep it off the site (re-ingest preserves it).');
 
   let albums = listDirs(SRC).map((d) => d.name).sort();
@@ -496,13 +592,24 @@ async function main() {
       artist: 'Daniel Ramirez',
       releaseDate: human.releaseDate || (tracks[0].processedDate || '').slice(0, 10) || new Date().toISOString().slice(0, 10),
       status: decideStatus(REMOTE, human.status),
-      coverArt: `/covers/${collectionId}/cover.png`,
+      coverArt: assetUrl(`/covers/${collectionId}/cover.png`),
       isrc: human.isrc || '',
       streamingLinks: human.streamingLinks,
       tags: human.tags || [],
       tracks,
     });
     log(`  ✓ wrote src/content/releases/${slug}.md  (${tracks.length} track(s), status=${human.status || 'draft'})`);
+
+    // Remote-public: push this collection's covers + reports to the PUBLIC R2 bucket
+    // (served from PUBLIC_R2_BASE_URL) and drop the local copies, so neither git nor the
+    // Hostinger deploy branch carries heavy assets. Same-key PUTs overwrite ⇒ no R2 growth.
+    if (REMOTE_PUBLIC) {
+      const cov = await uploadPublicDir(join(PUBLIC_DIR, 'covers', collectionId));
+      const rep = await uploadPublicDir(join(PUBLIC_DIR, 'reports', collectionId));
+      log(`  ↑ public R2 (${PUBLIC_BUCKET}): covers ${cov.uploaded} up/${cov.skipped} unchanged, reports ${rep.uploaded} up/${rep.skipped} unchanged → ${PUBLIC_BASE}`);
+      for (const sub of ['covers', 'reports']) rmSync(join(PUBLIC_DIR, sub, collectionId), { recursive: true, force: true });
+    }
+
     processed.push(`${slug} <- ${dirName} (${tracks.length} track(s))`);
   }
 
