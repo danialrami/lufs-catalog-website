@@ -9,7 +9,7 @@
   let duration = 0;
   let position = 0;
   let volume = 0.8;
-  
+
   let progressFill: HTMLElement;
   let timeCurrent: HTMLElement;
   let timeTotal: HTMLElement;
@@ -39,20 +39,20 @@
     const tick = () => {
       if (audioManager.isPlaying()) {
         position = audioManager.getPosition();
-        
+
         if (currentTrack) {
           persistedTrack.set({ audioPath: currentTrack.audioPath, position });
         }
-        
+
         if (progressFill && duration > 0) {
           progressFill.style.width = (position / duration * 100) + '%';
         }
-        
+
         updateTimeDisplay();
         animationId = requestAnimationFrame(tick);
       }
     };
-    
+
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
@@ -62,7 +62,7 @@
   function handlePlayTrack(e: Event) {
     const customEvent = e as CustomEvent;
     const { audioPath, trackTitle } = customEvent.detail;
-    
+
     const track: Track = {
       trackNumber: 0,
       displayTitle: trackTitle || 'Unknown',
@@ -75,7 +75,7 @@
       duration: 0,
       artwork: {}
     };
-    
+
     loadAndPlay(track);
   }
 
@@ -84,7 +84,7 @@
     isPlaying = true;
     position = 0;
     duration = 0;
-    
+
     persistedTrack.set({ audioPath: track.audioPath, position: 0 });
 
     // Persist volume first so the new Howl picks it up, then load with autoplay
@@ -142,30 +142,26 @@
 
   onMount(() => {
     if (typeof window !== 'undefined') {
-      // Clean up any existing listeners first (important for persisted components)
-      document.removeEventListener('astro:page-load', restorePlayback);
-      window.removeEventListener('play-track', handlePlayTrack as EventListener);
-      
       // Restore volume from persistent store
       volume = persistedVolume.get();
       if (volumeFill) {
         volumeFill.style.width = (volume * 100) + '%';
       }
-      
+
       audioManager.setOnLoad((dur) => {
         duration = dur;
         updateTimeDisplay();
       });
-      
+
       audioManager.setOnPlay(() => {
         isPlaying = true;
         startProgressLoop();
       });
-      
+
       audioManager.setOnPause(() => {
         isPlaying = false;
       });
-      
+
       audioManager.setOnEnd(() => {
         isPlaying = false;
         position = 0;
@@ -173,32 +169,36 @@
         if (progressFill) progressFill.style.width = '0%';
         updateTimeDisplay();
       });
-      
+
       audioManager.setOnSeek((pos) => {
         position = pos;
         if (currentTrack) {
           persistedTrack.set({ audioPath: currentTrack.audioPath, position: pos });
         }
       });
-      
+
       restorePlayback();
-      
-      document.addEventListener('astro:page-load', restorePlayback);
-      window.addEventListener('play-track', handlePlayTrack as EventListener);
-      window.addEventListener('keydown', handleKeydown);
+
+      // Bind global listeners ONCE via the audioManager (deduped at module scope) and
+      // point them at this instance's handlers. Astro ViewTransitions re-mount this
+      // island on every navigation; binding per-mount used to accumulate listeners, so a
+      // single play click fired multiple times and spawned overlapping Howls. Re-running
+      // this each mount just re-points the single set of listeners at the latest instance.
+      audioManager.setEventHandlers({
+        playTrack: handlePlayTrack,
+        pageLoad: restorePlayback,
+        keydown: handleKeydown,
+      });
     }
-    
+
     if (volumeFill) {
       volumeFill.style.width = (volume * 100) + '%';
     }
   });
 
   onDestroy(() => {
-    if (typeof window !== 'undefined') {
-      document.removeEventListener('astro:page-load', restorePlayback);
-      window.removeEventListener('play-track', handlePlayTrack as EventListener);
-      window.removeEventListener('keydown', handleKeydown);
-    }
+    // Global listeners are owned by audioManager (bound once, delegating to the active
+    // instance), so there's nothing to detach per-instance here.
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
@@ -239,19 +239,19 @@
 
   function handleSeek(e: MouseEvent) {
     if (!duration) return;
-    
+
     const bar = e.currentTarget as HTMLElement;
     const rect = bar.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const newPos = x * duration;
-    
+
     audioManager.seek(newPos);
     position = newPos;
-    
+
     if (currentTrack) {
       persistedTrack.set({ audioPath: currentTrack.audioPath, position: newPos });
     }
-    
+
     if (progressFill && duration > 0) {
       progressFill.style.width = (position / duration * 100) + '%';
     }
@@ -260,7 +260,7 @@
   function handleVolumeMouseDown(e: MouseEvent) {
     isDraggingVolume = true;
     updateVolumeFromEvent(e, volumeBar);
-    
+
     window.addEventListener('mousemove', handleVolumeMouseMove);
     window.addEventListener('mouseup', handleVolumeMouseUp);
   }
@@ -291,7 +291,7 @@
     volume = Math.max(0, Math.min(1, x));
     persistedVolume.set(volume);
     audioManager.setVolume(volume);
-    
+
     if (volumeFill) {
       volumeFill.style.width = (volume * 100) + '%';
     }
@@ -303,10 +303,10 @@
     } else {
       volume = 0.8;
     }
-    
+
     persistedVolume.set(volume);
     audioManager.setVolume(volume);
-    
+
     if (volumeFill) {
       volumeFill.style.width = (volume * 100) + '%';
     }
@@ -324,13 +324,13 @@
   <div class="track-info">
     {#if currentTrack}
       {#if currentTrack.artwork?.main}
-        <img 
-          class="cover-art" 
-          src={currentTrack.artwork.main} 
+        <img
+          class="cover-art"
+          src={currentTrack.artwork.main}
           alt="Cover Art"
         />
       {/if}
-      
+
       <div class="track-meta">
         <span class="track-title">{currentTrack.displayTitle}</span>
         {#if currentTrack.catalogNumber}
@@ -345,8 +345,8 @@
   </div>
 
   <div class="controls">
-    <button 
-      class="play-btn" 
+    <button
+      class="play-btn"
       onclick={togglePlayPause}
       aria-label={currentTrack && isPlaying ? 'Pause' : 'Play'}
     >
@@ -363,7 +363,7 @@
     </button>
 
     <div class="progress-container">
-      <div 
+      <div
         class="progress-bar"
         onclick={handleSeek}
         role="slider"
@@ -375,14 +375,14 @@
       >
         <div class="progress-fill" bind:this={progressFill}></div>
       </div>
-      
+
       <span class="time-display" bind:this={timeCurrent}>0:00</span>
       <span class="time-display" bind:this={timeTotal}>/ --</span>
     </div>
   </div>
 
   <div class="icons">
-    <button 
+    <button
       class="icon-btn"
       onclick={playNext}
       aria-label="Play next"
@@ -393,7 +393,7 @@
     </button>
 
     <div class="volume-container">
-      <button 
+      <button
         class="icon-btn"
         onclick={toggleMute}
         aria-label={volume > 0 ? 'Mute' : 'Unmute'}
@@ -409,7 +409,7 @@
         </svg>
       </button>
 
-      <div 
+      <div
         class="volume-bar"
         bind:this={volumeBar}
         onmousedown={handleVolumeMouseDown}
