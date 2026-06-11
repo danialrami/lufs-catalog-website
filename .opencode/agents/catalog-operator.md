@@ -76,6 +76,12 @@ touches production or storage, and always tell Daniel exactly what changed.
   - **Nothing heavy is committed to git:** `public/audio/`, `public/covers/`,
     `public/reports/` are gitignored. If the public bucket isn't configured the ingest
     falls back to committing covers/reports under `public/` (older behavior).
+  - **Object keys are STABLE PER TRACK:** `releases|covers|reports/<collectionId>/<lufs-id>/…`
+    where `<lufs-id>` is the workchain catalog number (a content hash), **not** the track's
+    ordinal. So adding / removing / reordering a track only ever touches THAT track's objects —
+    no renumber churn, and a prune after a removal clears just the one removed track's keys.
+    Track display ORDER still lives in the `.md` `trackNumber`. (Pre-migration catalogs used
+    positional keys `…/<n>/…`; re-key them once via the migration runbook below.)
 - Full reasoning + details: read `docs/implementation/` (esp. `09-ingest-and-deploy.md`
   for the ingest/deploy contract, `06-cdn-and-s3-guide.md`, `07-nas-rustfs-fallback.md`,
   and `12-hardening-and-verification.md`). The ingest + uploader headers
@@ -118,6 +124,10 @@ explicit order). The album **folder name is used verbatim** as the collectionId 
   (orphans from removed/renumbered tracks) — `dry` lists what would go, `apply` deletes.
   `R2_PRUNE_COLLECTIONS=<id,id>` additionally purges whole collections removed from source.
   Off by default; a normal ingest never lists or deletes.
+- `R2_ADOPT_LEGACY_KEYS=1` — **one-time migration only.** When a track's new stable-key
+  object is missing, copy it server-side from the legacy positional key (`releases/<id>/<n>/…`)
+  instead of re-encoding — re-keys the whole catalog with no re-transcode. See
+  "One-time: migrate to stable per-track keys" below. Harmless (and a no-op) once migrated.
 - Re-ingest is **idempotent**: audio is skipped when R2 already holds the same source
   (matched by `source_sha256` metadata); public covers/reports are skipped when the
   object exists at the same byte size. Same-key PUTs overwrite, so **R2 never grows on
@@ -167,17 +177,19 @@ to R2; it does NOT delete what disappeared, so removals pair with a prune. Alway
    `--report`). Verify: `./scripts/catalog-process.sh --verify-only`.
 3. (Preview) `pnpm catalog:ingest` then `pnpm dev` to eyeball the release locally.
 4. 🛑 Ship: `./catalog-deploy.sh --ingest` (ingest → commit → push `main` → CI auto-deploys).
-5. If you added a track to a multi-track album, ordering renumbers the others → run the
-   prune (below) to clear old keys. A brand-new album orphans nothing.
+5. With stable per-track keys, adding a track does NOT touch the other tracks' objects (it
+   only changes their display `trackNumber`), so there's nothing to prune — the re-ingest
+   just uploads the new track. (Prune only matters when you remove/replace something.)
 6. (Optional) edit `src/content/releases/<slug>.md` frontmatter for human fields.
 
 ### Remove a track from a multi-track release
 1. 🛑 Delete the track's source: `<album>/<track>_astro-catalog/` (+ `<track>.wav`). Show
    the exact path first; make sure the master exists elsewhere.
 2. 🛑 Preview: `R2_PRUNE=dry pnpm catalog:ingest` — regenerates the `.md` without the track
-   and LISTS the orphaned R2 keys it would delete. Removing a middle track renumbers the
-   later tracks, so the prune is **manifest-aware**: it keeps exactly what the new `.md`
-   references and only removes the leftovers. Review the list + the new `.md`.
+   and LISTS the orphaned R2 keys it would delete. With stable per-track keys the other
+   tracks' objects are untouched, so the prune lists just the removed track's own
+   `releases|covers|reports/<id>/<lufs-id>/…` objects (the prune is manifest-aware regardless).
+   Review the list + the new `.md`.
 3. 🛑 Apply + ship: `R2_PRUNE=apply ./catalog-deploy.sh --ingest` (re-ingest → delete the
    orphans → commit → push `main` → CI auto-deploys).
 4. Verify the track is gone and every remaining track's cover/report still loads.
@@ -193,10 +205,27 @@ to R2; it does NOT delete what disappeared, so removals pair with a prune. Alway
 Remove its source dir (as above), drop the new audio in the album, `catalog-process.sh`
 it, then run the remove-track flow (re-ingest with `R2_PRUNE=apply`) + deploy.
 
-> The manifest-aware prune (`R2_PRUNE`) is the safe way to clean R2 — never hand-delete
-> position-keyed `covers/<id>/<n>/` or `reports/<id>/<n>/` objects after a renumber, since
-> those slots get reused by the shifted tracks. `wrangler r2 object delete` is only a last
-> resort for one-offs, and only after showing Daniel the exact keys.
+> The manifest-aware prune (`R2_PRUNE`) is the safe way to clean R2. With stable per-track
+> keys each track owns its `<lufs-id>` subtree for life, so an edit no longer reshuffles
+> other tracks' objects — but ALWAYS `R2_PRUNE=dry` first and review the exact keys before
+> `apply`. `wrangler r2 object delete` is only a last resort for one-offs, and only after
+> showing Daniel the exact keys.
+
+### One-time: migrate to stable per-track keys
+Run this ONCE if R2 still holds the OLD positional objects (`releases|covers|reports/<id>/<n>/…`).
+It re-keys every track to `<lufs-id>` with **no re-encode** — audio is copied server-side, exact
+bytes + metadata preserved.
+1. (Recommended) finish any pending remove/prune first so R2 is already clean.
+2. 🛑 `R2_ADOPT_LEGACY_KEYS=1 pnpm catalog:ingest` (ALL collections — omit `CATALOG_ONLY`). Per
+   track it COPIES the audio from its legacy positional key to the new `<lufs-id>` key
+   (server-side, no transcode), re-uploads covers/reports under the new keys, and rewrites every
+   `.md` to id-based URLs. **Additive — deletes nothing.** Run in a REAL terminal (whole-catalog;
+   exceeds opencode's ~2-min bash timeout). A slug mismatch just falls back to a clean transcode.
+3. 🛑 Ship: commit the rewritten `.md` + `git push` `main` → CI deploys. Verify the live site
+   (audio plays, covers/reports load) — the OLD keys still exist as a safety net at this point.
+4. 🛑 Prune the now-orphaned positional keys: `R2_PRUNE=dry pnpm catalog:ingest` (review — it
+   should list every old `…/<id>/<n>/…`), then `R2_PRUNE=apply pnpm catalog:ingest`. R2-only, no
+   redeploy. Re-keying is then complete and permanent; leave `R2_ADOPT_LEGACY_KEYS` unset after.
 
 ## Deploy model (how the site actually ships)
 - **CI owns build + publish.** A push to `main` triggers `.github/workflows/deploy.yml`,

@@ -18,9 +18,9 @@ import { readFileSync } from 'node:fs';
 const warn = (...a) => console.warn('  ⚠', ...a);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-let S3Client; let PutObjectCommand; let HeadObjectCommand; let ListObjectsV2Command; let DeleteObjectsCommand;
+let S3Client; let PutObjectCommand; let HeadObjectCommand; let ListObjectsV2Command; let DeleteObjectsCommand; let CopyObjectCommand;
 try {
-  ({ S3Client, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } = await import('@aws-sdk/client-s3'));
+  ({ S3Client, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command, DeleteObjectsCommand, CopyObjectCommand } = await import('@aws-sdk/client-s3'));
 } catch {
   // Loaded lazily so local-mode ingest doesn't require the dependency.
 }
@@ -98,6 +98,27 @@ export async function uploadObject(localPath, key, contentType = 'application/oc
   // }
 
   return key;
+}
+
+/**
+ * Server-side COPY an object from srcKey to destKey WITHIN one bucket — the bytes never
+ * leave R2 (no download + re-upload, no re-encode). Metadata + Content-Type are preserved
+ * (MetadataDirective=COPY), so an audio object's source_sha256/duration carry over and
+ * later ingests still skip-as-unchanged. Default bucket is the PRIVATE audio bucket; pass
+ * { bucket } for the public one. The CopySource is per-segment URL-encoded (keys may hold
+ * spaces/parens). Used by the one-time stable-key migration (R2_ADOPT_LEGACY_KEYS) to
+ * re-key existing audio without re-transcoding. Returns destKey.
+ */
+export async function copyObject(srcKey, destKey, { bucket } = {}) {
+  if (!CopyObjectCommand) throw new Error('@aws-sdk/client-s3 not installed — run `pnpm install` (needed for STORAGE_MODE=remote).');
+  _r2 = _r2 || r2Client();
+  const Bucket = bucket || process.env.R2_BUCKET_NAME;
+  const encodedSource = `${Bucket}/${srcKey.split('/').map(encodeURIComponent).join('/')}`;
+  await _r2.send(new CopyObjectCommand({
+    Bucket, Key: destKey, CopySource: encodedSource, MetadataDirective: 'COPY',
+  }));
+  console.log(`    ⎘ R2 copy  ${srcKey} → ${destKey}`);
+  return destKey;
 }
 
 /**
