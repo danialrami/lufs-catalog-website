@@ -39,7 +39,9 @@
  *
  * Env: CATALOG_SOURCE_PATH, CATALOG_OUTPUT_ROOT, MP3_BITRATE (320k), STORAGE_MODE,
  *      R2_* (private audio), R2_PUBLIC_BUCKET_NAME + PUBLIC_R2_BASE_URL (public covers/
- *      reports), R2_FORCE_UPLOAD (re-upload even when unchanged), CATALOG_ONLY (one album).
+ *      reports), R2_FORCE_UPLOAD (re-upload even when unchanged), CATALOG_ONLY (one album),
+ *      R2_PRUNE=dry|apply (delete orphaned R2 keys for processed collections — dry lists,
+ *      apply deletes), R2_PRUNE_COLLECTIONS=<id,id> (also purge collections removed from source).
  */
 
 import {
@@ -106,11 +108,22 @@ if (REMOTE && !REMOTE_PUBLIC && (PUBLIC_BASE || PUBLIC_BUCKET)) {
   console.warn(`  ⚠ public-asset serving needs BOTH R2_PUBLIC_BUCKET_NAME (${PUBLIC_BUCKET || 'unset'}) and PUBLIC_R2_BASE_URL (${PUBLIC_BASE || 'unset'}); committing covers/reports to public/ for now.`);
 }
 
+// Prune (remote only): delete R2 objects a processed collection no longer produces —
+// orphans from removed/renumbered tracks. R2_PRUNE=dry lists what would go; R2_PRUNE=apply
+// deletes. R2_PRUNE_COLLECTIONS=<id,id> additionally purges whole collections removed from
+// the source. Off by default, so a normal ingest never lists or deletes anything.
+const PRUNE = (process.env.R2_PRUNE || '').toLowerCase();
+const PRUNE_ON = ['dry', 'apply', '1', 'true'].includes(PRUNE);
+const PRUNE_APPLY = PRUNE === 'apply';
+const PRUNE_COLLECTIONS = (process.env.R2_PRUNE_COLLECTIONS || '').split(',').map((s) => s.trim()).filter(Boolean);
+
 // Lazy-load the R2 uploader only in remote mode (keeps local ingest dependency-free).
 let uploadObject = null;
 let headObjectMeta = null;
+let listKeys = null;
+let deleteKeys = null;
 if (REMOTE) {
-  try { ({ uploadObject, headObjectMeta } = await import('./uploadR2.mjs')); }
+  try { ({ uploadObject, headObjectMeta, listKeys, deleteKeys } = await import('./uploadR2.mjs')); }
   catch (e) { console.warn('  ⚠ could not load uploadR2.mjs:', e.message); }
 }
 
@@ -172,7 +185,7 @@ function copyTree(srcDir, destDir, { skipWav = true, skipGif = false, skipMp4 = 
 // unless R2_FORCE_UPLOAD=1. Same-key PUTs overwrite, so R2 storage never grows on
 // re-ingest. Returns { uploaded, skipped }.
 async function uploadPublicDir(absDir) {
-  const stats = { uploaded: 0, skipped: 0 };
+  const stats = { uploaded: 0, skipped: 0, keys: [] };
   if (!existsSync(absDir) || !uploadObject) return stats;
   const walk = async (dir) => {
     for (const name of readdirSync(dir)) {
@@ -180,6 +193,7 @@ async function uploadPublicDir(absDir) {
       const p = join(dir, name);
       if (statSync(p).isDirectory()) { await walk(p); continue; }
       const key = relative(PUBLIC_DIR, p).split(sep).join('/'); // POSIX key regardless of OS
+      stats.keys.push(key); // live key — recorded whether we upload it or skip-as-current
       if (!FORCE_UPLOAD && headObjectMeta) {
         try {
           const head = await headObjectMeta(key, { bucket: PUBLIC_BUCKET });
@@ -192,6 +206,34 @@ async function uploadPublicDir(absDir) {
   };
   await walk(absDir);
   return stats;
+}
+
+// Delete R2 objects under a collection's prefixes that the current ingest no longer
+// produces — orphans left by removed or renumbered tracks. `liveAudio` / `livePublic` are
+// the exact keys this run uploaded or kept; anything else under releases|covers|reports/
+// <id>/ is orphaned. Dry-run by default (R2_PRUNE=dry); deletes only when R2_PRUNE=apply.
+// Never prunes a bucket when its live set is empty (guard against wiping a collection).
+async function pruneCollection(collectionId, liveAudio, livePublic) {
+  if (!REMOTE || !listKeys || !deleteKeys) return;
+  const plans = [];
+  if (liveAudio && liveAudio.size) {
+    const orphans = (await listKeys(`releases/${collectionId}/`)).filter((k) => !liveAudio.has(k));
+    if (orphans.length) plans.push({ label: `audio (${process.env.R2_BUCKET_NAME})`, bucket: undefined, orphans });
+  }
+  if (REMOTE_PUBLIC && livePublic && livePublic.size) {
+    const existing = [
+      ...await listKeys(`covers/${collectionId}/`, { bucket: PUBLIC_BUCKET }),
+      ...await listKeys(`reports/${collectionId}/`, { bucket: PUBLIC_BUCKET }),
+    ];
+    const orphans = existing.filter((k) => !livePublic.has(k));
+    if (orphans.length) plans.push({ label: `public (${PUBLIC_BUCKET})`, bucket: PUBLIC_BUCKET, orphans });
+  }
+  if (!plans.length) { log(`  ✓ prune: no orphaned R2 objects for ${collectionId}`); return; }
+  for (const { label, bucket, orphans } of plans) {
+    log(`  ${PRUNE_APPLY ? '🗑  prune' : '🔎 prune (dry-run)'}: ${orphans.length} orphan(s) in ${label}`);
+    for (const k of orphans) log(`       ${PRUNE_APPLY ? '- deleting ' : '- would delete '}${k}`);
+    if (PRUNE_APPLY) { const n = await deleteKeys(orphans, { bucket }); log(`     ✓ deleted ${n} object(s)`); }
+  }
 }
 
 // ---------- media ----------
@@ -616,14 +658,41 @@ async function main() {
     // Remote-public: push this collection's covers + reports to the PUBLIC R2 bucket
     // (served from PUBLIC_R2_BASE_URL) and drop the local copies, so neither git nor the
     // Hostinger deploy branch carries heavy assets. Same-key PUTs overwrite ⇒ no R2 growth.
+    const liveAudio = new Set(tracks.map((t) => t.audioPath).filter(Boolean)); // remote = R2 keys
+    let livePublic = new Set();
     if (REMOTE_PUBLIC) {
       const cov = await uploadPublicDir(join(PUBLIC_DIR, 'covers', collectionId));
       const rep = await uploadPublicDir(join(PUBLIC_DIR, 'reports', collectionId));
       log(`  ↑ public R2 (${PUBLIC_BUCKET}): covers ${cov.uploaded} up/${cov.skipped} unchanged, reports ${rep.uploaded} up/${rep.skipped} unchanged → ${PUBLIC_BASE}`);
+      livePublic = new Set([...cov.keys, ...rep.keys]);
       for (const sub of ['covers', 'reports']) rmSync(join(PUBLIC_DIR, sub, collectionId), { recursive: true, force: true });
     }
 
+    // Delete R2 objects this collection no longer produces (orphans from removed/renumbered
+    // tracks). Off unless R2_PRUNE is set; dry-run unless R2_PRUNE=apply.
+    if (PRUNE_ON) await pruneCollection(collectionId, liveAudio, livePublic);
+
     processed.push(`${slug} <- ${dirName} (${tracks.length} track(s))`);
+  }
+
+  // Whole-release removal: purge R2 objects for collections deleted from the source (their
+  // album folder is gone, so the per-collection prune above never runs for them). Opt in via
+  // R2_PRUNE_COLLECTIONS=<id,id>; dry-run unless R2_PRUNE=apply. (Also delete the stale
+  // src/content/releases/<slug>.md yourself — the ingest won't, since the album is gone.)
+  if (PRUNE_ON && REMOTE && PRUNE_COLLECTIONS.length && listKeys && deleteKeys) {
+    for (const cid of PRUNE_COLLECTIONS) {
+      const audio = await listKeys(`releases/${cid}/`);
+      const pub = REMOTE_PUBLIC
+        ? [...await listKeys(`covers/${cid}/`, { bucket: PUBLIC_BUCKET }), ...await listKeys(`reports/${cid}/`, { bucket: PUBLIC_BUCKET })]
+        : [];
+      log(`\n  ${PRUNE_APPLY ? '🗑  purge' : '🔎 purge (dry-run)'} collection "${cid}": ${audio.length} audio + ${pub.length} public object(s)`);
+      for (const k of [...audio, ...pub]) log(`       ${PRUNE_APPLY ? '- deleting ' : '- would delete '}${k}`);
+      if (PRUNE_APPLY) {
+        const a = await deleteKeys(audio);
+        const p = REMOTE_PUBLIC ? await deleteKeys(pub, { bucket: PUBLIC_BUCKET }) : 0;
+        log(`     ✓ purged ${a + p} object(s) for "${cid}"`);
+      }
+    }
   }
 
   log('\n=== summary ===');
