@@ -3,7 +3,7 @@
  * Uses localStorage for state persistence so audio can be restored after ViewTransition
  */
 
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 import { resolveAudioUrl, isDirectUrl } from './resolveAudio';
 
 const STORAGE_KEY = 'lufs-audio-state';
@@ -133,11 +133,13 @@ export function restoreFromStorage(): { audioPath: string; position: number; vol
  * on load so it works for both the synchronous (local) and async (R2) paths.
  */
 function buildHowl(resolvedUrl: string, autoPlay: boolean) {
-  // Never let two Howls coexist: tear down any current instance before creating a new one.
-  if (howlInstance) {
-    try { howlInstance.unload(); } catch { /* ignore */ }
-    howlInstance = null;
-  }
+  // Hard guarantee of single playback: unload EVERY live Howl, not just our module-local
+  // one. Astro re-creates the player island on navigation, so a Howl started on a previous
+  // page can keep playing with no reference the current module can reach — a module-local
+  // unload can't stop it (that was the cross-page "old audio keeps playing / amplitude
+  // overloads" bug). Howler tracks all instances globally, so this catches orphans too.
+  try { Howler.unload(); } catch { /* ignore */ }
+  howlInstance = null;
   const volume = getStoredState()?.volume ?? 0.8;
   try {
     howlInstance = new Howl({
