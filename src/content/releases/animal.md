@@ -1,0 +1,38 @@
+---
+title: "animal"
+collectionId: "animal"
+project: "Singles"
+artist: "Daniel Ramirez"
+releaseDate: 2026-06-10
+status: "draft"
+coverArt: "/covers/animal/cover.png"
+streamingLinks:
+  spotify: ""
+  appleMusic: ""
+  bandcamp: ""
+  soundcloud: ""
+tags: []
+tracks:
+  - trackNumber: 1
+    displayTitle: "animal"
+    filename: "animal"
+    catalogNumber: "lufs-10918ff3"
+    sha256: "10918ff3b6fe9c7ca31cb4caef46860a96be4e6acd1d45176f595c156c025e9b"
+    processedDate: "2026-06-10T22:53:42Z"
+    saturation: 0.5
+    audioPath: "/audio/animal/1/animal.mp3"
+    finalReport: "/reports/animal/1/final_report.html"
+    duration: 87
+    loudness:
+      targetLufs: -14
+      finalLufs: -12.92
+      truePeak: -1.5
+      lra: 7
+      sampleRate: 48000
+      channels: 2
+    artwork:
+      main: "/covers/animal/1/artwork.png"
+      identicon: "/covers/animal/1/identicon.png"
+      spectrogram: "/covers/animal/1/spectrogram.png"
+      canvasStatic: "/covers/animal/1/canvas_static.png"
+---
