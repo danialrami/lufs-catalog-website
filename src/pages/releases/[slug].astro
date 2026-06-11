@@ -4,7 +4,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
   const releases = await getCollection('releases');
-  
   return releases.map((release) => ({
     params: { slug: release.slug },
     props: { release },
@@ -12,413 +11,195 @@ export async function getStaticPaths() {
 }
 
 const { release } = Astro.props;
+const d = release.data;
+const sl = d.streamingLinks || {};
+const hasStreaming = !!(sl.spotify || sl.appleMusic || sl.bandcamp || sl.soundcloud);
+const releaseDate = (() => {
+  try { return new Date(d.releaseDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }); }
+  catch { return ''; }
+})();
 ---
 
-<BaseLayout title="{release.data.title} — LUFS Catalog">
-  <header>
-      <div class="container">
-        <a href="/" class="back-link">← Back to Catalog</a>
-        
-        <h1>{release.data.title}</h1>
-        
-        <div class="release-meta">
-          <span class="badge-project">{release.data.project}</span>
-          
-          {release.data.artist && (
-            <span class="artist">{release.data.artist}</span>
-          )}
-          
-          {release.data.isrc && (
-            <span class="badge-catalog">ISRC: {release.data.isrc}</span>
-          )}
-          
-          <span class="release-date">
-            Released: {new Date(release.data.releaseDate).toLocaleDateString()}
-          </span>
+<BaseLayout title={`${d.title} — LUFS Catalog`}>
+  <header class="rel-head">
+    <div class="container">
+      <a href="/" class="back mono reveal" data-hover>← Catalog</a>
+
+      <div class="rel-grid reveal">
+        <div class="rel-cover">
+          {d.coverArt
+            ? <img src={d.coverArt} alt={`${d.title} cover art`} />
+            : <div class="rel-cover-fallback" aria-hidden="true"></div>}
+        </div>
+
+        <div class="rel-info">
+          <p class="sec-label">{d.project}</p>
+          <h1 class="rel-title">{d.title}</h1>
+          <p class="rel-meta mono">
+            {d.artist && <span>{d.artist}</span>}
+            {releaseDate && <><span class="sep">—</span><span>{releaseDate}</span></>}
+            {d.isrc && <><span class="sep">—</span><span>ISRC {d.isrc}</span></>}
+            <span class="sep">—</span><span>{d.tracks.length} track{d.tracks.length === 1 ? '' : 's'}</span>
+          </p>
         </div>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <main class="container">
-      {release.data.coverArt && (
-        <img 
-          src={release.data.coverArt} 
-          alt={`${release.data.title} cover art`}
-          class="cover-art"
-        />
-      )}
+  <main class="container">
+    <section class="tracks-section">
+      <p class="sec-label">Tracks</p>
 
-      <section class="track-list">
-        <h2>Tracks</h2>
-        
-        {release.data.tracks.length > 0 ? (
-          <div class="tracks">
-            {release.data.tracks.map((track) => (
-              <div class="track reveal">
-                <div class="track-row">
-                  <div class="track-info">
-                    <span class="track-number">{track.trackNumber}</span>
-                    <button
-                      class="track-play-btn play-button"
-                      data-audio-path={track.audioPath}
-                      data-track-title={track.displayTitle}
-                      aria-label={`Play ${track.displayTitle}`}
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" fill="#78BEBA"/>
-                      </svg>
-                    </button>
-                    <div class="track-details">
-                      <span class="track-title">{track.displayTitle}</span>
-                      <span class="track-meta">
-                        {track.catalogNumber && <span class="catalog-number">{track.catalogNumber}</span>}
-                        {track.loudness?.finalLufs !== undefined && <span>{track.loudness.finalLufs} LUFS</span>}
-                        {track.loudness?.truePeak !== undefined && <span>{track.loudness.truePeak} dBTP</span>}
-                        {track.saturation && <span class="saturation">sat {track.saturation}</span>}
-                      </span>
-                    </div>
-                  </div>
+      {d.tracks.length > 0 ? (
+        <ol class="tracks">
+          {d.tracks.map((track) => (
+            <li class="track reveal">
+              <div class="track-row">
+                <span class="tnum mono">{String(track.trackNumber).padStart(2, '0')}</span>
+                <button
+                  class="track-play-btn"
+                  data-audio-path={track.audioPath}
+                  data-track-title={track.displayTitle}
+                  aria-label={`Play ${track.displayTitle}`}
+                >
+                  <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                </button>
 
-                  <div class="track-actions">
-                    {track.finalReport && (
-                      <a href={track.finalReport} target="_blank" rel="noopener noreferrer" class="report-link">
-                        Open report ↗
-                      </a>
-                    )}
-                    {track.renderStatsPath && (
-                      <a href={track.renderStatsPath} target="_blank" rel="noopener noreferrer" class="report-link">
-                        Render stats ↗
-                      </a>
-                    )}
-                  </div>
+                <div class="track-main">
+                  <span class="track-title">{track.displayTitle}</span>
+                  <span class="track-meta mono">
+                    {track.catalogNumber && <span class="cat">{track.catalogNumber}</span>}
+                    {track.loudness?.finalLufs !== undefined && <span>{track.loudness.finalLufs} LUFS</span>}
+                    {track.loudness?.truePeak !== undefined && <span>{track.loudness.truePeak} dBTP</span>}
+                    {track.saturation !== undefined && <span>sat {track.saturation}</span>}
+                  </span>
                 </div>
 
                 {track.finalReport && (
-                  <details class="report">
-                    <summary>Proof of work{track.sha256 ? ` — ${track.sha256.slice(0, 12)}…` : ''}</summary>
-                    <iframe
-                      src={track.finalReport}
-                      title={`Workchain report for ${track.displayTitle}`}
-                      loading="lazy"
-                      sandbox="allow-same-origin"
-                    ></iframe>
-                  </details>
+                  <a href={track.finalReport} target="_blank" rel="noopener noreferrer" class="report-link mono" data-hover>Report ↗</a>
                 )}
               </div>
-            ))}
-          </div>
-        ) : (
-          <p>No tracks available yet.</p>
-        )}
-      </section>
 
-      {release.data.streamingLinks && (
-        <section class="streaming-links">
-          <h2>Stream On</h2>
-          <div class="links">
-            {release.data.streamingLinks.spotify && (
-              <a href={release.data.streamingLinks.spotify} target="_blank" class="stream-link spotify">
-                Spotify
-              </a>
-            )}
-            {release.data.streamingLinks.appleMusic && (
-              <a href={release.data.streamingLinks.appleMusic} target="_blank" class="stream-link apple">
-                Apple Music
-              </a>
-            )}
-            {release.data.streamingLinks.bandcamp && (
-              <a href={release.data.streamingLinks.bandcamp} target="_blank" class="stream-link bandcamp">
-                Bandcamp
-              </a>
-            )}
-            {release.data.streamingLinks.soundcloud && (
-              <a href={release.data.streamingLinks.soundcloud} target="_blank" class="stream-link soundcloud">
-                SoundCloud
-              </a>
-            )}
-          </div>
-        </section>
+              {track.finalReport && (
+                <details class="report">
+                  <summary class="mono">Proof of work{track.sha256 ? ` · ${track.sha256.slice(0, 12)}…` : ''}</summary>
+                  <iframe
+                    src={track.finalReport}
+                    title={`Workchain report for ${track.displayTitle}`}
+                    loading="lazy"
+                    sandbox="allow-same-origin"
+                  ></iframe>
+                </details>
+              )}
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p class="empty mono">No tracks available yet.</p>
       )}
-    </main>
+    </section>
 
-    <script>
-      // Track play buttons - dispatch to player store
-      document.querySelectorAll('.track-play-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const audioPath = (btn as HTMLElement).dataset.audioPath;
-          const trackTitle = (btn as HTMLElement).dataset.trackTitle;
-          
-          console.log('Play clicked:', audioPath, trackTitle);
-          
-          // Dispatch custom event for player
+    {hasStreaming && (
+      <section class="streaming">
+        <p class="sec-label">Stream on</p>
+        <div class="links">
+          {sl.spotify && <a href={sl.spotify} target="_blank" rel="noopener noreferrer" class="stream-link" data-hover>Spotify</a>}
+          {sl.appleMusic && <a href={sl.appleMusic} target="_blank" rel="noopener noreferrer" class="stream-link" data-hover>Apple Music</a>}
+          {sl.bandcamp && <a href={sl.bandcamp} target="_blank" rel="noopener noreferrer" class="stream-link" data-hover>Bandcamp</a>}
+          {sl.soundcloud && <a href={sl.soundcloud} target="_blank" rel="noopener noreferrer" class="stream-link" data-hover>SoundCloud</a>}
+        </div>
+      </section>
+    )}
+  </main>
+
+  <script>
+    function wireRelease() {
+      document.querySelectorAll<HTMLElement>('.track-play-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
           window.dispatchEvent(new CustomEvent('play-track', {
-            detail: { audioPath, trackTitle }
+            detail: { audioPath: btn.dataset.audioPath, trackTitle: btn.dataset.trackTitle },
           }));
         });
       });
-    </script>
+    }
+    document.addEventListener('astro:page-load', wireRelease);
+  </script>
 
-    <style>
-      :root {
-        --color-bg: #111111;
-        --color-surface: #1a1a1a;
-        --color-surface-2: #242424;
-        --color-text: #fbf9e2;
-        --color-text-muted: #E2E3D8;
-        --color-teal: #78BEBA;
-        --color-red: #D35233;
-        --color-yellow: #E7B225;
-        --color-blue: #2069AF;
-        --color-border: rgba(251, 249, 226, 0.08);
-        --player-height: 72px;
-        --font-mono: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
-      }
-      
-      * { box-sizing: border-box; }
-      
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: var(--color-bg);
-        color: var(--color-text);
-        font-family: var(--font-body);
-      }
-      
-      .container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 0 1.5rem;
-        padding-bottom: calc(var(--player-height) + 2rem);
-      }
-      
-      header {
-        padding: 2rem 0 1rem;
-      }
-      
-      .back-link {
-        color: var(--color-teal);
-        text-decoration: none;
-        font-size: 0.875rem;
-      }
-      
-      .back-link:hover {
-        text-decoration: underline;
-      }
-      
-      h1 {
-        margin: 1rem 0 0.5rem 0;
-        font-size: 2.5rem;
-        color: var(--color-text);
-      }
-      
-      h2 {
-        margin: 2rem 0 1rem 0;
-        font-size: 1.25rem;
-        color: var(--color-text);
-        border-bottom: 1px solid var(--color-border);
-        padding-bottom: 0.5rem;
-      }
-      
-      .release-meta {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        align-items: center;
-        margin-top: 1rem;
-      }
-      
-      .badge-project {
-        background-color: var(--color-blue);
-        color: #fff;
-        padding: 0.25rem 0.75rem;
-        border-radius: 2px;
-        font-size: 0.75rem;
-      }
-      
-      .badge-catalog {
-        background-color: var(--color-yellow);
-        color: #111;
-        padding: 0.25rem 0.75rem;
-        border-radius: 2px;
-        font-size: 0.75rem;
-        font-family: var(--font-mono);
-      }
-      
-      .artist {
-        color: var(--color-text-muted);
-      }
-      
-      .release-date {
-        color: var(--color-text-muted);
-        font-size: 0.875rem;
-      }
-      
-      .cover-art {
-        width: 100%;
-        max-width: 400px;
-        height: auto;
-        border-radius: 4px;
-        margin-top: 1.5rem;
-      }
-      
-      .track-list {
-        margin-top: 2rem;
-      }
-      
-      .tracks {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-      
-      .track-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background-color: var(--color-surface);
-        border-radius: 4px;
-        gap: 1rem;
-      }
-      
-      .track-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex: 1;
-      }
-      
-      .track-number {
-        color: var(--color-text-muted);
-        font-family: var(--font-mono);
-        width: 1.5rem;
-      }
-      
-      .track-play-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background-color: var(--color-surface-2);
-        transition: background-color 0.2s;
-      }
-      
-      .track-play-btn:hover {
-        background-color: var(--color-teal);
-      }
-      
-      .track-play-btn:hover svg path {
-        fill: #111;
-      }
-      
-      .track-details {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-      }
-      
-      .track-title {
-        font-weight: 600;
-      }
-      
-      .track-meta {
-        display: flex;
-        gap: 0.75rem;
-        font-size: 0.75rem;
-        color: var(--color-text-muted);
-        font-family: var(--font-mono);
-      }
-      
-      .track-actions {
-        display: flex;
-        gap: 0.5rem;
-      }
-      
-      .report-link {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-        background-color: var(--color-surface-2);
-        color: var(--color-teal);
-        border-radius: 2px;
-        text-decoration: none;
-      }
-      
-      .report-link:hover {
-        background-color: var(--color-teal);
-        color: #111;
-      }
+  <style>
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 clamp(20px, 6vw, 64px); }
 
-      .track { display: flex; flex-direction: column; }
+    .rel-head { padding-top: clamp(24px, 5vh, 48px); }
+    .back { display: inline-block; color: var(--color-teal); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; }
+    .back:hover { text-decoration: none; opacity: 0.8; }
 
-      details.report { margin: 0.25rem 0; }
-      details.report > summary {
-        cursor: pointer;
-        list-style: none;
-        font-family: var(--font-mono);
-        font-size: 0.7rem;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--color-text-muted);
-        padding: 0.5rem 0;
-      }
-      details.report > summary::-webkit-details-marker { display: none; }
-      details.report > summary:hover,
-      details.report[open] > summary { color: var(--color-teal); }
-      details.report iframe {
-        width: 100%;
-        height: 520px;
-        margin-top: 0.5rem;
-        border: 1px solid var(--color-border);
-        border-radius: 4px;
-        background: #0c0c0c;
-      }
-      
-      .streaming-links {
-        margin-top: 2rem;
-      }
-      
-      .links {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-      }
-      
-      .stream-link {
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        text-decoration: none;
-        font-weight: 600;
-      }
-      
-      .stream-link.spotify {
-        background-color: #1DB954;
-        color: #000;
-      }
-      
-      .stream-link.apple {
-        background-color: #FA243C;
-        color: #fff;
-      }
-      
-      .stream-link.bandcamp {
-        background-color: #629AA9;
-        color: #fff;
-      }
-      
-      .stream-link.soundcloud {
-        background-color: #FF5500;
-        color: #fff;
-      }
-      
-      footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-      }
-    </style>
-  </BaseLayout>
+    .rel-grid {
+      margin-top: clamp(20px, 4vh, 40px); display: grid; gap: clamp(20px, 4vw, 48px);
+      grid-template-columns: minmax(200px, 320px) 1fr; align-items: end;
+      padding-bottom: clamp(28px, 5vh, 52px); border-bottom: 1px solid var(--color-hairline);
+    }
+    .rel-cover { aspect-ratio: 1 / 1; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-hairline); background: var(--color-surface-2); }
+    .rel-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .rel-cover-fallback { width: 100%; height: 100%; background: linear-gradient(135deg, var(--color-surface-2), var(--color-surface)); }
+    .rel-title { font-size: clamp(2.4rem, 6vw, 4.6rem); font-weight: 800; letter-spacing: -0.03em; line-height: 0.96; margin: var(--space-3) 0 var(--space-4); }
+    .rel-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; color: var(--color-text-muted); font-size: 0.8rem; }
+    .rel-meta .sep { color: var(--color-border); }
+
+    .tracks-section { padding-top: clamp(28px, 5vh, 48px); }
+    .tracks { list-style: none; counter-reset: none; margin-top: var(--space-4); padding-bottom: calc(var(--player-height) + 4rem); }
+    .track { border-top: 1px solid var(--color-hairline); }
+    .track:last-child { border-bottom: 1px solid var(--color-hairline); }
+    .track-row { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-4) 0; }
+    .tnum { color: var(--color-text-muted); font-size: 0.78rem; min-width: 1.6em; }
+    .track-main { flex: 1; display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+    .track-title { font-weight: 600; font-size: 1.02rem; }
+    .track-meta { display: flex; flex-wrap: wrap; gap: 0.85rem; font-size: 0.7rem; color: var(--color-text-muted); }
+    .track-meta .cat { color: var(--color-teal); }
+
+    .track-play-btn {
+      flex: none; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; background: var(--color-surface-2); border: 1px solid var(--color-border);
+      transition: background .2s ease, border-color .2s ease, transform .2s ease;
+    }
+    .track-play-btn svg { fill: var(--color-teal); transform: translateX(1px); }
+    .track-play-btn:hover { background: var(--color-teal); border-color: var(--color-teal); transform: scale(1.06); }
+    .track-play-btn:hover svg { fill: var(--color-bg); }
+
+    .report-link {
+      flex: none; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-text-muted);
+      border: 1px solid var(--color-border); padding: 0.35rem 0.6rem; border-radius: var(--radius-sm); transition: color .2s ease, border-color .2s ease;
+    }
+    .report-link:hover { color: var(--color-teal); border-color: var(--color-teal); text-decoration: none; }
+
+    details.report { margin: 0 0 var(--space-4) calc(1.6em + var(--space-4)); }
+    details.report > summary {
+      cursor: pointer; list-style: none; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.16em;
+      color: var(--color-text-muted); padding: 0.35rem 0;
+    }
+    details.report > summary::-webkit-details-marker { display: none; }
+    details.report > summary::before { content: '▸ '; color: var(--color-teal); }
+    details.report[open] > summary::before { content: '▾ '; }
+    details.report > summary:hover { color: var(--color-teal); }
+    details.report iframe {
+      width: 100%; height: 520px; margin-top: var(--space-3);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #0c0c0c;
+    }
+
+    .streaming { padding-top: var(--space-8); padding-bottom: calc(var(--player-height) + 3rem); }
+    .links { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); }
+    .stream-link {
+      padding: 0.55rem 1.1rem; border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 600;
+      color: var(--color-text); border: 1px solid var(--color-border); background: var(--color-surface);
+      transition: border-color .2s ease, color .2s ease;
+    }
+    .stream-link:hover { border-color: var(--color-teal); color: var(--color-teal); text-decoration: none; }
+
+    .empty { color: var(--color-text-muted); padding: 2rem 0; }
+
+    @media (max-width: 680px) {
+      .rel-grid { grid-template-columns: 1fr; align-items: start; }
+      .rel-cover { max-width: 260px; }
+      .report-link { display: none; }
+      details.report { margin-left: 0; }
+    }
+  </style>
+</BaseLayout>
