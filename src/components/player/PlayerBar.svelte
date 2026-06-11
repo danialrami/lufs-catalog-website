@@ -590,4 +590,21 @@
     height: 20px;
     fill: currentColor;
   }
+
+  /* Mobile: the fixed track/progress/volume widths (~750px) overflow narrow screens, so
+     the bar didn't resize. Let it shrink — track info flexes + truncates, the play button
+     and a flexible progress bar stay, and the time text + volume/next cluster are hidden
+     (volume is device-controlled on touch). */
+  @media (max-width: 760px) {
+    .player-bar { height: 60px; padding: 0 0.75rem; gap: 0.5rem; }
+    .track-info { min-width: 0; flex: 1 1 auto; gap: 0.6rem; }
+    .track-meta { min-width: 0; }
+    .cover-art { width: 40px; height: 40px; }
+    .track-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .controls { flex: 0 0 auto; gap: 0.6rem; }
+    .play-btn { width: 42px; height: 42px; }
+    .progress-container { width: clamp(96px, 34vw, 200px); gap: 0.5rem; }
+    .time-display { display: none; }
+    .icons { display: none; }
+  }
 </style>
