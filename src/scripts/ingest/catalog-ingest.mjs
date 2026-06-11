@@ -37,11 +37,19 @@
  *                                   deploy. If the public bucket isn't configured it falls
  *                                   back to committing covers/reports under public/. Doc 09.
  *
+ * Keys are STABLE PER TRACK, not positional: releases|covers|reports/<collectionId>/
+ * <lufs-id>/… where <lufs-id> is the workchain catalog number (a content hash from
+ * catalog_info.txt), NOT the track's ordinal. Adding/removing/reordering a track therefore
+ * only ever touches THAT track's objects — no renumber churn, so a prune after a removal
+ * clears just the removed track's keys. (Track ORDER still lives in the .md `trackNumber`.)
+ *
  * Env: CATALOG_SOURCE_PATH, CATALOG_OUTPUT_ROOT, MP3_BITRATE (320k), STORAGE_MODE,
  *      R2_* (private audio), R2_PUBLIC_BUCKET_NAME + PUBLIC_R2_BASE_URL (public covers/
  *      reports), R2_FORCE_UPLOAD (re-upload even when unchanged), CATALOG_ONLY (one album),
  *      R2_PRUNE=dry|apply (delete orphaned R2 keys for processed collections — dry lists,
- *      apply deletes), R2_PRUNE_COLLECTIONS=<id,id> (also purge collections removed from source).
+ *      apply deletes), R2_PRUNE_COLLECTIONS=<id,id> (also purge collections removed from source),
+ *      R2_ADOPT_LEGACY_KEYS=1 (one-time migration: re-key existing audio from the old
+ *      positional keys to stable <lufs-id> keys by server-side COPY instead of re-encoding).
  */
 
 import {
@@ -104,6 +112,11 @@ const PUBLIC_BASE = (process.env.PUBLIC_R2_BASE_URL || '').replace(/\/+$/, '');
 const PUBLIC_BUCKET = process.env.R2_PUBLIC_BUCKET_NAME || '';
 const REMOTE_PUBLIC = REMOTE && !!PUBLIC_BASE && !!PUBLIC_BUCKET;
 const FORCE_UPLOAD = /^(1|true)$/i.test(process.env.R2_FORCE_UPLOAD || '');
+// One-time migration only: when a track's NEW stable-key object is missing, adopt the
+// LEGACY position-keyed object by copying it server-side (no re-encode) instead of
+// transcoding. Harmless to leave unset; only meaningful while moving an existing catalog
+// from positional keys to <lufs-id> keys. See the catalog-operator "migrate" runbook.
+const ADOPT_LEGACY = /^(1|true)$/i.test(process.env.R2_ADOPT_LEGACY_KEYS || '');
 if (REMOTE && !REMOTE_PUBLIC && (PUBLIC_BASE || PUBLIC_BUCKET)) {
   console.warn(`  ⚠ public-asset serving needs BOTH R2_PUBLIC_BUCKET_NAME (${PUBLIC_BUCKET || 'unset'}) and PUBLIC_R2_BASE_URL (${PUBLIC_BASE || 'unset'}); committing covers/reports to public/ for now.`);
 }
@@ -122,8 +135,9 @@ let uploadObject = null;
 let headObjectMeta = null;
 let listKeys = null;
 let deleteKeys = null;
+let copyObject = null;
 if (REMOTE) {
-  try { ({ uploadObject, headObjectMeta, listKeys, deleteKeys } = await import('./uploadR2.mjs')); }
+  try { ({ uploadObject, headObjectMeta, listKeys, deleteKeys, copyObject } = await import('./uploadR2.mjs')); }
   catch (e) { console.warn('  ⚠ could not load uploadR2.mjs:', e.message); }
 }
 
@@ -233,6 +247,29 @@ async function pruneCollection(collectionId, liveAudio, livePublic) {
     log(`  ${PRUNE_APPLY ? '🗑  prune' : '🔎 prune (dry-run)'}: ${orphans.length} orphan(s) in ${label}`);
     for (const k of orphans) log(`       ${PRUNE_APPLY ? '- deleting ' : '- would delete '}${k}`);
     if (PRUNE_APPLY) { const n = await deleteKeys(orphans, { bucket }); log(`     ✓ deleted ${n} object(s)`); }
+  }
+}
+
+// One-time migration helper: adopt a track's audio from its LEGACY positional key by COPYING
+// it server-side to the new stable <lufs-id> key (no transcode). Returns true iff it copied.
+// Acts only when R2_ADOPT_LEGACY_KEYS is set; on any miss/mismatch/error it returns false so
+// the caller transcodes normally. The legacy key embeds THIS track's slug, so it can only
+// ever match the same audio — it never copies a different track's bytes even if the ordinal
+// drifted (a slug mismatch just 404s and falls through to a clean transcode).
+async function adoptLegacyAudio(collectionId, legacyN, base, newKey, sha256) {
+  if (!ADOPT_LEGACY || !copyObject || !headObjectMeta) return false;
+  const legacyKey = `releases/${collectionId}/${legacyN}/${base}.mp3`;
+  if (legacyKey === newKey) return false; // already id-keyed
+  try {
+    const head = await headObjectMeta(legacyKey);
+    if (!head) return false;
+    if (sha256 && head.metadata?.source_sha256 && head.metadata.source_sha256 !== sha256) return false;
+    await copyObject(legacyKey, newKey); // preserves source_sha256 + duration metadata
+    log(`    ⎘ adopted legacy audio  ${legacyKey} → ${newKey}`);
+    return true;
+  } catch (e) {
+    warn(`adopt failed for ${legacyKey} (${e.message}); will transcode instead`);
+    return false;
   }
 }
 
@@ -382,10 +419,17 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
   }
   const n = String(trackNumber);
   const base = slugify(m.name) || `track-${n}`; // path/URL-safe (track names may have spaces)
-  log(`    track ${n}: "${m.name}"  ${m.catalogNumber || '(no catalog#)'}`);
+  // Stable, position-INDEPENDENT key segment for this track's R2 objects. The workchain's
+  // catalog number (lufs-<hash>, from catalog_info.txt) is the canonical per-track id; fall
+  // back to a source-SHA prefix, then the slug, if it's ever missing. Keying audio/covers/
+  // reports off this (not the ordinal) is what makes add/remove/reorder touch only the
+  // changed track — no renumber churn. (trackNumber still carries display ORDER in the .md.)
+  const trackKey = m.catalogNumber || (m.sha256 ? `sha-${m.sha256.slice(0, 12)}` : `t-${base}`);
+  if (!m.catalogNumber) warn(`"${m.name}" has no catalog number; using fallback key "${trackKey}" (stable per source content/name).`);
+  log(`    track ${n}: "${m.name}"  ${m.catalogNumber || '(no catalog#)'}  [key ${trackKey}]`);
 
-  const reportDir = join(PUBLIC_DIR, 'reports', collectionId, n);
-  const coverDir = join(PUBLIC_DIR, 'covers', collectionId, n);
+  const reportDir = join(PUBLIC_DIR, 'reports', collectionId, trackKey);
+  const coverDir = join(PUBLIC_DIR, 'covers', collectionId, trackKey);
 
   // 1) transcode normalized WAV -> MP3 + duration.
   //    local  -> public/audio/…  |  remote -> temp file -> R2 releases/… (then audioPath = key)
@@ -394,7 +438,7 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
   if (!existsSync(m.normalizedWav)) {
     warn(`normalized WAV not found: ${m.normalizedWav}`);
   } else if (REMOTE) {
-    const key = `releases/${collectionId}/${n}/${base}.mp3`;
+    const key = `releases/${collectionId}/${trackKey}/${base}.mp3`;
     // Skip the transcode + upload when R2 already holds this exact source — matched by
     // the source SHA-256 we stamp as object metadata. Saves upload bandwidth + CPU on
     // re-ingests (and re-uploads automatically if the source changed). R2_FORCE_UPLOAD=1
@@ -407,8 +451,13 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
     if (head && head.metadata?.source_sha256 && head.metadata.source_sha256 === m.sha256) {
       duration = Number(head.metadata.duration) || 0;
       log(`    = R2 (unchanged)  ${key}`);
+    } else if (await adoptLegacyAudio(collectionId, n, base, key, m.sha256)) {
+      // Migration: server-side-copied from the legacy positional key (no re-encode). Pull
+      // the duration back off the freshly-copied object's preserved metadata.
+      const h2 = headObjectMeta ? await headObjectMeta(key).catch(() => null) : null;
+      duration = Number(h2?.metadata?.duration) || 0;
     } else if (uploadObject) {
-      const tmpMp3 = join(tmpdir(), `lufs-${slugify(collectionId)}-${n}-${base}.mp3`);
+      const tmpMp3 = join(tmpdir(), `lufs-${slugify(collectionId)}-${trackKey}-${base}.mp3`);
       transcodeMp3(m.normalizedWav, tmpMp3);
       duration = ffprobeDuration(tmpMp3);
       await uploadObject(tmpMp3, key, 'audio/mpeg', { metadata: { source_sha256: m.sha256 || '', duration } });
@@ -418,10 +467,10 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
     }
     audioPath = key; // the player exchanges this key for a signed URL via the Worker
   } else {
-    const audioDest = join(PUBLIC_DIR, 'audio', collectionId, n, `${base}.mp3`);
+    const audioDest = join(PUBLIC_DIR, 'audio', collectionId, trackKey, `${base}.mp3`);
     transcodeMp3(m.normalizedWav, audioDest);
     duration = ffprobeDuration(audioDest);
-    audioPath = `/audio/${collectionId}/${n}/${base}.mp3`;
+    audioPath = `/audio/${collectionId}/${trackKey}/${base}.mp3`;
   }
 
   // 2) sanitized report + its relative assets (no WAV, no canvas GIF) so links resolve.
@@ -451,6 +500,7 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
 
   return {
     trackNumber,
+    trackKey, // stable per-track id segment used in this track's R2 keys (for the prune/cover)
     displayTitle: m.name,
     filename: base,
     catalogNumber: m.catalogNumber,
@@ -458,14 +508,14 @@ async function processAstroTrack(collectionId, trackNumber, acDir) {
     processedDate: m.processedDate,
     saturation: m.saturation,
     audioPath,
-    finalReport: hasReport ? assetUrl(`/reports/${collectionId}/${n}/final_report.html`) : '',
+    finalReport: hasReport ? assetUrl(`/reports/${collectionId}/${trackKey}/final_report.html`) : '',
     duration,
     loudness: m.loudness,
     artwork: {
-      main: assetUrl(`/covers/${collectionId}/${n}/artwork.png`),
-      identicon: assetUrl(`/covers/${collectionId}/${n}/identicon.png`),
-      spectrogram: assetUrl(`/covers/${collectionId}/${n}/spectrogram.png`),
-      canvasStatic: assetUrl(`/covers/${collectionId}/${n}/canvas_static.png`),
+      main: assetUrl(`/covers/${collectionId}/${trackKey}/artwork.png`),
+      identicon: assetUrl(`/covers/${collectionId}/${trackKey}/identicon.png`),
+      spectrogram: assetUrl(`/covers/${collectionId}/${trackKey}/spectrogram.png`),
+      canvasStatic: assetUrl(`/covers/${collectionId}/${trackKey}/canvas_static.png`),
     },
   };
 }
@@ -634,8 +684,10 @@ async function main() {
       continue;
     }
 
-    // collection cover = first track's artwork
-    copy(join(PUBLIC_DIR, 'covers', collectionId, '1', 'artwork.png'),
+    // collection cover = first track's artwork (keyed by its stable id, not the ordinal).
+    // cover.png stays at the collection root, so its key is position-independent (a changed
+    // first track just overwrites it — same key, no orphan).
+    copy(join(PUBLIC_DIR, 'covers', collectionId, tracks[0].trackKey, 'artwork.png'),
          join(PUBLIC_DIR, 'covers', collectionId, 'cover.png'));
 
     const human = readHumanFields(slug);
