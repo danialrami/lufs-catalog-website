@@ -9,6 +9,12 @@
  * (see docs/implementation/07-nas-rustfs-fallback.md).
  */
 
+// Production signing Worker. Used as a fallback when PUBLIC_R2_STREAM_URL is not baked
+// into the build (e.g. a CI build missing the repo Variable or the build-step env block)
+// so audio can't silently break from a build-config slip. Any deploy can override it by
+// setting PUBLIC_R2_STREAM_URL at build time.
+const DEFAULT_STREAM_WORKER = 'https://stream.lufsaud.io';
+
 export function isDirectUrl(ref: string): boolean {
   return ref.startsWith('/') || /^https?:\/\//i.test(ref) || ref.startsWith('blob:') || ref.startsWith('data:');
 }
@@ -18,10 +24,7 @@ export async function resolveAudioUrl(ref: string): Promise<string> {
   if (isDirectUrl(ref)) return ref; // local path or already-public URL — no signing
 
   // Otherwise treat `ref` as a private R2 key and ask the Worker to sign it.
-  const worker = (import.meta as any).env?.PUBLIC_R2_STREAM_URL as string | undefined;
-  if (!worker) {
-    throw new Error('PUBLIC_R2_STREAM_URL is not set — cannot resolve R2 key: ' + ref);
-  }
+  const worker = ((import.meta as any).env?.PUBLIC_R2_STREAM_URL as string | undefined) || DEFAULT_STREAM_WORKER;
 
   try {
     const res = await fetch(`${worker}?key=${encodeURIComponent(ref)}`, {
