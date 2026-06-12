@@ -38,3 +38,10 @@
   --radius-md: 4px;
   --radius-lg: 20px;
 }
+
+/* On phones the player bar collapses to a shorter height (see PlayerBar.svelte).
+   Keep the token in sync so every `calc(var(--player-height) + …)` clearance
+   reserves the right amount of space below scrollable content. */
+@media (max-width: 760px) {
+  :root { --player-height: 58px; }
+}

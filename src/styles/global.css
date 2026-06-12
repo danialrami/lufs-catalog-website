@@ -8,6 +8,11 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
+  /* Global clearance for the fixed player bar — keeps the last row of any page
+     clear of the bar without each page having to remember to add it. The token
+     shrinks on mobile (tokens.css), and the safe-area inset covers the iOS home
+     indicator. */
+  padding-bottom: calc(var(--player-height) + var(--space-8) + env(safe-area-inset-bottom, 0px));
 }
 
 h1, h2, h3 {
