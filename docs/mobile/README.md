@@ -25,6 +25,7 @@ player-component JS).
 | 4 | [`04-touch-input-and-pointer-events.md`](./04-touch-input-and-pointer-events.md) | The root touch bug (mouse-only seek/volume) and the Pointer Events fix |
 | 5 | [`05-responsive-layout-and-breakpoints.md`](./05-responsive-layout-and-breakpoints.md) | The token sync, global player clearance, the 820/680/540 ladder, the report iframe, tap targets, viewport meta |
 | 6 | [`06-verification-and-screenshots.md`](./06-verification-and-screenshots.md) | How it was verified in-sandbox (build, tests, Playwright @375/390px, two subagent reviews) + what to re-check on a real device |
+| 7 | [`07-next-steps.md`](./07-next-steps.md) | The mobile backlog — album prev/next queue, swipe-down-to-dismiss, a committed smoke test |
 
 ---
 
@@ -35,6 +36,12 @@ player-component JS).
 - 🔜 **Planned** — candidate follow-up, not in this change
 
 ---
+
+## Status
+
+**Live** on `catalog.lufs.audio` (merged via PR #27) and confirmed on a real device —
+Pixel 10 Pro / Brave, 2026-06-12: artwork pulls, the now-playing sheet opens, touch
+scrubbing works. Known follow-ups are tracked in [`07-next-steps.md`](./07-next-steps.md).
 
 ## TL;DR
 
