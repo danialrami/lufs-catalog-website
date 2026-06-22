@@ -1,28 +1,29 @@
 /**
- * lufs-catalog-stream — Cloudflare Worker. Two jobs:
+ * lufs-catalog-stream — Cloudflare Worker. Three jobs:
  *
  *  1. (legacy, unchanged) Mint short-lived presigned GET URLs for PRIVATE R2 audio objects,
  *     for the catalog site's own player:
  *       GET https://stream.lufsaud.io/?key=releases/<collection>/<n>/<file>.mp3
  *       → { "url": "<presigned>", "expiresIn": 3600 }   (origin-locked, JSON)
  *
- *  2. (new) A public, human-addressable stream API that works as a plain media `src`,
- *     so any <audio> / Web Audio graph across the LUFS ecosystem can play catalog tracks:
+ *  2. A public, human-addressable stream API that works as a plain media `src`:
  *       GET https://stream.lufsaud.io/api/stream/<id>            → 302 → fresh presigned URL
  *       GET https://stream.lufsaud.io/api/stream/<id>?format=json → { url, expiresIn, id, ... }
- *     where <id> is the catalogNumber ("lufs-XXXXXXXX"), "{collection}/{slug}", or an
- *     unambiguous bare slug — resolved against /stream-manifest.json (see resolve.ts).
+ *     <id> = catalogNumber ("lufs-XXXXXXXX"), "{collection}/{slug}", or unambiguous bare slug.
  *
- * The public route defaults to permissive CORS because embedding is the explicit goal; the
- * legacy ?key= path stays origin-locked. NOTE: the audio BYTES are served by R2 after the
- * 302, so a cross-origin AnalyserNode also needs the R2 bucket CORS policy (worker/r2-cors.json)
- * — the Worker's CORS headers do not carry to the R2 response.
+ *  3. oEmbed discovery so a pasted catalog link auto-unfurls into the iframe player:
+ *       GET https://stream.lufsaud.io/api/oembed?url=<release-or-embed-url>&format=json
+ *       → { version, type:"rich", html:"<iframe …/embed/<id>>", title, thumbnail_url, ... }
  *
- * Secrets (wrangler secret put): R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
- * Vars (wrangler.toml): ALLOWED_ORIGIN, R2_BUCKET_NAME, URL_TTL_SECONDS, MANIFEST_URL, MANIFEST_TTL_SECONDS
+ * The public routes default to permissive CORS (embedding is the goal); the legacy ?key=
+ * path stays origin-locked. NOTE: audio BYTES are served by R2 after the 302, so a
+ * cross-origin AnalyserNode also needs the R2 bucket CORS policy (worker/r2-cors.json).
+ *
+ * Secrets: R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
+ * Vars: ALLOWED_ORIGIN, R2_BUCKET_NAME, URL_TTL_SECONDS, MANIFEST_URL, MANIFEST_TTL_SECONDS, EMBED_BASE
  */
 import { AwsClient } from 'aws4fetch';
-import { resolveStreamId, type ManifestTrack } from './resolve';
+import { resolveStreamId, firstTrackOfRelease, type ManifestTrack, type StreamManifest } from './resolve';
 import { loadManifest } from './manifest';
 
 export interface Env {
@@ -30,15 +31,17 @@ export interface Env {
   R2_ACCESS_KEY_ID: string;
   R2_SECRET_ACCESS_KEY: string;
   R2_BUCKET_NAME: string;
-  ALLOWED_ORIGIN: string; // comma-separated allowlist for the legacy ?key= path
+  ALLOWED_ORIGIN: string;
   URL_TTL_SECONDS?: string;
-  MANIFEST_URL?: string; // e.g. "https://catalog.lufs.audio/stream-manifest.json"
+  MANIFEST_URL?: string;
   MANIFEST_TTL_SECONDS?: string;
+  EMBED_BASE?: string; // e.g. "https://catalog.lufs.audio"
 }
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
+const EMBED_DEFAULT_W = 456;
+const EMBED_DEFAULT_H = 152;
 
-/** Origin-echoing CORS for the legacy, origin-locked ?key= path. */
 function cors(origin: string): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': origin || '*',
@@ -48,7 +51,6 @@ function cors(origin: string): Record<string, string> {
   };
 }
 
-/** Permissive CORS for the public /api/stream/* routes (embeddable anywhere). */
 function publicCors(): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': '*',
@@ -61,7 +63,6 @@ function ttlOf(env: Env): number {
   return Math.min(parseInt(env.URL_TTL_SECONDS || '3600', 10) || 3600, 86400);
 }
 
-/** Presign an S3 GET against R2 for a private object key. */
 async function presign(env: Env, key: string, ttl: number): Promise<string> {
   const aws = new AwsClient({
     accessKeyId: env.R2_ACCESS_KEY_ID,
@@ -75,13 +76,21 @@ async function presign(env: Env, key: string, ttl: number): Promise<string> {
   return signed.url;
 }
 
-/** Turn a resolved manifest track into a playable URL (presign R2 keys; pass direct urls). */
 async function urlForTrack(env: Env, track: ManifestTrack, ttl: number): Promise<string> {
   if (track.url) return track.url;
   if (track.key && track.key.startsWith('releases/') && !track.key.includes('..')) {
     return presign(env, track.key, ttl);
   }
   throw new Error('track has no playable source');
+}
+
+async function getManifest(env: Env): Promise<StreamManifest> {
+  if (!env.MANIFEST_URL) throw new Error('MANIFEST_URL not configured');
+  return loadManifest(env.MANIFEST_URL, parseInt(env.MANIFEST_TTL_SECONDS || '300', 10) || 300);
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
 }
 
 // ---- legacy ?key= handler (unchanged behavior) ------------------------------------------
@@ -110,21 +119,15 @@ async function handleKeySign(request: Request, env: Env): Promise<Response> {
   }
 }
 
-// ---- new public /api/stream/<id> handler ------------------------------------------------
+// ---- public /api/stream/<id> handler ----------------------------------------------------
 async function handleStream(request: Request, env: Env, id: string): Promise<Response> {
   const url = new URL(request.url);
   const wantJson = url.searchParams.get('format') === 'json';
   const cc = publicCors();
 
-  if (!env.MANIFEST_URL) {
-    return new Response(JSON.stringify({ error: 'no_manifest', message: 'MANIFEST_URL not configured' }), {
-      status: 503, headers: { ...JSON_HEADERS, ...cc },
-    });
-  }
-
-  let manifest;
+  let manifest: StreamManifest;
   try {
-    manifest = await loadManifest(env.MANIFEST_URL, parseInt(env.MANIFEST_TTL_SECONDS || '300', 10) || 300);
+    manifest = await getManifest(env);
   } catch (err) {
     return new Response(JSON.stringify({ error: 'manifest_unavailable', message: String((err as Error)?.message || err) }), {
       status: 502, headers: { ...JSON_HEADERS, ...cc },
@@ -161,12 +164,84 @@ async function handleStream(request: Request, env: Env, id: string): Promise<Res
     }), { headers: { ...JSON_HEADERS, 'Cache-Control': 'no-store', ...cc } });
   }
 
-  // Default: 302 so the route works as a plain media src (the browser follows to R2 and
-  // issues range requests there). Never cache the redirect — the target URL is short-lived.
   return new Response(null, {
     status: 302,
     headers: { Location: playable, 'Cache-Control': 'no-store', ...cc },
   });
+}
+
+// ---- /api/oembed handler ----------------------------------------------------------------
+function clampDim(v: string | null, def: number): number {
+  const n = parseInt(v || '', 10);
+  return Number.isFinite(n) && n > 0 ? n : def;
+}
+
+/** Map an oEmbed `url` (an /embed/<id> or /releases/<slug> link) to a manifest track. */
+function trackForOembedUrl(manifest: StreamManifest, target: string): ManifestTrack | null {
+  let path: string;
+  try { path = new URL(target).pathname; } catch { return null; }
+
+  const embedM = path.match(/\/embed\/([^/]+)\/?$/);
+  if (embedM) {
+    const r = resolveStreamId(manifest, decodeURIComponent(embedM[1]));
+    return r.ok ? r.track : null;
+  }
+  const relM = path.match(/\/releases\/([^/]+)\/?$/);
+  if (relM) return firstTrackOfRelease(manifest, decodeURIComponent(relM[1]));
+  return null;
+}
+
+async function handleOembed(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+  const cc = publicCors();
+
+  const format = url.searchParams.get('format');
+  if (format && format !== 'json') {
+    // oEmbed: signal unsupported formats (we only emit JSON, not XML).
+    return new Response('Only json format is supported', { status: 501, headers: cc });
+  }
+  const target = url.searchParams.get('url');
+  if (!target) {
+    return new Response(JSON.stringify({ error: 'missing_url' }), { status: 400, headers: { ...JSON_HEADERS, ...cc } });
+  }
+
+  let manifest: StreamManifest;
+  try { manifest = await getManifest(env); }
+  catch (err) {
+    return new Response(JSON.stringify({ error: 'manifest_unavailable', message: String((err as Error)?.message || err) }), {
+      status: 502, headers: { ...JSON_HEADERS, ...cc },
+    });
+  }
+
+  const track = trackForOembedUrl(manifest, target);
+  if (!track) {
+    return new Response(JSON.stringify({ error: 'not_found', message: 'No catalog track for that url.' }), {
+      status: 404, headers: { ...JSON_HEADERS, ...cc },
+    });
+  }
+
+  const embedBase = (env.EMBED_BASE || 'https://catalog.lufs.audio').replace(/\/$/, '');
+  const width = Math.min(clampDim(url.searchParams.get('maxwidth'), EMBED_DEFAULT_W), 900);
+  const height = Math.min(clampDim(url.searchParams.get('maxheight'), EMBED_DEFAULT_H), 400);
+  const embedUrl = `${embedBase}/embed/${encodeURIComponent(track.id)}`;
+  const html =
+    `<iframe src="${escapeHtml(embedUrl)}" width="${width}" height="${height}" ` +
+    `frameborder="0" loading="lazy" allow="autoplay; encrypted-media" ` +
+    `style="border:none;overflow:hidden;border-radius:14px" title="${escapeHtml(track.title)}"></iframe>`;
+
+  return new Response(JSON.stringify({
+    version: '1.0',
+    type: 'rich',
+    provider_name: 'LUFS Catalog',
+    provider_url: embedBase,
+    title: track.title,
+    author_name: 'LUFS Audio',
+    author_url: embedBase,
+    thumbnail_url: track.cover ?? undefined,
+    width,
+    height,
+    html,
+  }), { headers: { ...JSON_HEADERS, 'Cache-Control': 'public, max-age=300', ...cc } });
 }
 
 export default {
@@ -178,14 +253,13 @@ export default {
       return new Response('Method Not Allowed', { status: 405, headers: publicCors() });
     }
 
-    const url = new URL(request.url);
-    const path = url.pathname;
+    const path = new URL(request.url).pathname;
 
-    // Public stream API: /api/stream/<id> (id may contain a "/" for {collection}/{slug}).
+    if (path === '/api/oembed') return handleOembed(request, env);
+
     const m = path.match(/^\/api\/stream\/(.+)$/);
     if (m) return handleStream(request, env, m[1]);
 
-    // Legacy signing path: /?key=releases/...
     if (path === '/' || path === '') return handleKeySign(request, env);
 
     return new Response('Not Found', { status: 404, headers: publicCors() });

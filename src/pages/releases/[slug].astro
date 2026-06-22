@@ -2,6 +2,9 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
+const CATALOG_ORIGIN = 'https://catalog.lufs.audio';
+const STREAM_ORIGIN = 'https://stream.lufsaud.io';
+
 export async function getStaticPaths() {
   const releases = await getCollection('releases');
   return releases.map((release) => ({
@@ -18,9 +21,23 @@ const releaseDate = (() => {
   try { return new Date(d.releaseDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }); }
   catch { return ''; }
 })();
+
+// oEmbed discovery: lets Notion/Discord/WordPress auto-unfurl a pasted release link into
+// the iframe player. The oEmbed endpoint lives on the signing Worker (the only dynamic
+// surface); it resolves this release URL to its first track's /embed/{id}.
+const releaseUrl = `${CATALOG_ORIGIN}/releases/${release.slug}`;
+const oembedHref = `${STREAM_ORIGIN}/api/oembed?url=${encodeURIComponent(releaseUrl)}&format=json`;
 ---
 
 <BaseLayout title={`${d.title} — LUFS Catalog`}>
+  <Fragment slot="head">
+    <link rel="alternate" type="application/json+oembed" href={oembedHref} title={d.title} />
+    <meta property="og:title" content={d.title} />
+    <meta property="og:type" content="music.album" />
+    <meta property="og:url" content={releaseUrl} />
+    {d.coverArt && <meta property="og:image" content={d.coverArt} />}
+  </Fragment>
+
   <header class="rel-head">
     <div class="container">
       <a href="/" class="back mono reveal" data-hover>← Catalog</a>
@@ -77,6 +94,16 @@ const releaseDate = (() => {
                   </span>
                 </div>
 
+                {d.status === 'released' && track.catalogNumber && (
+                  <button
+                    class="embed-btn mono"
+                    data-embed-id={track.catalogNumber}
+                    data-default-label="Embed"
+                    aria-label={`Copy embed code for ${track.displayTitle}`}
+                    data-hover
+                  >Embed</button>
+                )}
+
                 {track.finalReport && (
                   <a href={track.finalReport} target="_blank" rel="noopener noreferrer" class="report-link mono" data-hover>Report ↗</a>
                 )}
@@ -115,6 +142,8 @@ const releaseDate = (() => {
   </main>
 
   <script>
+    const CATALOG_ORIGIN = 'https://catalog.lufs.audio';
+
     function wireRelease() {
       document.querySelectorAll<HTMLElement>('.track-play-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -126,6 +155,27 @@ const releaseDate = (() => {
               catalogNumber: btn.dataset.catalog,
             },
           }));
+        });
+      });
+
+      // "Embed" → copy a ready-to-paste iframe snippet for this track.
+      document.querySelectorAll<HTMLButtonElement>('.embed-btn').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.embedId;
+          if (!id) return;
+          const snippet =
+            `<iframe src="${CATALOG_ORIGIN}/embed/${id}" width="456" height="152" ` +
+            `frameborder="0" loading="lazy" allow="autoplay; encrypted-media" ` +
+            `style="border:none;border-radius:14px"></iframe>`;
+          const label = btn.dataset.defaultLabel || 'Embed';
+          try {
+            await navigator.clipboard.writeText(snippet);
+            btn.textContent = 'Copied ✓';
+            btn.classList.add('copied');
+          } catch {
+            btn.textContent = 'Copy failed';
+          }
+          setTimeout(() => { btn.textContent = label; btn.classList.remove('copied'); }, 1600);
         });
       });
     }
@@ -171,11 +221,13 @@ const releaseDate = (() => {
     .track-play-btn:hover { background: var(--color-teal); border-color: var(--color-teal); transform: scale(1.06); }
     .track-play-btn:hover svg { fill: var(--color-bg); }
 
-    .report-link {
+    .embed-btn, .report-link {
       flex: none; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-text-muted);
-      border: 1px solid var(--color-border); padding: 0.35rem 0.6rem; border-radius: var(--radius-sm); transition: color .2s ease, border-color .2s ease;
+      border: 1px solid var(--color-border); padding: 0.35rem 0.6rem; border-radius: var(--radius-sm);
+      background: transparent; cursor: pointer; transition: color .2s ease, border-color .2s ease;
     }
-    .report-link:hover { color: var(--color-teal); border-color: var(--color-teal); text-decoration: none; }
+    .embed-btn:hover, .report-link:hover { color: var(--color-teal); border-color: var(--color-teal); text-decoration: none; }
+    .embed-btn.copied { color: var(--color-gold); border-color: var(--color-gold); }
 
     details.report { margin: 0 0 var(--space-4) calc(1.6em + var(--space-4)); }
     details.report > summary {
