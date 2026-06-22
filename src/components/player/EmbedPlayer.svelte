@@ -41,7 +41,9 @@
   }
 
   async function ensureHowl(): Promise<Howl | null> {
-    if (howl) return howl;
+    if (howl && !errored) return howl;
+    // A previous load failed: tear the dead instance down so "play" is an honest retry.
+    if (howl && errored) { try { howl.unload(); } catch { /* ignore */ } howl = null; }
     loading = true;
     errored = false;
     try {
@@ -73,14 +75,45 @@
     else h.play();
   }
 
-  function seek(e: PointerEvent) {
+  function seekToClientX(bar: HTMLElement, clientX: number) {
     if (!howl || !duration) return;
-    const bar = e.currentTarget as HTMLElement;
     const rect = bar.getBoundingClientRect();
-    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     const pos = x * duration;
     howl.seek(pos);
     position = pos;
+  }
+
+  function seek(e: PointerEvent) {
+    seekToClientX(e.currentTarget as HTMLElement, e.clientX);
+  }
+
+  // Keyboard seek: the bar advertises role="slider" + tabindex, so it must honor arrows.
+  function seekKey(e: KeyboardEvent) {
+    if (!howl || !duration) return;
+    const step = e.shiftKey ? 10 : 5; // seconds
+    let next = position;
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowUp':
+        next = Math.min(duration, position + step);
+        break;
+      case 'ArrowLeft':
+      case 'ArrowDown':
+        next = Math.max(0, position - step);
+        break;
+      case 'Home':
+        next = 0;
+        break;
+      case 'End':
+        next = duration;
+        break;
+      default:
+        return; // let other keys (Tab, etc.) behave normally
+    }
+    e.preventDefault();
+    howl.seek(next);
+    position = next;
   }
 
   onDestroy(() => {
@@ -113,26 +146,31 @@
         {/if}
       </button>
 
-      <div class="track">
-        <div
-          class="seek"
-          on:pointerdown={seek}
-          role="slider"
-          aria-label="Seek"
-          tabindex="0"
-          aria-valuemin="0"
-          aria-valuemax={Math.round(duration)}
-          aria-valuenow={Math.round(position)}
-        >
-          <div class="seek-track"><div class="fill" style={`width:${pct}%`}></div></div>
+      {#if errored}
+        <!-- Error replaces the seek row (never adds a 4th row) so it can't clip the
+             fixed-height iframe. The play button doubles as a retry. -->
+        <span class="err mono" role="alert">Couldn’t load this track. Tap play to retry.</span>
+      {:else}
+        <div class="track">
+          <div
+            class="seek"
+            on:pointerdown={seek}
+            on:keydown={seekKey}
+            role="slider"
+            aria-label="Seek"
+            tabindex="0"
+            aria-valuemin="0"
+            aria-valuemax={Math.round(duration)}
+            aria-valuenow={Math.round(position)}
+          >
+            <div class="seek-track"><div class="fill" style={`width:${pct}%`}></div></div>
+          </div>
+          <div class="time mono">
+            <span>{fmt(position)}</span><span>{fmt(duration)}</span>
+          </div>
         </div>
-        <div class="time mono">
-          <span>{fmt(position)}</span><span>{fmt(duration)}</span>
-        </div>
-      </div>
+      {/if}
     </div>
-
-    {#if errored}<span class="err mono">Couldn’t load this track.</span>{/if}
   </div>
 
   <a class="brand mono" href={releaseUrl} target="_blank" rel="noopener noreferrer" aria-label="Open in LUFS catalog">LUFS ↗</a>
@@ -175,7 +213,7 @@
   .fill { height: 100%; background: var(--color-gold, #E7B225); border-radius: 2px; }
   .time { display: flex; justify-content: space-between; margin-top: 4px; font-size: 0.66rem; color: var(--color-text-muted, rgba(251,249,226,0.62)); }
 
-  .err { font-size: 0.68rem; color: #e06b6b; }
+  .err { flex: 1; min-width: 0; font-size: 0.72rem; line-height: 1.3; color: #e06b6b; }
 
   .brand { flex: none; align-self: flex-start; font-size: 0.64rem; letter-spacing: 0.12em; color: var(--color-text-muted, rgba(251,249,226,0.62)); text-decoration: none; }
   .brand:hover { color: var(--color-text, #fbf9e2); }

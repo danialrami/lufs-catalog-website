@@ -224,10 +224,13 @@ async function handleOembed(request: Request, env: Env): Promise<Response> {
   const width = Math.min(clampDim(url.searchParams.get('maxwidth'), EMBED_DEFAULT_W), 900);
   const height = Math.min(clampDim(url.searchParams.get('maxheight'), EMBED_DEFAULT_H), 400);
   const embedUrl = `${embedBase}/embed/${encodeURIComponent(track.id)}`;
+  // Responsive iframe: width="100%" capped by max-width so a pasted embed never forces
+  // horizontal scroll on a narrow host. The numeric width/height below stay as oEmbed
+  // sizing hints (the spec wants integers); only the rendered iframe is fluid.
   const html =
-    `<iframe src="${escapeHtml(embedUrl)}" width="${width}" height="${height}" ` +
+    `<iframe src="${escapeHtml(embedUrl)}" width="100%" height="${height}" ` +
     `frameborder="0" loading="lazy" allow="autoplay; encrypted-media" ` +
-    `style="border:none;overflow:hidden;border-radius:14px" title="${escapeHtml(track.title)}"></iframe>`;
+    `style="border:none;overflow:hidden;border-radius:14px;max-width:${width}px" title="${escapeHtml(track.title)}"></iframe>`;
 
   return new Response(JSON.stringify({
     version: '1.0',
