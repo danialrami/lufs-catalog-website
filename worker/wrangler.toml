@@ -1,7 +1,10 @@
-# Cloudflare Worker that signs private R2 audio URLs for catalog.lufs.audio.
+# Cloudflare Worker that signs private R2 audio URLs + serves the public stream API for
+# the LUFS ecosystem.
 # Deploy:  cd worker && npm install && npx wrangler deploy
-# Map a route/custom domain to it (e.g. stream.lufs.audio) in the Cloudflare dashboard,
-# then set PUBLIC_R2_STREAM_URL to that URL in .env.production.
+# Map a route/custom domain to it (e.g. stream.lufsaud.io) in the Cloudflare dashboard.
+#
+# Apply the R2 CORS policy ONCE (so cross-origin AnalyserNode reads aren't tainted):
+#   node scripts/apply-r2-cors.mjs        (needs the same R2_* creds as the Worker secrets)
 
 name = "lufs-catalog-stream"
 main = "src/index.ts"
@@ -9,14 +12,23 @@ compatibility_date = "2024-11-01"
 
 # Non-secret vars (safe to commit).
 [vars]
-ALLOWED_ORIGIN = "https://catalog.lufs.audio"
+# Legacy ?key= JSON path stays origin-locked. Only the catalog site itself uses it (its
+# Howler player exchanges R2 keys for signed URLs). Consumer sites (resume, lufs.audio)
+# use the PUBLIC /api/stream route instead, which is CORS-open — so they do NOT need to be
+# listed here. Add an origin only if a site needs the raw ?key= signing JSON.
+ALLOWED_ORIGIN = "https://catalog.lufs.audio,http://localhost:4321"
 R2_BUCKET_NAME = "lufs-catalog"
 URL_TTL_SECONDS = "3600"
+
+# Public stream API (/api/stream/<id>): build-time manifest emitted by the catalog site,
+# edge-cached by the Worker. Regenerated on every catalog deploy.
+MANIFEST_URL = "https://catalog.lufs.audio/stream-manifest.json"
+MANIFEST_TTL_SECONDS = "300"
+
+# Where the iframe embed pages live (used by the /api/oembed route, Phase 2).
+EMBED_BASE = "https://catalog.lufs.audio"
 
 # Secrets — DO NOT put here. Set them once with:
 #   npx wrangler secret put R2_ACCOUNT_ID
 #   npx wrangler secret put R2_ACCESS_KEY_ID
 #   npx wrangler secret put R2_SECRET_ACCESS_KEY
-#
-# To also allow local dev origin, set:
-#   ALLOWED_ORIGIN = "https://catalog.lufs.audio,http://localhost:4321"

@@ -1,0 +1,60 @@
+---
+/**
+ * /embed/{id} — a self-contained iframe player for a single catalog track.
+ *
+ * Static-prerendered, one page per RELEASED track (id = catalogNumber). Embeds like
+ * Spotify/Apple Music: `<iframe src="https://catalog.lufs.audio/embed/{id}" …>`. It runs ON
+ * catalog.lufs.audio, so it resolves audio via the existing origin-allowed ?key= signing
+ * path — no new CORS surface. (A cross-origin iframe is a sealed box; it cannot drive a
+ * host's reactive background — that's what the /api/stream URL is for. See the
+ * catalog-embedding doc suite.)
+ */
+import { getCollection } from 'astro:content';
+import EmbedLayout from '../../layouts/EmbedLayout.astro';
+import EmbedPlayer from '../../components/player/EmbedPlayer.svelte';
+
+const CATALOG_ORIGIN = 'https://catalog.lufs.audio';
+
+export async function getStaticPaths() {
+  const releases = await getCollection('releases');
+  const seen = new Set<string>();
+  const paths = [];
+
+  for (const release of releases) {
+    const d = release.data;
+    if (d.status !== 'released') continue;
+    for (const t of d.tracks ?? []) {
+      const id = t.catalogNumber?.trim();
+      const ref = t.audioPath?.trim();
+      if (!id || !ref || seen.has(id)) continue;
+      seen.add(id);
+      paths.push({
+        params: { id },
+        props: {
+          audioPath: ref,
+          title: t.displayTitle,
+          catalogNumber: id,
+          cover: d.coverArt || undefined,
+          releaseSlug: release.slug,
+          releaseTitle: d.title,
+        },
+      });
+    }
+  }
+  return paths;
+}
+
+const { audioPath, title, catalogNumber, cover, releaseSlug, releaseTitle } = Astro.props;
+const releaseUrl = `${CATALOG_ORIGIN}/releases/${releaseSlug}`;
+---
+
+<EmbedLayout title={`${title} — LUFS`}>
+  <EmbedPlayer
+    client:load
+    audioPath={audioPath}
+    title={title}
+    catalogNumber={catalogNumber}
+    cover={cover}
+    releaseUrl={releaseUrl}
+  />
+</EmbedLayout>
