@@ -5,7 +5,9 @@
   "description": "Cloudflare Worker that signs short-lived presigned GET URLs for private R2 audio (catalog.lufs.audio).",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "aws4fetch": "^1.0.20"
@@ -13,6 +15,7 @@
   "devDependencies": {
     "wrangler": "^3.90.0",
     "@cloudflare/workers-types": "^4.20241106.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.8"
   }
 }
