@@ -26,6 +26,13 @@
   let position = 0;
   let raf = 0;
 
+  // SSR-safe rAF: Astro server-renders this client:load component, and Svelte 5 runs
+  // onDestroy during SSR — where requestAnimationFrame / cancelAnimationFrame don't exist.
+  const raf_req: (cb: FrameRequestCallback) => number =
+    typeof requestAnimationFrame !== 'undefined' ? requestAnimationFrame : () => 0;
+  const raf_cancel: (id: number) => void =
+    typeof cancelAnimationFrame !== 'undefined' ? cancelAnimationFrame : () => {};
+
   function fmt(s: number): string {
     if (!s || !isFinite(s)) return '0:00';
     const m = Math.floor(s / 60);
@@ -36,7 +43,7 @@
   function loop() {
     if (howl && howl.playing()) {
       position = howl.seek() as number;
-      raf = requestAnimationFrame(loop);
+      raf = raf_req(loop);
     }
   }
 
@@ -53,10 +60,10 @@
         html5: true,            // stream via range requests; don't buffer the whole file
         format: ['mp3'],
         onload: () => { duration = howl?.duration() ?? 0; },
-        onplay: () => { isPlaying = true; raf = requestAnimationFrame(loop); },
-        onpause: () => { isPlaying = false; cancelAnimationFrame(raf); },
-        onstop: () => { isPlaying = false; cancelAnimationFrame(raf); },
-        onend: () => { isPlaying = false; position = 0; cancelAnimationFrame(raf); },
+        onplay: () => { isPlaying = true; raf = raf_req(loop); },
+        onpause: () => { isPlaying = false; raf_cancel(raf); },
+        onstop: () => { isPlaying = false; raf_cancel(raf); },
+        onend: () => { isPlaying = false; position = 0; raf_cancel(raf); },
         onloaderror: () => { errored = true; loading = false; },
         onplayerror: () => { errored = true; },
       });
@@ -117,7 +124,7 @@
   }
 
   onDestroy(() => {
-    cancelAnimationFrame(raf);
+    raf_cancel(raf);
     try { howl?.unload(); } catch { /* ignore */ }
   });
 
