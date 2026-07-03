@@ -1,0 +1,12 @@
+# CORS — allow cross-origin fetch of the public stream manifest.
+# catalog.lufs.audio is served by Hostinger (LiteSpeed), so CORS is set here via
+# .htaccess (not a Cloudflare Pages _headers file). This lets other LUFS origins
+# (e.g. lufs.audio) fetch stream-manifest.json client-side for catalog search.
+# The audio bytes themselves are CORS-enabled at the R2 bucket, not here.
+<IfModule mod_headers.c>
+  <FilesMatch "stream-manifest\.json$">
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+    Header set Access-Control-Allow-Headers "Range, Content-Type"
+  </FilesMatch>
+</IfModule>
