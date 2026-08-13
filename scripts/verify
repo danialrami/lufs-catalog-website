@@ -17,8 +17,18 @@
 # Usage: scripts/verify [DIR]   (DIR defaults to the repo root)
 set -euo pipefail
 
-DIR="${1:-.}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Where the servable bytes live when no directory is given. For a repo-root
+# static site that is "."; for a site generated into a subdirectory, or one
+# whose artifact is a build output, it is whatever site/publish-root.txt names.
+# Defaulting to "." here was a real bug: CI runs `scripts/verify` with no
+# argument, so on a site whose pages live in build/ the gate looked at the repo
+# root, found no index.html, and failed 12 checks that were never wrong.
+PUBLISH_ROOT="."
+[ -f "$ROOT/site/publish-root.txt" ] && PUBLISH_ROOT="$(grep -vE '^[[:space:]]*(#|$)' "$ROOT/site/publish-root.txt" | head -1)"
+: "${PUBLISH_ROOT:=.}"
+DIR="${1:-$PUBLISH_ROOT}"
 MAX_BYTES=26214400   # 25 MiB (site.yaml runtime.max_asset_bytes)
 
 fail=0
@@ -26,6 +36,11 @@ pass(){ printf '  ok    %s\n' "$1"; }
 bad(){  printf '  FAIL  %s\n' "$1"; fail=$((fail+1)); }
 
 echo "verify: $DIR"
+if [ ! -d "$DIR" ]; then
+  echo "  FAIL  target directory does not exist: $DIR"
+  [ "$DIR" = "$PUBLISH_ROOT" ] && echo "        (this is the declared publish root; if it is a build output, build first)"
+  echo; echo "VERIFY: FAIL (1)"; exit 1
+fi
 
 # The marker comes from the manifest, never from a copy pasted into this script.
 MARKER="$(sed -nE 's/^[[:space:]]*content_marker:[[:space:]]*"?([^"#]*[^"# ])"?.*/\1/p' "$ROOT/site.yaml" | head -1)"
@@ -169,8 +184,12 @@ if [ -f "$ROOT/site/routes.txt" ]; then
   [ "$rmiss" -eq 0 ] && pass "all declared routes backed by files"
 else bad "site/routes.txt missing (neutral route manifest is required)"; fi
 
-# 8. the generated adapter must ride along in a packaged artifact
-if [ "$DIR" != "." ]; then
+# 8. the generated adapter must ride along in a PACKAGED artifact.
+# Keyed off the artifact directory itself, not `DIR != "."`. That older proxy
+# quietly assumed the only non-"." target was dist/ — untrue the moment a site
+# declares a publish root (its source dir is build/, where no adapter has been
+# rendered yet and none should be).
+if [ "$(basename "$DIR")" = "dist" ]; then
   if [ -s "$DIR/_headers" ]; then pass "adapter _headers rendered"
   else bad "_headers missing/empty in the packaged artifact"; fi
 fi
