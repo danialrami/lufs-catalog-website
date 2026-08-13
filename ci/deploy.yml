@@ -1,0 +1,90 @@
+# PLACE THIS AT: .github/workflows/deploy.yml
+# (It lives under ci/ because the GitHub App that maintains this repo cannot
+#  commit under .github/workflows/ via the API — `git mv` it into place.)
+#
+# lufs-catalog — website-portability output-branch deploy adapter.
+# Tier B: a real build. install (frozen) -> build ONCE -> render adapters ->
+# verify the built artifact (fail-closed) -> stamp provenance -> retain off-host
+# -> publish. The build runs exactly once and the bytes that are verified are the
+# bytes that ship. A red verify never updates `site`.
+#
+# Platform-AGNOSTIC: there is no wrangler, no provider API, no deploy token.
+# The host subscribes to the `site` branch:
+#   Cloudflare Pages: production branch = site, build command EMPTY, output "/"
+#   Any pull host:    point it at the `site` branch
+# Switching hosts, or running two in parallel, needs no change here.
+name: deploy
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write        # least privilege: only what publishing the output branch needs
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-verify-publish:
+    # GitHub-hosted, NOT [self-hosted, lufs]. This repo is not eligible for the
+    # fleet (public repos cannot use self-hosted runners — fork-PR RCE risk, KB
+    # ci-and-runners/08 rule 9 — and personal-account repos are outside the org
+    # runner scope entirely). A fleet label here means the job queues forever.
+    runs-on: ubuntu-latest
+    steps:
+      # Third-party actions pinned to commit SHAs (KB 02/08 security policy).
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      # Hosted runners ship python3 and are NOT root, so the fleet's bare
+      # `apt-get` install step would be both unnecessary and wrong here.
+      - name: Confirm python3
+        run: python3 --version
+
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af  # v4.1.0
+        with:
+          node-version: "20"      # matches the toolchain declared in site.yaml
+          cache: npm
+
+      # Frozen install: the committed lockfile is the contract, so CI cannot
+      # quietly resolve a different dependency tree than the one that was tested.
+      - name: Install (frozen)
+        run: npm ci
+
+      - name: Build once
+        run: npm run build
+
+      # Package operates in place: the build already produced the artifact, so
+      # this renders the host adapters into it, verifies it fail-closed, and
+      # stamps provenance. Nothing is rebuilt or recopied.
+      - name: Package + verify the built artifact (fail-closed)
+        run: bash scripts/package
+
+      - name: Re-verify exactly what ships
+        run: bash scripts/verify dist
+
+      # Retain the release off-host, so the hosting platform is never the only
+      # place the deployable site exists.
+      - name: Retain the build off-host
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882  # v4.4.3
+        with:
+          name: lufs-catalog-dist-${{ github.sha }}
+          path: dist/
+          retention-days: 30
+          if-no-files-found: error
+
+      # Only main publishes; a pull request runs the whole gate and stops here.
+      - name: Publish the verified output to the site branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e  # v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: site
+          commit_message: "deploy: ${{ github.sha }}"
+
+# ROLLBACK: re-run this workflow from a known-good SHA (Actions -> Run workflow),
+# or reset the `site` branch to its previous deploy commit. Never rebuild old
+# source and call it a rollback — redeploy the retained good build.

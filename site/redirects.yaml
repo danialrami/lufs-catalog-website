@@ -1,0 +1,2 @@
+# No redirects. A single static entry point served at the site root.
+redirects: []

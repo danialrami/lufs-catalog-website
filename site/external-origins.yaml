@@ -1,0 +1,12 @@
+# Cross-origin dependencies of the served artifact. scripts/verify fails closed
+# on any resource origin in the shipped HTML that is not declared here.
+# Anchors are links, not dependencies, and are not listed.
+external_origins:
+  - url: https://cdn.lufsaud.io/covers/10-00.0006-37.182_final/cover.png
+  - url: https://fonts.googleapis.com
+  - url: https://fonts.gstatic.com
+  - url: https://stream.lufsaud.io/api/oembed?url=https%3A%2F%2Fcatalog.lufs.audio%2Freleases%2F10-00-0006-37-182-final&format=json
+  - url: https://umami.lufshq.com/script.js
+  # Runtime API: the Worker mints short-lived signed R2 URLs for playback.
+  # It is a genuine runtime dependency even though it is fetched by script,
+  # not referenced as a subresource, so it is declared explicitly.

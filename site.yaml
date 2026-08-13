@@ -1,0 +1,55 @@
+# LUFS website-portability manifest — the target-independent source of truth.
+# See agent-knowledge docs/infra/website-portability/01-portability-contract.
+schema_version: 1
+site_id: lufs-catalog
+canonical_url: https://catalog.lufs.audio
+
+source:
+  repository: danialrami/lufs-catalog-website
+  production_ref: main
+
+build:
+  # Tier B: a real build. It runs ONCE in CI and the bytes it produces are the
+  # bytes that are verified and shipped — nothing is rebuilt at deploy time.
+  command: npm run build
+  output_dir: dist
+  toolchain:
+    node: "20"
+    package_manager: "npm"
+  lockfiles:
+    - package-lock.json
+
+runtime:
+  kind: static
+  index: index.html
+  error_document: 404.html
+  spa_fallback: false
+  # Astro emits root-absolute asset URLs (/_astro/...). That pins the artifact to
+  # a domain root: it will not work under a subpath or on a Pages preview URL.
+  # Declared rather than ignored — making it relative means setting Astro's base
+  # /assetsPrefix, which is a real change to routing and belongs in its own PR.
+  subpath_safe: false
+  max_asset_bytes: 26214400   # 25 MiB — the lowest active host's per-asset cap
+
+routes:
+  source: site/routes.txt
+release:
+  include:
+    source: site/publish.txt
+  artifact_name: site.tar.gz
+  retain: 20
+external_origins:
+  source: site/external-origins.yaml
+
+domains:
+  - catalog.lufs.audio
+
+adapters:
+  cloudflare_pages:
+    headers: _headers
+    deploy_branch: site
+
+verification:
+  content_probe: /index.html
+  content_marker: "LUFS Catalog"
+  smoke_timeout_seconds: 10

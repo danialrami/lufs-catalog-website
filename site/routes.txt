@@ -1,0 +1,9 @@
+# Declared routes that MUST exist. Content pages generated per release are not
+# listed: they come and go with the catalogue, and pinning them here would make
+# the manifest lie every time one is added.
+/
+/index.html
+/404.html
+/favicon.svg
+/favicon.ico
+/stream-manifest.json

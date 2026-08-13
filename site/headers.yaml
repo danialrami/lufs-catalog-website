@@ -1,0 +1,17 @@
+# Neutral header intent, translated per host by scripts/render-adapters.py.
+# The generated _headers / _redirects are ADAPTER OUTPUT — never the source of
+# truth, never hand-edited. website-portability 01.
+headers:
+  # HTML is mutable and rewritten on every release, so it must never be cached
+  # immutably (RFC 8246 immutable is only correct for versioned URLs).
+  - path: /*.html
+    values:
+      Cache-Control: "no-cache"
+      X-Content-Type-Options: "nosniff"
+      Referrer-Policy: "strict-origin-when-cross-origin"
+  # Content-hashed bundles: the URL changes whenever the bytes do, so a long
+  # immutable window is correct here and only here.
+  - path: /_astro/*
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+      X-Content-Type-Options: "nosniff"
