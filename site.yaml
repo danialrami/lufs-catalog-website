@@ -11,13 +11,13 @@ source:
 build:
   # Tier B: a real build. It runs ONCE in CI and the bytes it produces are the
   # bytes that are verified and shipped — nothing is rebuilt at deploy time.
-  command: npm run build
+  command: pnpm build
   output_dir: dist
   toolchain:
     node: "20"
-    package_manager: "npm"
+    package_manager: "pnpm"
   lockfiles:
-    - package-lock.json
+    - pnpm-lock.yaml
 
 runtime:
   kind: static
