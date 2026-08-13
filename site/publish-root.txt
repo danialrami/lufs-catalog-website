@@ -1,0 +1,4 @@
+# Tier B: the build produces the artifact. scripts/package therefore works
+# IN PLACE on the build output rather than recopying it — the bytes that are
+# verified are exactly the bytes the build produced and that ship.
+dist

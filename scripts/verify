@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+# Tier A static site — fail-closed artifact verifier.
+# "Exit 0 is not enough": prove the servable bytes are correct before they ship.
+# Aligned to agent-knowledge docs/infra/website-portability (Required verification).
+#
+# Adapted from lufs-audio/lufs-recorder-pwa scripts/verify. PWA-only checks
+# (web manifest, service-worker cache/navigation) are dropped: this site has
+# neither, and a check that cannot fail is worse than no check.
+#
+# Nothing site-specific is hardcoded here. The neutral manifests are the single
+# source of truth, so the verifier and the declaration cannot drift apart:
+#   site.yaml            -> verification.content_marker
+#   site/publish.txt     -> the servable set
+#   site/routes.txt      -> the declared routes
+#   site/external-origins.yaml -> the cross-origin allowlist
+#
+# Usage: scripts/verify [DIR]   (DIR defaults to the repo root)
+set -euo pipefail
+
+DIR="${1:-.}"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+MAX_BYTES=26214400   # 25 MiB (site.yaml runtime.max_asset_bytes)
+
+fail=0
+pass(){ printf '  ok    %s\n' "$1"; }
+bad(){  printf '  FAIL  %s\n' "$1"; fail=$((fail+1)); }
+
+echo "verify: $DIR"
+
+# The marker comes from the manifest, never from a copy pasted into this script.
+MARKER="$(sed -nE 's/^[[:space:]]*content_marker:[[:space:]]*"?([^"#]*[^"# ])"?.*/\1/p' "$ROOT/site.yaml" | head -1)"
+if [ -n "$MARKER" ]; then pass "content_marker read from site.yaml: $MARKER"
+else bad "site.yaml has no verification.content_marker"; fi
+
+# The servable set comes from site/publish.txt (neutral, machine-readable).
+PUBLISH="$ROOT/site/publish.txt"
+if [ ! -f "$PUBLISH" ]; then bad "site/publish.txt missing (the servable set is undeclared)"; fi
+
+# 1. every declared file exists and is non-empty
+if [ -f "$PUBLISH" ]; then
+  miss=0
+  while IFS= read -r p; do
+    case "$p" in ""|"#"*) continue ;; esac
+    if [ -d "$DIR/$p" ]; then
+      [ -n "$(find "$DIR/$p" -type f -print -quit 2>/dev/null)" ] || { bad "declared dir is empty: $p"; miss=$((miss+1)); }
+    elif [ ! -s "$DIR/$p" ]; then bad "missing/empty: $p"; miss=$((miss+1)); fi
+  done < "$PUBLISH"
+  [ "$miss" -eq 0 ] && pass "every declared file present and non-empty"
+fi
+
+# 2. HTML entry points parse and index carries the content marker
+for f in index.html 404.html; do
+  if [ ! -f "$DIR/$f" ]; then bad "html missing: $f"
+  elif grep -qi '<!doctype html>' "$DIR/$f" && grep -qi '</html>' "$DIR/$f"; then pass "html well-formed: $f"
+  else bad "html not well-formed: $f"; fi
+done
+if [ -n "$MARKER" ] && [ -f "$DIR/index.html" ] && grep -qF "$MARKER" "$DIR/index.html"; then pass "content marker present"
+elif [ -n "$MARKER" ]; then bad "content marker missing from index.html: $MARKER"; fi
+
+# 3. declared-origins gate. Every cross-origin RESOURCE reference in every shipped
+# HTML file must be declared. An <a href> a visitor clicks is not a dependency.
+# NB guarded with if/then/else on purpose: under `set -e` a bare failing command
+# aborts the run, skipping every later check and never printing the summary —
+# a verifier that stops early is a verifier that lies about its coverage.
+if python3 - "$DIR" "$ROOT/site/external-origins.yaml" <<'PY'
+import sys, re, os, glob
+from html.parser import HTMLParser
+
+root, yaml_path = sys.argv[1], sys.argv[2]
+
+# Only these tag/attribute pairs are SUBRESOURCES — things the browser fetches
+# to render the page. An <a href> a visitor clicks is a link, not a dependency,
+# and declaring links as origins would make the declaration meaningless.
+SUBRESOURCE = {
+    ("script","src"), ("link","href"), ("img","src"), ("img","srcset"),
+    ("source","src"), ("source","srcset"), ("video","src"), ("audio","src"),
+    ("track","src"), ("iframe","src"), ("embed","src"), ("object","data"),
+}
+
+def to_origin(url):
+    m = re.match(r"(https?://[^/]+)", url)
+    return m.group(1) if m else None
+
+class Refs(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True); self.urls=[]; self._style=False
+    def handle_starttag(self, tag, attrs):
+        a = {k.lower(): (v or "") for k, v in attrs}
+        for etag, attr in SUBRESOURCE:
+            if tag == etag and a.get(attr):
+                vals = a[attr]
+                cands = [c.strip().split()[0] for c in vals.split(",") if c.strip()] if attr == "srcset" else [vals]
+                self.urls.extend(cands)
+        if tag == "style": self._style = True
+    def handle_endtag(self, tag):
+        if tag == "style": self._style = False
+    def handle_data(self, data):
+        if self._style:
+            self.urls.extend(re.findall(r'url\(\s*["\x27]?(https?://[^)"\x27\s]+)', data))
+
+declared = set()
+if os.path.exists(yaml_path):
+    for line in open(yaml_path, encoding="utf-8"):
+        m = re.match(r"\s*-\s*(?:url:\s*)?(https?://\S+)", line)
+        if m:
+            o = to_origin(m.group(1).strip("\'\""))
+            if o: declared.add(o)
+else:
+    sys.stdout.write("        (no external-origins.yaml; nothing is declared)\n")
+
+found = {}
+for path in glob.glob(os.path.join(root, "**", "*.html"), recursive=True):
+    try: html = open(path, encoding="utf-8", errors="replace").read()
+    except OSError: continue
+    p = Refs()
+    try: p.feed(html)
+    except Exception: pass
+    for u in p.urls:
+        o = to_origin(u)
+        if o: found.setdefault(o, os.path.relpath(path, root))
+
+sys.stdout.write("        found: %s\n        declared: %s\n" % (sorted(found) or "[]", sorted(declared) or "[]"))
+undeclared = {k: v for k, v in found.items() if k not in declared}
+if undeclared:
+    for o, where in sorted(undeclared.items()):
+        sys.stdout.write("        undeclared: %s (in %s)\n" % (o, where))
+    sys.exit(1)
+PY
+then pass "external-origin resource refs all declared"
+else bad "undeclared external origin (see found/declared above)"; fi
+
+# 4. subpath portability. Root-absolute refs (src="/x") pin a site to a domain
+# root: it breaks under a subpath and on a Pages preview URL. Hand-authored
+# sites can and should stay relative. A framework build may legitimately emit
+# root-absolute URLs, so the site DECLARES its position in site.yaml
+# (runtime.subpath_safe, default true) rather than the check being quietly
+# deleted for whichever site it happened to fail on.
+SUBPATH_SAFE="$(sed -nE 's/^[[:space:]]*subpath_safe:[[:space:]]*([a-z]+).*/\1/p' "$ROOT/site.yaml" | head -1)"
+: "${SUBPATH_SAFE:=true}"
+if grep -rlE '(src|href)="/[^/]' "$DIR"/*.html >/dev/null 2>&1; then
+  if [ "$SUBPATH_SAFE" = "false" ]; then
+    pass "root-absolute refs present, and site.yaml declares subpath_safe: false (pinned to a domain root)"
+  else
+    bad "absolute-root asset ref (breaks subpath hosting; declare runtime.subpath_safe: false if intended)"
+    grep -rnE '(src|href)="/[^/]' "$DIR"/*.html | head -3
+  fi
+else
+  if [ "$SUBPATH_SAFE" = "false" ]; then
+    pass "no root-absolute refs (site.yaml declares subpath_safe: false, but none were found)"
+  else pass "all asset refs relative"; fi
+fi
+
+# 5. no secret-pattern material in the shipped bytes
+if grep -rnE 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|AKIA[0-9A-Z]{16}' "$DIR" >/dev/null 2>&1; then
+  bad "possible secret material in shipped assets"; else pass "no secret patterns"; fi
+
+# 6. no asset exceeds the lowest active host's per-file cap
+big="$(find "$DIR" -type f -size +${MAX_BYTES}c 2>/dev/null | head -3)"
+if [ -z "$big" ]; then pass "no asset over $MAX_BYTES b"; else bad "asset over cap: $big"; fi
+
+# 7. every declared route is backed by a real file
+if [ -f "$ROOT/site/routes.txt" ]; then
+  rmiss=0
+  while IFS= read -r route; do
+    case "$route" in ""|"#"*) continue ;; esac
+    rel="${route#/}"; [ -z "$rel" ] && rel="index.html"
+    [ -f "$DIR/$rel" ] || { bad "declared route has no file: $route"; rmiss=$((rmiss+1)); }
+  done < "$ROOT/site/routes.txt"
+  [ "$rmiss" -eq 0 ] && pass "all declared routes backed by files"
+else bad "site/routes.txt missing (neutral route manifest is required)"; fi
+
+# 8. the generated adapter must ride along in a packaged artifact
+if [ "$DIR" != "." ]; then
+  if [ -s "$DIR/_headers" ]; then pass "adapter _headers rendered"
+  else bad "_headers missing/empty in the packaged artifact"; fi
+fi
+
+echo
+if [ "$fail" -eq 0 ]; then echo "VERIFY: PASS"; else echo "VERIFY: FAIL ($fail)"; fi
+[ "$fail" -eq 0 ]

@@ -1,0 +1,11 @@
+# The servable set, relative to site/publish-root.txt (the build output).
+# scripts/verify proves each is present in the built artifact, so a build that
+# silently stops emitting one of these fails the gate instead of shipping.
+404.html
+_astro
+embed
+favicon.ico
+favicon.svg
+index.html
+releases
+stream-manifest.json

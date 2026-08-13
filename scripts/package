@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# Tier A static site — assemble the host-neutral release into dist/ with provenance.
+# Emits: the servable set, dist/_headers, dist/SHA256SUMS, dist/artifact.json,
+#        dist/verification.json
+# The servable set is site/publish.txt — declared, not inferred, so a new file
+# cannot silently ship and a removed one cannot silently vanish.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+OUT=dist
+SITE_ID="$(sed -nE 's/^[[:space:]]*site_id:[[:space:]]*"?([^"#]*[^"# ])"?.*/\1/p' site.yaml | head -1)"
+REPO="$(sed -nE 's|^[[:space:]]*repository:[[:space:]]*"?([^"#]*[^"# ])"?.*|\1|p' site.yaml | head -1)"
+
+# Where the servable bytes live before packaging. "." for a repo-root static
+# site; a subdirectory for a site whose pages are generated into one; and the
+# build output dir itself for a site with a real build, in which case the build
+# has already produced the artifact and there is nothing to copy.
+SRC="."
+[ -f site/publish-root.txt ] && SRC="$(grep -vE '^[[:space:]]*(#|$)' site/publish-root.txt | head -1)"
+: "${SRC:=.}"
+
+if [ "$SRC" = "$OUT" ]; then
+  echo "in-place: the build produced $OUT; packaging it without recopying"
+  [ -d "$OUT" ] || { echo "FATAL: $OUT does not exist — run the build first" >&2; exit 1; }
+  while IFS= read -r p; do
+    case "$p" in ""|"#"*) continue ;; esac
+    [ -e "$OUT/$p" ] || { echo "FATAL: declared in site/publish.txt but not in the build output: $p" >&2; exit 1; }
+  done < site/publish.txt
+else
+  rm -rf "$OUT"; mkdir -p "$OUT"
+  while IFS= read -r p; do
+    case "$p" in ""|"#"*) continue ;; esac
+    [ -e "$SRC/$p" ] || { echo "FATAL: declared in site/publish.txt but not in the tree: $SRC/$p" >&2; exit 1; }
+    mkdir -p "$OUT/$(dirname "$p")"
+    if [ -d "$SRC/$p" ]; then cp -R "$SRC/$p" "$OUT/$(dirname "$p")/"; else cp "$SRC/$p" "$OUT/$p"; fi
+  done < site/publish.txt
+fi
+
+# Host adapters are RENDERED from the neutral manifests, never hand-written per host.
+python3 scripts/render-adapters.py "$OUT" site
+
+# Fail-closed verify of the packaged bytes — what actually ships, not the source tree.
+set +e
+bash scripts/verify "$OUT" > "$OUT/.verify.log" 2>&1
+rc=$?
+set -e
+case "$rc" in 0) VSTATUS=passed ;; 1) VSTATUS=failed ;; *) VSTATUS=errored ;; esac
+cat "$OUT/.verify.log"
+
+python3 - "$OUT" "$VSTATUS" "$rc" > "$OUT/verification.json" <<'PY'
+import json,sys
+out,status,rc=sys.argv[1],sys.argv[2],int(sys.argv[3])
+print(json.dumps({
+  "schema_version":1,"status":status,"verifier_exit_code":rc,
+  "meaning":{
+    "passed":"every check ran and passed",
+    "failed":"checks ran; the artifact violated the contract",
+    "errored":"the verifier could not run — the artifact is UNPROVEN, not proven bad",
+  }[status],
+  "log":".verify.log"},indent=2))
+PY
+
+( cd "$OUT" && find . -type f ! -name SHA256SUMS ! -name artifact.json ! -name verification.json ! -name .verify.log \
+    | LC_ALL=C sort | xargs sha256sum > SHA256SUMS )
+
+COMMIT="${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo unknown)}"
+python3 - "$OUT" "$SITE_ID" "$COMMIT" "$REPO" > "$OUT/artifact.json" <<'PY'
+import json,sys,os,hashlib,glob
+out,site_id,commit,repo=sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4]
+skip={"SHA256SUMS","artifact.json","verification.json",".verify.log"}
+files=[p for p in glob.glob(out+"/**",recursive=True) if os.path.isfile(p) and os.path.basename(p) not in skip]
+digest=hashlib.sha256(open(os.path.join(out,"SHA256SUMS"),"rb").read()).hexdigest()
+print(json.dumps({
+  "schema_version":1,"site_id":site_id,
+  "source":{"repository":repo,"commit":commit},
+  "build":{"builder":"github-actions" if os.environ.get("GITHUB_ACTIONS") else "local","command":"none (Tier A static)"},
+  "artifact":{"sha256":digest,"files":len(files),"bytes":sum(os.path.getsize(p) for p in files)},
+  "verification":{"report":"verification.json"}},indent=2))
+PY
+
+echo "packaged -> $OUT/ (verify: $VSTATUS)"
+[ "$VSTATUS" = passed ]
