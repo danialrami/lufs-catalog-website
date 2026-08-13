@@ -1,0 +1,11 @@
+# GENERATED from site/headers.yaml by scripts/render-adapters.py.
+# Do not edit: the neutral manifest is the source of truth.
+
+/*.html
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff

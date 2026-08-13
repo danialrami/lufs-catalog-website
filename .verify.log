@@ -1,0 +1,16 @@
+verify: dist
+  ok    content_marker read from site.yaml: LUFS Catalog
+  ok    every declared file present and non-empty
+  ok    html well-formed: index.html
+  ok    html well-formed: 404.html
+  ok    content marker present
+        found: ['https://cdn.lufsaud.io', 'https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://stream.lufsaud.io', 'https://umami.lufshq.com']
+        declared: ['https://cdn.lufsaud.io', 'https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://stream.lufsaud.io', 'https://umami.lufshq.com']
+  ok    external-origin resource refs all declared
+  ok    root-absolute refs present, and site.yaml declares subpath_safe: false (pinned to a domain root)
+  ok    no secret patterns
+  ok    no asset over 26214400 b
+  ok    all declared routes backed by files
+  ok    adapter _headers rendered
+
+VERIFY: PASS

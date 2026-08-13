@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "site_id": "lufs-catalog",
+  "source": {
+    "repository": "danialrami/lufs-catalog-website",
+    "commit": "583faf7717b4487a7ac5b92e534e0623c8681ca8"
+  },
+  "build": {
+    "builder": "github-actions",
+    "command": "none (Tier A static)"
+  },
+  "artifact": {
+    "sha256": "6cf971e5a622db4313c5744437d19d08cb8043479d40282c438e4951951030b6",
+    "files": 133,
+    "bytes": 1935376
+  },
+  "verification": {
+    "report": "verification.json"
+  }
+}
