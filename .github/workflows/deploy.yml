@@ -43,18 +43,30 @@ jobs:
       - name: Confirm python3
         run: python3 --version
 
+      # This repo builds with pnpm, not npm. pnpm-lock.yaml is the maintained
+      # lockfile; the package-lock.json that sat beside it was stale -- it did
+      # not contain @aws-sdk/client-s3 at all -- and is deleted in this change,
+      # so there is exactly one lockfile and no ambiguity about which package
+      # manager owns the tree.
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1  # v4
+        with:
+          version: 9
+
       - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af  # v4.1.0
         with:
           node-version: "20"      # matches the toolchain declared in site.yaml
-          cache: npm
+          cache: pnpm
 
       # Frozen install: the committed lockfile is the contract, so CI cannot
       # quietly resolve a different dependency tree than the one that was tested.
+      # Checked offline before switching this on: all 16 specifiers in
+      # package.json match pnpm-lock.yaml's importers, so a frozen install
+      # resolves cleanly.
       - name: Install (frozen)
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build once
-        run: npm run build
+        run: pnpm build
 
       # Package operates in place: the build already produced the artifact, so
       # this renders the host adapters into it, verifies it fail-closed, and
