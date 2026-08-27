@@ -28,6 +28,17 @@ MANIFEST_TTL_SECONDS = "300"
 # Where the iframe embed pages live (used by the /api/oembed route, Phase 2).
 EMBED_BASE = "https://catalog.lufs.audio"
 
+# --- Stream protection (see agent-knowledge: catalog-embedding/06-stream-protection) -------
+# TTL for the PUBLIC /api/stream presigns. Kept shorter than URL_TTL_SECONDS so a leaked URL
+# dies fast — but it MUST be >= the longest track + a buffer margin, or long tracks 403
+# mid-playback (HTML5 range requests re-validate the presign expiry on each request).
+# Longest track today ~16min (960s) -> 1200s (20min, ~25% margin).
+PUBLIC_STREAM_TTL_SECONDS = "1200"
+# Hostnames allowed to embed via /api/stream (EXTENDS the built-in LUFS allow-list in
+# src/gate.ts -> DEFAULT_EMBED_HOSTS). Comma-separated, host only. Direct address-bar
+# navigation and non-listed hosts get 403.
+EMBED_ALLOWED_HOSTS = "catalog.lufs.audio,lufs.audio,www.lufs.audio,danialrami.com,www.danialrami.com,resume.danialrami.com,localhost"
+
 # Secrets — DO NOT put here. Set them once with:
 #   npx wrangler secret put R2_ACCOUNT_ID
 #   npx wrangler secret put R2_ACCESS_KEY_ID

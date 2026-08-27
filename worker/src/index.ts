@@ -15,16 +15,33 @@
  *       GET https://stream.lufsaud.io/api/oembed?url=<release-or-embed-url>&format=json
  *       → { version, type:"rich", html:"<iframe …/embed/<id>>", title, thumbnail_url, ... }
  *
+ * STREAM PROTECTION (Phase 0 + Phase 1, 2026-06-22). The public route used to be a wide-open
+ * 302 to a downloadable R2 object — pasting it in a browser served the raw MP3. We hardened it
+ * WITHOUT breaking cross-site embedding or the AnalyserNode visualizers:
+ *   - Phase 0: every presign now forces `Content-Disposition: inline` + a correct
+ *     `Content-Type` (browser plays, no download dialog), and the public route uses its own
+ *     TTL (`PUBLIC_STREAM_TTL_SECONDS`) so a leaked URL dies fast. That TTL MUST be ≥ the
+ *     longest track + a buffer margin, or long tracks 403 mid-playback (HTML5 range requests
+ *     re-validate expiry). Longest track ≈16min → default 1200s.
+ *   - Phase 1: `/api/stream` is gated by `isEmbedAllowed()` — same-site + allow-listed LUFS
+ *     hosts pass; direct address-bar navigation and foreign hotlinks get 403.
+ * Hard controls (HMAC tokens / Worker byte-proxy) are Phase 2 — deliberately deferred. See
+ * the agent-knowledge `catalog-embedding/06-stream-protection` doc for the full rationale.
+ * Audio that a browser can play can never be made truly undownloadable; this is friction +
+ * revocability, proportionate to a small catalog — not DRM.
+ *
  * The public routes default to permissive CORS (embedding is the goal); the legacy ?key=
  * path stays origin-locked. NOTE: audio BYTES are served by R2 after the 302, so a
  * cross-origin AnalyserNode also needs the R2 bucket CORS policy (worker/r2-cors.json).
  *
  * Secrets: R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
- * Vars: ALLOWED_ORIGIN, R2_BUCKET_NAME, URL_TTL_SECONDS, MANIFEST_URL, MANIFEST_TTL_SECONDS, EMBED_BASE
+ * Vars: ALLOWED_ORIGIN, R2_BUCKET_NAME, URL_TTL_SECONDS, PUBLIC_STREAM_TTL_SECONDS,
+ *       EMBED_ALLOWED_HOSTS, MANIFEST_URL, MANIFEST_TTL_SECONDS, EMBED_BASE
  */
 import { AwsClient } from 'aws4fetch';
 import { resolveStreamId, firstTrackOfRelease, type ManifestTrack, type StreamManifest } from './resolve';
 import { loadManifest } from './manifest';
+import { isEmbedAllowed, parseHostList, contentTypeForKey, presignParams } from './gate';
 
 export interface Env {
   R2_ACCOUNT_ID: string;
@@ -33,6 +50,11 @@ export interface Env {
   R2_BUCKET_NAME: string;
   ALLOWED_ORIGIN: string;
   URL_TTL_SECONDS?: string;
+  /** TTL for the PUBLIC /api/stream route. MUST be ≥ longest track + margin. Default 1200. */
+  PUBLIC_STREAM_TTL_SECONDS?: string;
+  /** Comma-separated hostnames allowed to embed via the public route (extends the built-in
+   *  LUFS allow-list). */
+  EMBED_ALLOWED_HOSTS?: string;
   MANIFEST_URL?: string;
   MANIFEST_TTL_SECONDS?: string;
   EMBED_BASE?: string; // e.g. "https://catalog.lufs.audio"
@@ -63,6 +85,12 @@ function ttlOf(env: Env): number {
   return Math.min(parseInt(env.URL_TTL_SECONDS || '3600', 10) || 3600, 86400);
 }
 
+/** Public-route TTL. Kept separate + shorter so a leaked /api/stream URL dies fast, but it
+ *  must still exceed the longest track (range requests re-validate expiry mid-playback). */
+function publicTtlOf(env: Env): number {
+  return Math.min(parseInt(env.PUBLIC_STREAM_TTL_SECONDS || '1200', 10) || 1200, 86400);
+}
+
 async function presign(env: Env, key: string, ttl: number): Promise<string> {
   const aws = new AwsClient({
     accessKeyId: env.R2_ACCESS_KEY_ID,
@@ -72,7 +100,9 @@ async function presign(env: Env, key: string, ttl: number): Promise<string> {
   });
   const encodedKey = key.split('/').map(encodeURIComponent).join('/');
   const base = `https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${env.R2_BUCKET_NAME}/${encodedKey}`;
-  const signed = await aws.sign(`${base}?X-Amz-Expires=${ttl}`, { method: 'GET', aws: { signQuery: true } });
+  // Force inline playback + a correct media type on the object response, then sign the lot.
+  const query = presignParams(ttl, contentTypeForKey(key));
+  const signed = await aws.sign(`${base}?${query.toString()}`, { method: 'GET', aws: { signQuery: true } });
   return signed.url;
 }
 
@@ -125,6 +155,23 @@ async function handleStream(request: Request, env: Env, id: string): Promise<Res
   const wantJson = url.searchParams.get('format') === 'json';
   const cc = publicCors();
 
+  // Phase 1 gate: same-site + allow-listed LUFS hosts pass; address-bar navigation and
+  // foreign hotlinks are denied. Soft (headers are spoofable) but it closes the casual
+  // download/hotlink vector without breaking legitimate cross-site embeds.
+  const gate = isEmbedAllowed({
+    secFetchSite: request.headers.get('Sec-Fetch-Site'),
+    origin: request.headers.get('Origin'),
+    referer: request.headers.get('Referer'),
+    allowHosts: parseHostList(env.EMBED_ALLOWED_HOSTS),
+  });
+  if (!gate.allowed) {
+    console.warn(JSON.stringify({ at: 'stream', event: 'gate_denied', id, reason: gate.reason }));
+    return new Response(JSON.stringify({
+      error: 'forbidden_embed',
+      message: 'This stream URL is playable only when embedded on an approved LUFS site.',
+    }), { status: 403, headers: { ...JSON_HEADERS, ...cc } });
+  }
+
   let manifest: StreamManifest;
   try {
     manifest = await getManifest(env);
@@ -146,7 +193,16 @@ async function handleStream(request: Request, env: Env, id: string): Promise<Res
     }), { status, headers: { ...JSON_HEADERS, ...cc } });
   }
 
-  const ttl = ttlOf(env);
+  const ttl = publicTtlOf(env);
+  // Observability: warn if the configured TTL can't cover this track's full length — the
+  // browser will 403 on a range request past expiry. Tells us to raise PUBLIC_STREAM_TTL_SECONDS.
+  if (typeof r.track.duration === 'number' && r.track.duration + 30 > ttl) {
+    console.warn(JSON.stringify({
+      at: 'stream', event: 'ttl_too_short', id: r.track.id,
+      durationSec: r.track.duration, ttlSec: ttl,
+    }));
+  }
+
   let playable: string;
   try {
     playable = await urlForTrack(env, r.track, ttl);
